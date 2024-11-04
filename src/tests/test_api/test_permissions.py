@@ -11,7 +11,7 @@ class TestTransformRequest:
         """Prove that 'type' field is checked for authorization."""
         with pytest.raises(ProblemJsonException, match="ZoekMetPostcodeEnHuisnummer"):
             validate_parameters(
-                ruleset=views.HaalCentraalBRP.parameter_ruleset,
+                ruleset=views.BrpPersonenView.parameter_ruleset,
                 hc_request={"type": "ZoekMetPostcodeEnHuisnummer"},
                 user_scopes=set(),
             )
@@ -24,7 +24,7 @@ class TestTransformRequest:
         """Prove that search outside Amsterdam is denied."""
         with pytest.raises(ProblemJsonException, match="gemeenteVanInschrijving"):
             validate_parameters(
-                ruleset=views.HaalCentraalBRP.parameter_ruleset,
+                ruleset=views.BrpPersonenView.parameter_ruleset,
                 hc_request={
                     "type": "RaadpleegMetBurgerservicenummer",
                     "gemeenteVanInschrijving": "0111",
@@ -40,7 +40,7 @@ class TestTransformRequest:
         """Prove that searching 'verblijfplaats' is not possible without extra permissions."""
         with pytest.raises(ProblemJsonException, match="verblijfplaats"):
             validate_parameters(
-                ruleset=views.HaalCentraalBRP.parameter_ruleset,
+                ruleset=views.BrpPersonenView.parameter_ruleset,
                 hc_request={
                     "type": "ZoekMetPostcodeEnHuisnummer",
                     "fields": ["verblijfplaats"],

@@ -306,6 +306,21 @@ HAAL_CENTRAAL_KEY_FILE = env.str("HAAL_CENTRAAL_KEY_FILE", None)
 HAAL_CENTRAAL_CERT_FILE = env.str("HAAL_CENTRAAL_CERT_FILE", None)
 
 HAAL_CENTRAAL_BRP_URL = env.str(
-    "HAAL_CENTRAAL_BRP_URL",
-    "https://proefomgeving.haalcentraal.nl/haalcentraal/api/brp/personen",
+    "HAAL_CENTRAAL_BRP_PERSONEN_URL",
+    default=env.str(
+        "HAAL_CENTRAAL_BRP_URL",  # Allow old name too.
+        "https://proefomgeving.haalcentraal.nl/haalcentraal/api/brp/personen",
+    ),
+)
+HAAL_CENTRAAL_BRP_BEWONINGEN_URL = env.str(
+    "HAAL_CENTRAAL_BRP_BEWONINGEN_URL",
+    "https://demo-omgeving.haalcentraal.nl/haalcentraal/api/bewoning/bewoningen",
+)
+HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL = env.str(
+    "HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL",
+    "https://demo-omgeving.haalcentraal.nl/haalcentraal/api/brphistorie/verblijfplaatshistorie",
+)
+HAAL_CENTRAAL_REISDOCUMENTEN_URL = env.str(
+    "HAAL_CENTRAAL_REISDOCUMENTEN_URL",
+    "https://proefomgeving.haalcentraal.nl/haalcentraal/api/reisdocumenten/reisdocumenten",
 )

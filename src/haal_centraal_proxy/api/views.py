@@ -127,11 +127,10 @@ class BaseProxyView(APIView):
                     self._rewrite_links(child, rewrites, in_links)
 
 
-class HaalCentraalBRP(BaseProxyView):
-    """View that proxies Haal Centraal BRP.
+class BrpPersonenView(BaseProxyView):
+    """View that proxies Haal Centraal BRP 'personen' (persons).
 
-    See:
-    https://brp-api.github.io/Haal-Centraal-BRP-bevragen/
+    See: https://brp-api.github.io/Haal-Centraal-BRP-bevragen/
     """
 
     endpoint_url = settings.HAAL_CENTRAAL_BRP_URL
@@ -236,3 +235,100 @@ class HaalCentraalBRP(BaseProxyView):
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
             hc_request.setdefault("gemeenteVanInschrijving", GEMEENTE_AMSTERDAM_CODE)
+
+
+class BrpBewoningenView(BaseProxyView):
+    """View to proxy Haal Centraal Bewoning (ocupancy).
+
+    See: https://brp-api.github.io/Haal-Centraal-BRP-bewoning/
+    """
+
+    endpoint_url = settings.HAAL_CENTRAAL_BRP_BEWONINGEN_URL
+
+    # Require extra scopes
+    needed_scopes = {"BRP/RO"}
+
+    # Validate the access to various parameters:
+    parameter_ruleset = {
+        "type": ParameterPolicy(
+            scopes_for_values={
+                "BewoningMetPeildatum": {"BRP/zoek-bewoningen"},
+                "BewoningMetPeriode": {"BRP/zoek-bewoningen"},
+            }
+        ),
+        "adresseerbaarObjectIdentificatie": ParameterPolicy.allow_all,  # used for both types.
+        "peildatum": ParameterPolicy.allow_all,  # for BewoningMetPeildatum
+        "datumTot": ParameterPolicy.allow_all,  # for BewoningMetPeriode
+        "datumVan": ParameterPolicy.allow_all,  # for BewoningMetPeriode
+    }
+
+
+class BrpVerblijfsplaatsHistorieView(BaseProxyView):
+    """View that proxies Haal Centraal BRP Verblijfplaatshistorie of a person (residence history).
+
+    See: https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/
+    """
+
+    endpoint_url = settings.HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL
+
+    # Require extra scopes
+    needed_scopes = {"BRP/RO"}
+
+    # A quick dictionary to automate permission-based access to certain filter parameters.
+    parameter_ruleset = {
+        "type": ParameterPolicy(
+            scopes_for_values={
+                "RaadpleegMetPeildatum": {"BRP/zoek-historie"},
+                "RaadpleegMetPeriode": {"BRP/zoek-historie"},
+            }
+        ),
+        "burgerservicenummer": ParameterPolicy.allow_all,  # used for both request types.
+        "peildatum": ParameterPolicy.allow_all,  # for RaadpleegMetPeildatum
+        "datumTot": ParameterPolicy.allow_all,  # for RaadpleegMetPeriode
+        "datumVan": ParameterPolicy.allow_all,  # for RaadpleegMetPeriode
+    }
+
+
+class ReisdocumentenView(BaseProxyView):
+    """View to proxy Haal Centraal Reisdocumenten (travel documents).
+
+    See: https://brp-api.github.io/Haal-Centraal-Reisdocumenten-bevragen/
+    """
+
+    endpoint_url = settings.HAAL_CENTRAAL_REISDOCUMENTEN_URL
+
+    # Require extra scopes
+    needed_scopes = {"BRP/RO"}
+
+    # A quick dictionary to automate permission-based access to certain filter parameters.
+    parameter_ruleset = {
+        "type": ParameterPolicy(
+            scopes_for_values={
+                "RaadpleegMetReisdocumentnummer": {"BRP/zoek-doc"},
+                "ZoekMetBurgerservicenummer": {"BRP/zoek-doc-bsn"},
+            }
+        ),
+        "fields": ParameterPolicy(
+            scopes_for_values={
+                # Extracted from redoc and
+                # https://github.com/BRP-API/Haal-Centraal-Reisdocumenten-bevragen/blob/master/src/Reisdocument.Validatie/Validators/ReisdocumentenQueryValidator.cs
+                "reisdocumentnummer": {"BRP/x"},
+                "soort": {"BRP/x"},
+                "soort.*": {"BRP/x"},
+                "houder": {"BRP/x"},
+                "houder.*": {"BRP/x"},
+                "datumEindeGeldigheid": {"BRP/x"},
+                "datumEindeGeldigheid.*": {"BRP/x"},
+                "inhoudingOfVermissing": {"BRP/x"},
+                "inhoudingOfVermissing.*": {"BRP/x"},
+            }
+        ),
+        "reisdocumentnummer": ParameterPolicy(
+            # for RaadpleegMetReisdocumentnummer
+            default_scope={"BRP/zoek-doc"}
+        ),
+        "burgerservicenummer": ParameterPolicy(
+            # for ZoekMetBurgerservicenummer
+            default_scope={"BRP/zoek-doc-bsn"}
+        ),
+    }

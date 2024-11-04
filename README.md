@@ -75,7 +75,10 @@ The following environment variables are useful for configuring a local developme
 
 Connections:
 
-* `HAAL_CENTRAAL_BRP_URL` endpoint for the Haal Centraal BRP API.
+* `HAAL_CENTRAAL_BRP_PERSONEN_URL` endpoint for the Haal Centraal BRP Personen API.
+* `HAAL_CENTRAAL_BRP_BEWONINGEN_URL` endpoint for the BRP occupancy URL.
+* `HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL` endpoint for the address history URL.
+* `HAAL_CENTRAAL_REISDOCUMENTEN_URL` endpoint for the travel documents URL.
 * `HAAL_CENTRAAL_API_KEY` the API key for Haal Centraal
 * `HAAL_CENTRAAL_CERT_FILE` the mTLS certificate for Haal Centraal.
 * `HAAL_CENTRAAL_KEY_FILE` the mTLS key file for Haal Centraal.
