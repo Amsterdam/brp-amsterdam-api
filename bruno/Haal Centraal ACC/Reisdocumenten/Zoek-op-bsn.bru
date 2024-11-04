@@ -1,0 +1,29 @@
+meta {
+  name: Zoek-op-bsn
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://proefomgeving.haalcentraal.nl/haalcentraal/api/reisdocumenten/reisdocumenten
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json; charset=utf-8
+  X-API-Key: {{process.env.HAAL_CENTRAAL_API_KEY}}
+  Accept: application/json; charset=utf-8
+}
+
+body:json {
+  // client  --->  Haal Centraal ACC
+  // data from https://github.com/BRP-API/Haal-Centraal-BRP-historie-bevragen/blob/master/scripts/20220502_Testset_persoonslijsten_proefomgeving_GBA-V.csv
+
+  {
+    "type": "ZoekMetBurgerservicenummer",
+    "burgerservicenummer": "999993240",
+    "fields": ["reisdocumentnummer", "soort", "houder", "datumEindeGeldigheid", "inhoudingOfVermissing"]
+  }
+
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Zoek-op-pijldatum
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://demo-omgeving.haalcentraal.nl/haalcentraal/api/brphistorie/verblijfplaatshistorie
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json; charset=utf-8
+  X-API-Key: {{process.env.HAAL_CENTRAAL_API_KEY}}
+  Accept: application/json; charset=utf-8
+}
+
+body:json {
+  // client  --->  Haal Centraal ACC
+
+
+  {
+    "type": "RaadpleegMetPeildatum",
+    "burgerservicenummer": "999993240",
+    "peildatum": "2020-09-24"
+  }
+
+}
