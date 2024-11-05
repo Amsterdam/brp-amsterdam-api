@@ -9,7 +9,8 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from . import permissions
-from .client import HaalCentraalClient
+from .client import HaalCentraalClient, HaalCentraalResponse
+from .permissions import audit_log
 
 logger = logging.getLogger(__name__)
 
@@ -74,24 +75,73 @@ class BaseProxyView(APIView):
         The API uses POST so the logs won't include personally identifiable information (PII).
         """
         # Check the request
+        user_id = request.get_token_claims.get("email", request.get_token_subject)
         user_scopes = set(request.get_token_scopes)
         hc_request = request.data.copy()
 
         self.transform_request(hc_request, user_scopes)
-        permissions.validate_parameters(
+        all_needed_scopes = permissions.validate_parameters(
             self.parameter_ruleset, hc_request, user_scopes, service_log_id=self.service_log_id
         )
 
         # Proxy to Haal Centraal
-        response = self.client.call(hc_request)
+        hc_response = self.client.call(hc_request)
 
         # Rewrite the response to pagination still works.
-        self.transform_response(response.data)
+        # (currently in in-place)
+        self.transform_response(hc_response.data)
+
+        # Post it to audit logging
+        self.log_access(
+            request,
+            hc_request,
+            hc_response,
+            user_id=user_id,
+            user_scopes=user_scopes,
+            needed_scopes=all_needed_scopes,
+        )
 
         # And return it.
         return HttpResponse(
-            orjson.dumps(response.data),
-            content_type=response.headers.get("Content-Type"),
+            orjson.dumps(hc_response.data),
+            content_type=hc_response.headers.get("Content-Type"),
+        )
+
+    def log_access(
+        self,
+        request,
+        hc_request: dict,
+        hc_response: HaalCentraalResponse,
+        user_id: str,
+        user_scopes: set[str],
+        needed_scopes: set[str],
+    ) -> None:
+        """Perform the audit logging for the request/response.
+
+        This is a very basic global logging.
+        Per service type, it may need more refinement.
+        """
+        # user.AuthenticatedId is already added globally.
+        # TODO:
+        # - Per record (in lijst) een log melding doen.
+        # - afnemerindicatie (client certificaat)
+        # - session ID van afnemende applicatie.
+        # - A-nummer in de response
+        audit_log.info(
+            "Access granted to '%(service)s' for '%(user)s, full request/response",
+            {
+                "service": self.service_log_id,
+                "user": user_id,
+            },
+            extra={
+                "service": self.service_log_id,
+                "user": user_id,
+                "granted": sorted(user_scopes),
+                "needed": sorted(needed_scopes),
+                "request": request.data,
+                "hc_request": hc_request,
+                "hc_response": hc_response.data,
+            },
         )
 
     def transform_request(self, hc_request: dict, user_scopes: set) -> None:

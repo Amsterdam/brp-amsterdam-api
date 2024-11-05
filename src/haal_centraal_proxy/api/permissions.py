@@ -81,8 +81,14 @@ def validate_parameters(
     user_scopes: set[str],
     *,
     service_log_id: str,
-):
-    """Check the parameters of the query"""
+) -> set[str]:
+    """Validate the incoming request against the ruleset of allowed parameters/values.
+
+    When access is denied, this will raise an exception that returns the desired error response.
+    Both grants/denies are logged to the audit log as well.
+
+    :returns: The needed scopes needed to satify the request.
+    """
     request_type = hc_request.get("type")
     if not request_type:
         raise ProblemJsonException(
@@ -129,6 +135,7 @@ def validate_parameters(
             "granted": sorted(user_scopes),
         },
     )
+    return all_needed_scopes
 
 
 def _validate_parameter_values(
