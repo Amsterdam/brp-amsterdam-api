@@ -120,6 +120,24 @@ class TestBrpPersonenView:
         assert response.status_code == 200
         assert response.json() == self.RESPONSE_POSTCODE_HUISNUMMER
 
+    def test_bsn_search_deny(self, api_client):
+        """Prove that search is possible"""
+        url = reverse("brp-personen")
+        token = build_jwt_token(["BRP/RO"])
+
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                "fields": ["naam"],
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"
+
     def test_add_gemeente_filter(self):
         """Prove that gemeente-filter is added."""
         view = views.BrpPersonenView()
@@ -168,6 +186,23 @@ class TestBrpBewoningenView:
         )
         assert response.status_code == 200, response
         assert response.json() == self.RESPONSE_BEWONINGEN
+
+    def test_address_id_search_deny(self, api_client):
+        """Prove that acess is checked"""
+        url = reverse("brp-bewoningen")
+        token = build_jwt_token(["BRP/RO"])
+
+        response = api_client.post(
+            url,
+            {
+                "type": "BewoningMetPeildatum",
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "peildatum": "2020-09-24",
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"
 
 
 class BrpVerblijfsplaatsHistorieView:
@@ -225,6 +260,22 @@ class BrpVerblijfsplaatsHistorieView:
         assert response.status_code == 200, response
         assert response.json() == self.RESPONSE_VERBLIJFSPLAATS
 
+    def test_bsn_date_search_deny(self, api_client):
+        """Prove that acess is checked"""
+        url = reverse("brp-verblijfsplaatshistorie")
+        token = build_jwt_token(["BRP/RO"])
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetPeildatum",
+                "burgerservicenummer": "999993240",
+                "peildatum": "2020-09-24",
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"
+
 
 class TestReisdocumentenView:
     """Prove that the API works as advertised."""
@@ -274,3 +325,25 @@ class TestReisdocumentenView:
         )
         assert response.status_code == 200, response.data
         assert response.json() == self.RESPONSE_REISDOCUMENTEN
+
+    def test_bsn_search__deny(self, api_client):
+        """Prove that acess is checked"""
+        url = reverse("reisdocumenten")
+        token = build_jwt_token(["BRP/RO"])
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetBurgerservicenummer",
+                "burgerservicenummer": "999993240",
+                "fields": [
+                    "reisdocumentnummer",
+                    "soort",
+                    "houder",
+                    "datumEindeGeldigheid",
+                    "inhoudingOfVermissing",
+                ],
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"

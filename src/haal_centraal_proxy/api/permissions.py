@@ -188,7 +188,7 @@ def _validate_parameter_values(
         raise ProblemJsonException(
             title="U bent niet geautoriseerd voor deze operatie.",
             detail=f"U bent niet geautoriseerd voor {field_name} = {', '.join(denied_values)}.",
-            code="permissionDenied",
+            code="permissionDenied",  # Same as what Haal Centraal would do.
             status=status.HTTP_403_FORBIDDEN,
         )
 
