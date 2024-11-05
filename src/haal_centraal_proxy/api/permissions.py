@@ -75,7 +75,13 @@ class ParameterPolicy:
 ParameterPolicy.allow_all = ParameterPolicy(default_scope=set())
 
 
-def validate_parameters(ruleset: dict[str, ParameterPolicy], hc_request, user_scopes: set[str]):
+def validate_parameters(
+    ruleset: dict[str, ParameterPolicy],
+    hc_request,
+    user_scopes: set[str],
+    *,
+    service_log_id: str,
+):
     """Check the parameters of the query"""
     request_type = hc_request.get("type")
     if not request_type:
@@ -95,7 +101,9 @@ def validate_parameters(ruleset: dict[str, ParameterPolicy], hc_request, user_sc
         except KeyError:
             invalid_names.append(field_name)
         else:
-            needed_for_param = _check_parameter_values(policy, field_name, values, user_scopes)
+            needed_for_param = _validate_parameter_values(
+                policy, field_name, values, user_scopes, service_log_id=service_log_id
+            )
             all_needed_scopes.update(needed_for_param)
 
     if invalid_names:
@@ -107,22 +115,28 @@ def validate_parameters(ruleset: dict[str, ParameterPolicy], hc_request, user_sc
         )
 
     audit_log.info(
-        "Granted access for %(type)s, needed: %(needed)s, granted: %(granted)s",
+        "Granted access for %(service)s.%(type)s, needed: %(needed)s, granted: %(granted)s",
         {
-            "type": hc_request.get("type", "<unknown type>"),
-            "granted": ",".join(sorted(user_scopes)),
+            "service": service_log_id,
+            "type": request_type,
             "needed": ",".join(sorted(all_needed_scopes)),
+            "granted": ",".join(sorted(user_scopes)),
         },
         extra={
-            "type": hc_request.get("type", "<unknown type>"),
-            "granted": sorted(user_scopes),
+            "service": service_log_id,
+            "type": request_type,
             "needed": sorted(all_needed_scopes),
+            "granted": sorted(user_scopes),
         },
     )
 
 
-def _check_parameter_values(
-    policy: ParameterPolicy, field_name: str, values: list | str, user_scopes: set[str]
+def _validate_parameter_values(
+    policy: ParameterPolicy,
+    field_name: str,
+    values: list | str,
+    user_scopes: set[str],
+    service_log_id: str,
 ):
     """Check whether the given parameter values are allowed."""
     is_multiple = isinstance(values, list)
@@ -156,11 +170,15 @@ def _check_parameter_values(
 
     if denied_values:
         audit_log.info(
-            "Denied access to %s=%s, missing %s",
-            field_name,
-            ",".join(denied_values),
-            ",".join(sorted(all_needed_scopes - user_scopes)),
+            "Denied access to '%(service)s' using %(field)s=%(values)s, missing %(missing)s",
+            {
+                "service": service_log_id,
+                "field": field_name,
+                "values": ",".join(denied_values),
+                "missing": ",".join(sorted(all_needed_scopes - user_scopes)),
+            },
             extra={
+                "service": service_log_id,
                 "field": field_name,
                 "values": denied_values,
                 "granted": sorted(user_scopes),

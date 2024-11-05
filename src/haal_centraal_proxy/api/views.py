@@ -30,9 +30,15 @@ class BaseProxyView(APIView):
     #: Define which additional scopes are needed
     client_class = HaalCentraalClient
 
-    # Need to define for every sublass:
+    # Need to define for every subclass:
+
+    #: An random short-name for the service name in logging statements
+    service_log_id: str = None
+    #: Which endpoint to proxy
     endpoint_url: str = None
+    #: The based scopes needed for all requests.
     needed_scopes: set = None
+    #: The ruleset which parameters are allowed, or require additional roles.
     parameter_ruleset: dict[str, ParameterPolicy] = None
 
     def setup(self, request, *args, **kwargs):
@@ -72,7 +78,9 @@ class BaseProxyView(APIView):
         hc_request = request.data.copy()
 
         self.transform_request(hc_request, user_scopes)
-        permissions.validate_parameters(self.parameter_ruleset, hc_request, user_scopes)
+        permissions.validate_parameters(
+            self.parameter_ruleset, hc_request, user_scopes, service_log_id=self.service_log_id
+        )
 
         # Proxy to Haal Centraal
         response = self.client.call(hc_request)
@@ -133,6 +141,7 @@ class BrpPersonenView(BaseProxyView):
     See: https://brp-api.github.io/Haal-Centraal-BRP-bevragen/
     """
 
+    service_log_id = "personen"
     endpoint_url = settings.HAAL_CENTRAAL_BRP_URL
 
     # Require extra scopes
@@ -243,6 +252,7 @@ class BrpBewoningenView(BaseProxyView):
     See: https://brp-api.github.io/Haal-Centraal-BRP-bewoning/
     """
 
+    service_log_id = "bewoningen"
     endpoint_url = settings.HAAL_CENTRAAL_BRP_BEWONINGEN_URL
 
     # Require extra scopes
@@ -269,6 +279,7 @@ class BrpVerblijfsplaatsHistorieView(BaseProxyView):
     See: https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/
     """
 
+    service_log_id = "verblijfsplaatshistorie"
     endpoint_url = settings.HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL
 
     # Require extra scopes
@@ -295,6 +306,7 @@ class ReisdocumentenView(BaseProxyView):
     See: https://brp-api.github.io/Haal-Centraal-Reisdocumenten-bevragen/
     """
 
+    service_log_id = "reisdocumenten"
     endpoint_url = settings.HAAL_CENTRAAL_REISDOCUMENTEN_URL
 
     # Require extra scopes

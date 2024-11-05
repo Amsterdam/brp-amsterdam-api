@@ -14,10 +14,11 @@ class TestTransformRequest:
                 ruleset=views.BrpPersonenView.parameter_ruleset,
                 hc_request={"type": "ZoekMetPostcodeEnHuisnummer"},
                 user_scopes=set(),
+                service_log_id="personen",
             )
-        assert (
-            caplog.messages[0]
-            == "Denied access to type=ZoekMetPostcodeEnHuisnummer, missing BRP/zoek-postcode"
+        assert caplog.messages[0] == (
+            "Denied access to 'personen' using type=ZoekMetPostcodeEnHuisnummer, "
+            "missing BRP/zoek-postcode"
         )
 
     def test_deny_other_gemeente(self, caplog):
@@ -30,10 +31,11 @@ class TestTransformRequest:
                     "gemeenteVanInschrijving": "0111",
                 },
                 user_scopes={"BRP/zoek-bsn"},
+                service_log_id="personen",
             )
-        assert (
-            caplog.messages[0]
-            == "Denied access to gemeenteVanInschrijving=0111, missing BRP/buiten-gemeente"
+        assert caplog.messages[0] == (
+            "Denied access to 'personen' using gemeenteVanInschrijving=0111, "
+            "missing BRP/buiten-gemeente"
         )
 
     def test_deny_field_access(self, caplog):
@@ -46,8 +48,9 @@ class TestTransformRequest:
                     "fields": ["verblijfplaats"],
                 },
                 user_scopes={"BRP/zoek-postcode"},
+                service_log_id="personen",
             )
-        assert (
-            caplog.messages[0]
-            == "Denied access to fields=verblijfplaats, missing BRP/adres-buitenland"
+        assert caplog.messages[0] == (
+            "Denied access to 'personen' using fields=verblijfplaats, "
+            "missing BRP/adres-buitenland"
         )
