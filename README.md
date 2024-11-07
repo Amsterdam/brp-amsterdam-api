@@ -42,6 +42,7 @@ All possible parameters are documented in the [Haal Centraal documentation](http
 
 ## Using Local Python
 
+
 Create a virtualenv:
 
 ```shell
@@ -64,6 +65,17 @@ export DJANGO_DEBUG=true
 
 ./manage.py runserver localhost:8000
 ```
+
+## Available Endpoints
+
+The following URLs are available:
+
+| API                                  | Description                              | Setting for Proxy URL                            | Docs                                                                     |
+|--------------------------------------|------------------------------------------|--------------------------------------------------|--------------------------------------------------------------------------|
+| `/api/brp/personen`                  | Person details.                          | `HAAL_CENTRAAL_BRP_PERSONEN_URL`                 | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)            |
+| `/api/brp/bewoningen`                | Who lived at an address.                 | `HAAL_CENTRAAL_BRP_BEWONINGEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)            |
+| `/api/brp/verblijfsplaatshistorie`   | All addresses where someone lived.       | `HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)   |
+| `/api/reisdocumenten/reisdocumenten` | Check travel documents (e.g. passports). | `HAAL_CENTRAAL_REISDOCUMENTEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-Reisdocumenten-bevragen/) |
 
 ## Environment Settings
 
