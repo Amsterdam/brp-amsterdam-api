@@ -2,7 +2,7 @@ services:
   personen-mock:
     # from https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/docker-compose-mock.yml
     container_name: personen-mock
-    image: ghcr.io/brp-api/personen-mock:2.2.1-latest
+    image: ghcr.io/brp-api/personen-mock:2.3.0-latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://+:5010
