@@ -11,7 +11,7 @@ _USE_SECRET_STORE = Path("/mnt/secrets-store").exists()
 SRC_DIR = Path(__file__).parents[1]
 
 CLOUD_ENV = env.str("CLOUD_ENV", "default").lower()
-DEBUG = env.bool("DJANGO_DEBUG", not bool(CLOUD_ENV))
+DEBUG = env.bool("DJANGO_DEBUG", default=(CLOUD_ENV == "default"))
 
 # Whitenoise needs a place to store static files and their gzipped versions.
 STATIC_ROOT = env.str("STATIC_ROOT", str(SRC_DIR.parent / "web/static"))
@@ -267,6 +267,16 @@ if CLOUD_ENV.startswith("azure"):
 
 
 # -- Third party app settings
+
+if DEBUG:
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        r"^http://localhost(?::\d+)?/",
+        r"^http://127.0.0.1(?::\d+)?/",
+    ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=False)
 
 HEALTH_CHECKS = {
     "app": lambda request: True,
