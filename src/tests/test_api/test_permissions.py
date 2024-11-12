@@ -18,7 +18,7 @@ class TestTransformRequest:
             )
         assert caplog.messages[0] == (
             "Denied access to 'personen' using type=ZoekMetPostcodeEnHuisnummer, "
-            "missing BRP/zoek-postcode"
+            "missing benk-brp-zoekvraag-postcode-huisnummer"
         )
 
     def test_deny_other_gemeente(self, caplog):
@@ -30,7 +30,7 @@ class TestTransformRequest:
                     "type": "RaadpleegMetBurgerservicenummer",
                     "gemeenteVanInschrijving": "0111",
                 },
-                user_scopes={"BRP/zoek-bsn"},
+                user_scopes={"benk-brp-zoekvraag-bsn"},
                 service_log_id="personen",
             )
         assert caplog.messages[0] == (
@@ -47,7 +47,7 @@ class TestTransformRequest:
                     "type": "ZoekMetPostcodeEnHuisnummer",
                     "fields": ["verblijfplaats"],
                 },
-                user_scopes={"BRP/zoek-postcode"},
+                user_scopes={"benk-brp-zoekvraag-postcode-huisnummer"},
                 service_log_id="personen",
             )
         assert caplog.messages[0] == (

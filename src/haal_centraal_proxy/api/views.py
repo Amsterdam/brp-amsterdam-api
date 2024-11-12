@@ -195,18 +195,20 @@ class BrpPersonenView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_BRP_URL
 
     # Require extra scopes
-    needed_scopes = {"BRP/RO"}
+    needed_scopes = {"benk-brp-api"}
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
         "type": ParameterPolicy(
             scopes_for_values={
-                "RaadpleegMetBurgerservicenummer": {"BRP/zoek-bsn"},
-                "ZoekMetGeslachtsnaamEnGeboortedatum": {"BRP/zoek-naam-geb"},
+                "RaadpleegMetBurgerservicenummer": {"benk-brp-zoekvraag-bsn"},
+                "ZoekMetGeslachtsnaamEnGeboortedatum": {
+                    "benk-brp-zoekvraag-geslachtsnaam-geboortedatum"
+                },
                 "ZoekMetNaamEnGemeenteVanInschrijving": {"BRP/zoek-naam-gemeente"},
                 "ZoekMetAdresseerbaarObjectIdentificatie": {"BRP/zoek-adres-id"},
                 "ZoekMetNummeraanduidingIdentificatie": {"BRP/zoek-nummeraand-id"},
-                "ZoekMetPostcodeEnHuisnummer": {"BRP/zoek-postcode"},
+                "ZoekMetPostcodeEnHuisnummer": {"benk-brp-zoekvraag-postcode-huisnummer"},
                 "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving": {"BRP/zoek-straat"},
             }
         ),
@@ -275,14 +277,15 @@ class BrpPersonenView(BaseProxyView):
         "nummeraanduidingIdentificatie": ParameterPolicy.allow_all,
         "adresseerbaarObjectIdentificatie": ParameterPolicy.allow_all,
         "verblijfplaats": ParameterPolicy.for_all_values({"BRP/in-buitenland"}),
-        "burgerservicenummer": ParameterPolicy.for_all_values({"BRP/zoek-bsn"}),
+        "burgerservicenummer": ParameterPolicy.for_all_values({"benk-brp-zoekvraag-bsn"}),
         "inclusiefOverledenPersonen": ParameterPolicy(
             scopes_for_values={
-                "true": {"BRP/in-overl"},
+                "true": {"benk-brp-inclusief-overledenen"},
                 "false": ALLOW_VALUE,
             }
         ),
         "gemeenteVanInschrijving": ParameterPolicy(
+            # NOTE: no benk-brp-amsterdam ?
             {GEMEENTE_AMSTERDAM_CODE: ALLOW_VALUE},  # ok to include ?gemeenteVanInschrijving=0363
             default_scope=SCOPE_NATIONWIDE,
         ),
@@ -306,7 +309,7 @@ class BrpBewoningenView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_BRP_BEWONINGEN_URL
 
     # Require extra scopes
-    needed_scopes = {"BRP/RO"}
+    needed_scopes = {"benk-brp-api"}
 
     # Validate the access to various parameters:
     parameter_ruleset = {
@@ -333,7 +336,7 @@ class BrpVerblijfsplaatsHistorieView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL
 
     # Require extra scopes
-    needed_scopes = {"BRP/RO"}
+    needed_scopes = {"benk-brp-api"}
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
@@ -360,7 +363,7 @@ class ReisdocumentenView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_REISDOCUMENTEN_URL
 
     # Require extra scopes
-    needed_scopes = {"BRP/RO"}
+    needed_scopes = {"benk-brp-api"}
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {

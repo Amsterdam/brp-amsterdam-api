@@ -37,7 +37,7 @@ class TestBaseProxyView:
     def test_invalid_api_key(self, api_client, urllib3_mocker):
         """Prove that incorrect API-key settings are handled gracefully."""
         url = reverse("brp-personen")
-        token = build_jwt_token(["BRP/RO", "BRP/zoek-postcode"])
+        token = build_jwt_token(["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer"])
         urllib3_mocker.add(
             "POST",
             "/haalcentraal/api/brp/personen",
@@ -99,7 +99,7 @@ class TestBrpPersonenView:
     def test_bsn_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
         url = reverse("brp-personen")
-        token = build_jwt_token(["BRP/RO", "BRP/zoek-postcode"])
+        token = build_jwt_token(["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer"])
         urllib3_mocker.add(
             "POST",
             "/haalcentraal/api/brp/personen",
@@ -123,7 +123,7 @@ class TestBrpPersonenView:
     def test_bsn_search_deny(self, api_client):
         """Prove that search is possible"""
         url = reverse("brp-personen")
-        token = build_jwt_token(["BRP/RO"])
+        token = build_jwt_token(["benk-brp-api"])
 
         response = api_client.post(
             url,
@@ -142,7 +142,7 @@ class TestBrpPersonenView:
         """Prove that gemeente-filter is added."""
         view = views.BrpPersonenView()
         hc_request = {"type": "RaadpleegMetBurgerservicenummer"}
-        view.transform_request(hc_request, user_scopes={"BRP/zoek-bsn"})
+        view.transform_request(hc_request, user_scopes={"benk-brp-zoekvraag-bsn"})
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
             "gemeenteVanInschrijving": "0363",
@@ -166,7 +166,7 @@ class TestBrpBewoningenView:
     def test_address_id_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
         url = reverse("brp-bewoningen")
-        token = build_jwt_token(["BRP/RO", "BRP/zoek-bewoningen"])
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-bewoningen"])
         urllib3_mocker.add(
             "POST",
             # https://demo-omgeving.haalcentraal.nl
@@ -190,7 +190,7 @@ class TestBrpBewoningenView:
     def test_address_id_search_deny(self, api_client):
         """Prove that acess is checked"""
         url = reverse("brp-bewoningen")
-        token = build_jwt_token(["BRP/RO"])
+        token = build_jwt_token(["benk-brp-api"])
 
         response = api_client.post(
             url,
@@ -239,7 +239,7 @@ class BrpVerblijfsplaatsHistorieView:
     def test_bsn_date_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
         url = reverse("brp-verblijfsplaatshistorie")
-        token = build_jwt_token(["BRP/RO", "BRP/zoek-historie"])
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-historie"])
         urllib3_mocker.add(
             "POST",
             # https://demo-omgeving.haalcentraal.nl
@@ -263,7 +263,7 @@ class BrpVerblijfsplaatsHistorieView:
     def test_bsn_date_search_deny(self, api_client):
         """Prove that acess is checked"""
         url = reverse("brp-verblijfsplaatshistorie")
-        token = build_jwt_token(["BRP/RO"])
+        token = build_jwt_token(["benk-brp-api"])
         response = api_client.post(
             url,
             {
@@ -299,7 +299,7 @@ class TestReisdocumentenView:
     def test_bsn_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
         url = reverse("reisdocumenten")
-        token = build_jwt_token(["BRP/RO", "BRP/zoek-doc-bsn", "BRP/x"])
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-doc-bsn", "BRP/x"])
         urllib3_mocker.add(
             "POST",
             # https://proefomgeving.haalcentraal.nl
@@ -329,7 +329,7 @@ class TestReisdocumentenView:
     def test_bsn_search__deny(self, api_client):
         """Prove that acess is checked"""
         url = reverse("reisdocumenten")
-        token = build_jwt_token(["BRP/RO"])
+        token = build_jwt_token(["benk-brp-api"])
         response = api_client.post(
             url,
             {
