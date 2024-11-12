@@ -107,7 +107,7 @@ Deployment:
 
 # Developer Notes
 
-Run `make` in the `src` folder to have an help-overview of all common developer tasks.
+Run `make` in the `src` folder to have a help-overview of all common developer tasks.
 
 ## Package Management
 

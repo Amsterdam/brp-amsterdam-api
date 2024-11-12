@@ -1,7 +1,7 @@
 """Client for Haal Centraal API.
 
-Endpoints are queried with raw urllib3,
-to avoid the overhead of the requests library.
+Endpoints are queried with raw *urllib3*,
+to avoid the overhead of the *requests* library.
 """
 
 import logging
@@ -15,7 +15,7 @@ import urllib3
 from more_ds.network.url import URL
 from rest_framework import status
 from rest_framework.exceptions import APIException, NotFound, ParseError, PermissionDenied
-from urllib3 import HTTPResponse
+from urllib3 import BaseHTTPResponse
 
 from .exceptions import BadGateway, GatewayTimeout, RemoteAPIException, ServiceUnavailable
 
@@ -67,7 +67,7 @@ class HaalCentraalClient:
         t0 = time.perf_counter_ns()
         try:
             # Using urllib directly instead of requests for performance
-            response: HTTPResponse = self._pool.request(
+            response: BaseHTTPResponse = self._pool.request(
                 "POST",
                 self.endpoint_url,
                 body=orjson.dumps(data),
@@ -103,7 +103,7 @@ class HaalCentraalClient:
             (time.perf_counter_ns() - t0) * 1e-9,
         )
 
-        if response.status >= 200 and response.status < 300:
+        if 200 <= response.status < 300:
             return HaalCentraalResponse(
                 headers=response.headers,
                 data=orjson.loads(response.data),
@@ -122,7 +122,7 @@ class HaalCentraalClient:
 
         raise self._get_http_error(response)
 
-    def _get_http_error(self, response: HTTPResponse) -> APIException:
+    def _get_http_error(self, response: BaseHTTPResponse) -> APIException:
         # Translate the remote HTTP error to the proper response.
         #
         # This translates some errors into a 502 "Bad Gateway" or 503 "Gateway Timeout"

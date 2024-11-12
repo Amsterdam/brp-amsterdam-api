@@ -29,7 +29,7 @@ class ParameterPolicy:
       ``ParameterPolicy(default_scope={"required-scope", "scope2"})`` (shorthand:
       ``ParameterPolicy.for_all_values(...)``).
     * Require a scope to allow certain values:
-      ``ParameterPolicy(scopes_for_values={"value1": {"required-scope", ...}, "value2": ...)``.
+      ``ParameterPolicy(scopes_for_values={"value1": {"required-scope", ...}, "value2": ...})``.
     * Require a scope, but allow a wildcard fallback:
       ``ParameterPolicy(scopes_for_values=..., default_scope=...)``
     """
