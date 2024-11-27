@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import logging
 import re
+from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import cached_property
 from typing import ClassVar
 
+from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import BasePermission
 
@@ -26,8 +28,8 @@ class ParameterPolicy:
     * Allow the parameter, and ALL values:
       ``ParameterPolicy(default_scope=set())`` (shorthand: ``ParameterPolicy.allow_all``).
     * Require that certain scopes are fulfilled:
-      ``ParameterPolicy(default_scope={"required-scope", "scope2"})`` (shorthand:
-      ``ParameterPolicy.for_all_values(...)``).
+      ``ParameterPolicy(default_scope={"required-scope", "alternative-scope2"})``
+      (shorthand: ``ParameterPolicy.for_all_values(...)``).
     * Require a scope to allow certain values:
       ``ParameterPolicy(scopes_for_values={"value1": {"required-scope", ...}, "value2": ...})``.
     * Require a scope, but allow a wildcard fallback:
@@ -38,7 +40,8 @@ class ParameterPolicy:
     #: This is the same as using `default_scope=set()`.
     allow_all: ClassVar[ParameterPolicy]
 
-    #: A specific scope for each value.
+    #: A specific scope for each value. Multiple values acts as OR.
+    #: The user needs to have one of the listed scopes.
     scopes_for_values: dict[str | None, set[str]] = field(default_factory=dict)
 
     #: A default scope in case the value is missing in the :attr:`scopes_for_values`.
@@ -49,8 +52,10 @@ class ParameterPolicy:
         """A configuration shorthand, to require a specific scope for all incoming values."""
         return cls(default_scope=scopes_for_all_values)
 
-    def get_needed_scopes(self, value) -> set[str]:
-        """Return which scopes are required for a given parameter value."""
+    def get_needed_scopes(self, value) -> set[str] | None:
+        """Return which scopes are required for a given parameter value.
+        The user only needs to have one scope of the set ("OR" comparison).
+        """
         try:
             return self.scopes_for_values[value]
         except KeyError:
@@ -146,11 +151,8 @@ def _validate_parameter_values(
     service_log_id: str,
 ):
     """Check whether the given parameter values are allowed."""
-    is_multiple = isinstance(values, list)
-    if not is_multiple:
-        # Multiple values: will check each one
-        values = [values]
-
+    # Multiple values: will check each one
+    values = [values] if not isinstance(values, list) else values
     invalid_values = []
     denied_values = []
     all_needed_scopes = set()
@@ -160,9 +162,19 @@ def _validate_parameter_values(
         except ValueError:
             invalid_values.append(value)
         else:
-            all_needed_scopes.update(needed_scopes)
-            if not user_scopes.issuperset(needed_scopes):
+            if needed_scopes is None:
+                # No scopes defined for this value. Deny.
                 denied_values.append(value)
+                all_needed_scopes.add(f"<undefined {field_name}={value}>")
+            elif needed_scopes:
+                if user_scopes.isdisjoint(needed_scopes):  # OR comparison
+                    denied_values.append(value)
+
+                # track for logging
+                log_needed = sorted(needed_scopes)
+                if len(needed_scopes) > 2:
+                    log_needed = log_needed[:2] + ["..."]
+                all_needed_scopes.add("|".join(log_needed))
 
     if invalid_values:
         raise ProblemJsonException(
@@ -223,3 +235,23 @@ class IsUserScope(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)
+
+
+def read_dataset_fields_files(file_glob) -> dict:
+    """Read the 'gegevensset' configuration files.
+    The scopes are grouped by field name they allow.
+
+    Comments and whitespace are allowed.
+    :returns: Which field names (keys) are accessible for which roles (values).
+    """
+    scopes_for_values = defaultdict(set)
+    for file in settings.SRC_DIR.glob(file_glob):
+        scope_name = file.stem
+        with open(file) as f:
+            for field_name in f.readlines():
+                # Strip comment or \n characters
+                field_name = field_name.partition("#")[0].strip()
+                if field_name:
+                    scopes_for_values[field_name].add(scope_name)
+
+    return dict(scopes_for_values)

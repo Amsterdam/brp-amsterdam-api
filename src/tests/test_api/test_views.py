@@ -34,10 +34,8 @@ class TestBaseProxyView:
             "instance": url,
         }
 
-    def test_invalid_api_key(self, api_client, urllib3_mocker):
+    def test_invalid_api_key(self, api_client, urllib3_mocker, caplog):
         """Prove that incorrect API-key settings are handled gracefully."""
-        url = reverse("brp-personen")
-        token = build_jwt_token(["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer"])
         urllib3_mocker.add(
             "POST",
             "/haalcentraal/api/brp/personen",
@@ -54,17 +52,24 @@ class TestBaseProxyView:
             content_type="application/json",
         )
 
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            ["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer", "benk-brp-gegevensset-1"]
+        )
         response = api_client.post(
             url,
             {
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "postcode": "1074VE",
                 "huisnummer": 1,
-                "fields": ["naam"],
+                "fields": ["naam.aanduidingNaamgebruik"],
             },
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
         assert response.status_code == 403
+        assert caplog.messages[1].startswith(
+            "Granted access for personen.ZoekMetPostcodeEnHuisnummer, needed:"
+        ), caplog.messages
         assert response.json() == {
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
             "title": "You do not have permission to perform this action.",
@@ -98,8 +103,6 @@ class TestBrpPersonenView:
 
     def test_bsn_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
-        url = reverse("brp-personen")
-        token = build_jwt_token(["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer"])
         urllib3_mocker.add(
             "POST",
             "/haalcentraal/api/brp/personen",
@@ -107,17 +110,21 @@ class TestBrpPersonenView:
             content_type="application/json",
         )
 
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            ["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer", "benk-brp-gegevensset-1"]
+        )
         response = api_client.post(
             url,
             {
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "postcode": "1074VE",
                 "huisnummer": 1,
-                "fields": ["naam"],
+                "fields": ["naam.aanduidingNaamgebruik"],
             },
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
-        assert response.status_code == 200
+        assert response.status_code == 200, response.data
         assert response.json() == self.RESPONSE_POSTCODE_HUISNUMMER
 
     def test_bsn_search_deny(self, api_client):
@@ -165,8 +172,6 @@ class TestBrpBewoningenView:
 
     def test_address_id_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
-        url = reverse("brp-bewoningen")
-        token = build_jwt_token(["benk-brp-api", "BRP/zoek-bewoningen"])
         urllib3_mocker.add(
             "POST",
             # https://demo-omgeving.haalcentraal.nl
@@ -175,6 +180,8 @@ class TestBrpBewoningenView:
             content_type="application/json",
         )
 
+        url = reverse("brp-bewoningen")
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-bewoningen"])
         response = api_client.post(
             url,
             {
@@ -238,8 +245,6 @@ class BrpVerblijfsplaatsHistorieView:
 
     def test_bsn_date_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
-        url = reverse("brp-verblijfsplaatshistorie")
-        token = build_jwt_token(["benk-brp-api", "BRP/zoek-historie"])
         urllib3_mocker.add(
             "POST",
             # https://demo-omgeving.haalcentraal.nl
@@ -248,6 +253,8 @@ class BrpVerblijfsplaatsHistorieView:
             content_type="application/json",
         )
 
+        url = reverse("brp-verblijfsplaatshistorie")
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-historie"])
         response = api_client.post(
             url,
             {
@@ -298,8 +305,6 @@ class TestReisdocumentenView:
 
     def test_bsn_search(self, api_client, urllib3_mocker):
         """Prove that search is possible"""
-        url = reverse("reisdocumenten")
-        token = build_jwt_token(["benk-brp-api", "BRP/zoek-doc-bsn", "BRP/x"])
         urllib3_mocker.add(
             "POST",
             # https://proefomgeving.haalcentraal.nl
@@ -308,6 +313,8 @@ class TestReisdocumentenView:
             content_type="application/json",
         )
 
+        url = reverse("reisdocumenten")
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-doc-bsn", "BRP/x"])
         response = api_client.post(
             url,
             {
