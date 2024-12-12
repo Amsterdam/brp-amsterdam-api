@@ -34,6 +34,7 @@ TIME_ZONE = "Europe/Amsterdam"
 INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
+    "rest_framework",
     "haal_centraal_proxy",
 ]
 
@@ -287,6 +288,11 @@ HEALTH_CHECKS = {
 HEALTH_CHECKS_ERROR_CODE = 503
 
 REST_FRAMEWORK = dict(
+    DEFAULT_RENDERER_CLASSES=[
+        # Removed HTML rendering, Give pure application/problem+json responses instead.
+        # The HTML rendering is not needed and conflicts with the exception_handler code.
+        "rest_framework.renderers.JSONRenderer",
+    ],
     EXCEPTION_HANDLER="haal_centraal_proxy.views.exception_handler",
     UNAUTHENTICATED_USER=None,  # Avoid importing django.contrib.auth.models
     UNAUTHENTICATED_TOKEN=None,
