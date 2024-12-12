@@ -73,13 +73,16 @@ class BaseProxyView(APIView):
         The API uses POST so the logs won't include personally identifiable information (PII).
         """
         # Check the request
-        user_id = request.get_token_claims.get("email", request.get_token_subject)
-        user_scopes = set(request.get_token_scopes)
+        self.user_scopes = set(request.get_token_scopes)
+        self.user_id = request.get_token_claims.get("email", request.get_token_subject)
         hc_request = request.data.copy()
 
-        self.transform_request(hc_request, user_scopes)
+        self.transform_request(hc_request)
         all_needed_scopes = permissions.validate_parameters(
-            self.parameter_ruleset, hc_request, user_scopes, service_log_id=self.service_log_id
+            self.parameter_ruleset,
+            hc_request,
+            self.user_scopes,
+            service_log_id=self.service_log_id,
         )
 
         # Proxy to Haal Centraal
@@ -94,8 +97,6 @@ class BaseProxyView(APIView):
             request,
             hc_request,
             hc_response,
-            user_id=user_id,
-            user_scopes=user_scopes,
             needed_scopes=all_needed_scopes,
         )
 
@@ -110,8 +111,6 @@ class BaseProxyView(APIView):
         request,
         hc_request: dict,
         hc_response: HaalCentraalResponse,
-        user_id: str,
-        user_scopes: set[str],
         needed_scopes: set[str],
     ) -> None:
         """Perform the audit logging for the request/response.
@@ -129,12 +128,12 @@ class BaseProxyView(APIView):
             "Access granted to '%(service)s' for '%(user)s, full request/response",
             {
                 "service": self.service_log_id,
-                "user": user_id,
+                "user": self.user_id,
             },
             extra={
                 "service": self.service_log_id,
-                "user": user_id,
-                "granted": sorted(user_scopes),
+                "user": self.user_id,
+                "granted": sorted(self.user_scopes),
                 "needed": sorted(needed_scopes),
                 "request": request.data,
                 "hc_request": hc_request,
@@ -142,7 +141,7 @@ class BaseProxyView(APIView):
             },
         )
 
-    def transform_request(self, hc_request: dict, user_scopes: set) -> None:
+    def transform_request(self, hc_request: dict) -> None:
         """This method can be overwritten to provide extra request parameter handling per endpoint.
         It may perform in-place replacements of the request.
         """
@@ -293,9 +292,9 @@ class BrpPersonenView(BaseProxyView):
         ),
     }
 
-    def transform_request(self, hc_request: dict, user_scopes: set) -> None:
+    def transform_request(self, hc_request: dict) -> None:
         """Extra rules before passing the request to Haal Centraal"""
-        if not user_scopes.issuperset(SCOPE_NATIONWIDE):
+        if not self.user_scopes.issuperset(SCOPE_NATIONWIDE):
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
             hc_request.setdefault("gemeenteVanInschrijving", GEMEENTE_AMSTERDAM_CODE)

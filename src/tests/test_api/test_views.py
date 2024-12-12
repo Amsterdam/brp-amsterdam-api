@@ -148,8 +148,9 @@ class TestBrpPersonenView:
     def test_add_gemeente_filter(self):
         """Prove that gemeente-filter is added."""
         view = views.BrpPersonenView()
+        view.user_scopes = {"benk-brp-zoekvraag-bsn"}
         hc_request = {"type": "RaadpleegMetBurgerservicenummer"}
-        view.transform_request(hc_request, user_scopes={"benk-brp-zoekvraag-bsn"})
+        view.transform_request(hc_request)
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
             "gemeenteVanInschrijving": "0363",
