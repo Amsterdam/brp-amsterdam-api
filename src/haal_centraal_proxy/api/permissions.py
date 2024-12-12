@@ -42,7 +42,7 @@ class ParameterPolicy:
 
     #: A specific scope for each value. Multiple values acts as OR.
     #: The user needs to have one of the listed scopes.
-    scopes_for_values: dict[str | None, set[str]] = field(default_factory=dict)
+    scopes_for_values: dict[str | None, set[str] | None] = field(default_factory=dict)
 
     #: A default scope in case the value is missing in the :attr:`scopes_for_values`.
     default_scope: set[str] | None = None
