@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 GEMEENTE_AMSTERDAM_CODE = "0363"
 ALLOW_VALUE = set()  # no scopes
 SCOPE_NATIONWIDE = "BRP/buiten-gemeente"
+SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-geheimhouding-persoonsgegevens"
 
 
 class BaseProxyView(APIView):
@@ -335,6 +336,21 @@ class BrpPersonenView(BaseProxyFieldsView):
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
             hc_request.setdefault("gemeenteVanInschrijving", GEMEENTE_AMSTERDAM_CODE)
+
+    def transform_response(self, hc_response: dict | list) -> None:
+        """Extra rules before passing the response to the client."""
+        super().transform_response(hc_response)  # rewrite links
+
+        if SCOPE_ALLOW_CONFIDENTIAL_PERSONS not in self.user_scopes:
+            # If the user may not see persons with confidential data,
+            # hide those persons in the response. Based on:
+            # https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1756
+            # https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1857
+            hc_response["personen"] = [
+                persoon
+                for persoon in hc_response["personen"]
+                if not persoon.get("geheimhoudingPersoonsgegevens")
+            ]
 
 
 class BrpBewoningenView(BaseProxyView):

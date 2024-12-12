@@ -82,7 +82,10 @@ class TestBaseProxyView:
 
 
 class TestBrpPersonenView:
-    """Prove that the BRP view works as advertised."""
+    """Prove that the BRP view works as advertised.
+
+    This incluedes tests that are specific for the BRP (not generic tests).
+    """
 
     RESPONSE_POSTCODE_HUISNUMMER = {
         "type": "ZoekMetPostcodeEnHuisnummer",
@@ -223,6 +226,50 @@ class TestBrpPersonenView:
         assert response.data["detail"] == (
             "U bent niet geautoriseerd voor een gegevensset bij deze operatie."
         )
+
+    @pytest.mark.parametrize("hide", [True, False])
+    def test_hide_confidential(self, api_client, urllib3_mocker, hide):
+        """Prove that confidential persons are hidden."""
+        person1 = {
+            "naam": {"geslachtsnaam": "FOO"},
+        }
+        person2 = {
+            "naam": {"geslachtsnaam": "BAR"},
+            "geheimhoudingPersoonsgegevens": "1",
+        }
+        urllib3_mocker.add(
+            "POST",
+            "/haalcentraal/api/brp/personen",
+            body=orjson.dumps(
+                {
+                    "type": "ZoekMetPostcodeEnHuisnummer",
+                    "personen": [person1, person2],
+                }
+            ),
+            content_type="application/json",
+        )
+        url = reverse("brp-personen")
+        scopes = [
+            "benk-brp-api",
+            "benk-brp-zoekvraag-postcode-huisnummer",
+            "benk-brp-gegevensset-1",
+        ]
+        if not hide:
+            scopes.append(views.SCOPE_ALLOW_CONFIDENTIAL_PERSONS)
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                "fields": ["naam.geslachtsnaam"],
+            },
+            HTTP_AUTHORIZATION=f"Bearer {build_jwt_token(scopes)}",
+        )
+        assert response.status_code == 200, response.data
+        personen = response.json()["personen"]
+        expect = [person1] if hide else [person1, person2]
+        assert personen == expect
 
 
 class TestBrpBewoningenView:
