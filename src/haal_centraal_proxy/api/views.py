@@ -5,11 +5,13 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from . import permissions
 from .client import HaalCentraalClient, HaalCentraalResponse
+from .exceptions import ProblemJsonException
 from .permissions import ParameterPolicy, audit_log
 
 logger = logging.getLogger(__name__)
@@ -182,7 +184,40 @@ class BaseProxyView(APIView):
                     self._rewrite_links(child, rewrites, in_links)
 
 
-class BrpPersonenView(BaseProxyView):
+class BaseProxyFieldsView(BaseProxyView):
+    """Base proxy view that also has a default 'fields' parameter.
+    Could also have been a mixin, but this seems clear too."""
+
+    def get_default_fields_value(self):
+        """Determine all values for the "fields" parameter that the user has access to."""
+        allowed_values = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
+        if not allowed_values:
+            audit_log.info(
+                "Denied access to '%(service)s' no allowed values for 'fields'",
+                {"service": self.service_log_id},
+                extra={
+                    "service": self.service_log_id,
+                    "field": "fields",
+                    "values": [],
+                    "granted": sorted(self.user_scopes),
+                },
+            )
+            raise ProblemJsonException(
+                title="U bent niet geautoriseerd voor deze operatie.",
+                detail="U bent niet geautoriseerd voor een gegevensset bij deze operatie.",
+                code="permissionDenied",  # Same as what Haal Centraal would do.
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return permissions.compact_fields_values(allowed_values)
+
+    def transform_request(self, hc_request):
+        if "fields" not in hc_request:
+            # When no 'fields' parameter is given, pass all allowed options
+            hc_request["fields"] = self.get_default_fields_value()
+
+
+class BrpPersonenView(BaseProxyFieldsView):
     """View that proxies Haal Centraal BRP 'personen' (persons).
 
     See: https://brp-api.github.io/Haal-Centraal-BRP-bevragen/
@@ -294,6 +329,8 @@ class BrpPersonenView(BaseProxyView):
 
     def transform_request(self, hc_request: dict) -> None:
         """Extra rules before passing the request to Haal Centraal"""
+        super().transform_request(hc_request)  # add 'fields'
+
         if not self.user_scopes.issuperset(SCOPE_NATIONWIDE):
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
@@ -354,7 +391,7 @@ class BrpVerblijfsplaatsHistorieView(BaseProxyView):
     }
 
 
-class ReisdocumentenView(BaseProxyView):
+class ReisdocumentenView(BaseProxyFieldsView):
     """View to proxy Haal Centraal Reisdocumenten (travel documents).
 
     See: https://brp-api.github.io/Haal-Centraal-Reisdocumenten-bevragen/

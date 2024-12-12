@@ -68,6 +68,20 @@ class ParameterPolicy:
             raise ValueError(f"Value not handled: {value}")
         return self.default_scope
 
+    def get_allowed_values(self, user_scopes: set[str]) -> list[str]:
+        """Tell which values are allowed according to the given scope.
+        This may include values that end with a wildcard expression.
+        """
+        return [
+            value
+            for value, required_scope in self.scopes_for_values.items()
+            if (
+                # None is permission denied, empty set is no permissions required
+                required_scope is not None
+                and (not required_scope or not required_scope.isdisjoint(user_scopes))
+            )
+        ]
+
     @cached_property
     def _roles_for_values_re(self) -> list[tuple[re.Pattern, set[str]]]:
         return [
@@ -259,3 +273,26 @@ def read_dataset_fields_files(file_glob) -> dict:
                     scopes_for_values[field_name].add(scope_name)
 
     return dict(scopes_for_values)
+
+
+def compact_fields_values(allowed_values: list[str]):
+    """Determine what the "fields" parameter should be if it's not given in request.
+
+    By default, it will allow all possible field to be returned that a user has access to.
+    """
+    if not allowed_values:
+        raise ValueError("No allowed values given")
+
+    # Remove wildcard versions (e.g. remove 'naam.voornaam' when 'naam.*' is also allowed).
+    wildcards = [re.sub(r"\.?\*$", "", value) for value in allowed_values if value.endswith("*")]
+    if not wildcards:
+        return allowed_values
+
+    is_wildcard_replaced = re.compile(
+        "^({})".format(
+            "|".join(
+                re.escape(key).replace(r"\*", ".+") for key in allowed_values if key.endswith("*")
+            )
+        )
+    )
+    return [v for v in wildcards + allowed_values if not is_wildcard_replaced.match(v)]

@@ -2,6 +2,7 @@ import orjson
 import pytest
 from django.urls import reverse
 from haal_centraal_proxy.api import views
+from haal_centraal_proxy.api.permissions import read_dataset_fields_files
 
 from tests.utils import build_jwt_token
 
@@ -145,16 +146,83 @@ class TestBrpPersonenView:
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
 
-    def test_add_gemeente_filter(self):
-        """Prove that gemeente-filter is added."""
+    def test_defaults_allow_nationwide(self):
+        """Prove that 'gemeenteVanInschrijving' won't be added if there is nationwide access."""
         view = views.BrpPersonenView()
-        view.user_scopes = {"benk-brp-zoekvraag-bsn"}
-        hc_request = {"type": "RaadpleegMetBurgerservicenummer"}
+        view.user_scopes = {
+            "benk-brp-zoekvraag-bsn",
+            "benk-brp-gegevensset-1",
+            *views.SCOPE_NATIONWIDE,
+        }
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+        }
         view.transform_request(hc_request)
+
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
-            "gemeenteVanInschrijving": "0363",
+            "fields": ["naam.aanduidingNaamgebruik"],
+            # no gemeenteVanInschrijving added.
         }
+
+    def test_defaults_enforce_municipality(self):
+        """Prove that 'gemeenteVanInschrijving' will be added."""
+        view = views.BrpPersonenView()
+        view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+        }
+        view.transform_request(hc_request)
+
+        assert hc_request == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+        }
+
+    def test_defaults_add_fields(self):
+        """Prove that 'fields' and 'gemeente-filter is added."""
+        set1 = sorted(
+            read_dataset_fields_files(
+                "config/dataset_fields/personen/benk-brp-gegevensset-1.txt"
+            ).keys()
+        )
+        assert set1
+
+        view = views.BrpPersonenView()
+        view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+        }
+
+        view.transform_request(hc_request)
+        hc_request["fields"].sort()
+
+        assert hc_request == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+            "fields": set1,  # added (default all allowed fields)
+        }
+
+    def test_defaults_missing_sets(self, api_client):
+        """Prove that not having access to a set is handled gracefully."""
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            ["benk-brp-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-foobar"]
+        )
+
+        response = api_client.post(
+            url,
+            {"type": "RaadpleegMetBurgerservicenummer"},
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"
+        assert response.data["detail"] == (
+            "U bent niet geautoriseerd voor een gegevensset bij deze operatie."
+        )
 
 
 class TestBrpBewoningenView:

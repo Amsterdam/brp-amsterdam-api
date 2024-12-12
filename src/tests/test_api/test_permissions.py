@@ -2,6 +2,7 @@ import pytest
 from haal_centraal_proxy.api.exceptions import ProblemJsonException
 from haal_centraal_proxy.api.permissions import (
     ParameterPolicy,
+    compact_fields_values,
     read_dataset_fields_files,
     validate_parameters,
 )
@@ -35,6 +36,28 @@ class TestParameterPolicy:
         assert policy.get_needed_scopes("naam") == {"role1"}
         with pytest.raises(ValueError, match="Value not handled: foobar"):
             policy.get_needed_scopes("foobar")
+
+    def test_get_allowed_values(self):
+        """Prove that get_allowed_values() returns expected results."""
+        policy = ParameterPolicy(
+            scopes_for_values={
+                "naam.voornaam": {"dataset1"},
+                "ouders": {"dataset1"},
+                "kinderen.naam": {"dataset1", "dataset2"},
+                "other": {"dataset3"},
+                "none": None,
+                "always": set(),
+            }
+        )
+        assert policy.get_allowed_values({"dataset1"}) == [
+            "naam.voornaam",
+            "ouders",
+            "kinderen.naam",
+            "always",
+        ]
+        assert policy.get_allowed_values({"dataset2"}) == ["kinderen.naam", "always"]
+        assert policy.get_allowed_values({"dataset3"}) == ["other", "always"]
+        assert policy.get_allowed_values({"datasetFOO"}) == ["always"]
 
 
 class TestValidateParameters:
@@ -190,7 +213,7 @@ class TestValidateParameters:
         }
 
     def test_satisfy_all_scopes(self):
-        """Prove ."""
+        """Prove that access is given when all scopes are satisfied."""
         needed = validate_parameters(
             ruleset=self.RULESET,
             hc_request={
@@ -199,9 +222,9 @@ class TestValidateParameters:
                 "gemeenteVanInschrijving": "0363",
             },
             user_scopes={
-                "benk-brp-zoekvraag-postcode-huisnummer",
-                "dataset2",
-                "BRP/adres-buitenland",
+                "benk-brp-zoekvraag-postcode-huisnummer",  # type OK
+                "dataset2",  # fields ok
+                "BRP/adres-buitenland",  # gemeenteVanInschrijving ok
             },
             service_log_id="personen",
         )
@@ -229,3 +252,20 @@ class TestReadConfiguration:
             "woonplaats": {"role1", "role2"},
             "kinderen": {"role2", "role3"},
         }
+
+
+class TestCompactValues:
+
+    def test_compact_fields_values(self):
+        """Prove that wildcard values can be properly stripped from a list of allowed values."""
+        assert compact_fields_values(
+            [
+                "naam.voornaam",
+                "naam.*",
+                "naam.achternaam",
+                "adres",
+            ]
+        ) == ["naam", "adres"]
+
+        assert compact_fields_values(["naam", "naamlanger"]) == ["naam", "naamlanger"]
+        assert compact_fields_values(["naam.*", "naamlanger"]) == ["naam", "naamlanger"]
