@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 ALLOW_VALUE = set()  # no scopes
-SCOPE_NATIONWIDE = {"BRP/buiten-gemeente"}
+SCOPE_NATIONWIDE = "BRP/buiten-gemeente"
 
 
 class BaseProxyView(APIView):
@@ -323,7 +323,7 @@ class BrpPersonenView(BaseProxyFieldsView):
         "gemeenteVanInschrijving": ParameterPolicy(
             # NOTE: no benk-brp-amsterdam ?
             {GEMEENTE_AMSTERDAM_CODE: ALLOW_VALUE},  # ok to include ?gemeenteVanInschrijving=0363
-            default_scope=SCOPE_NATIONWIDE,
+            default_scope={SCOPE_NATIONWIDE},
         ),
     }
 
@@ -331,7 +331,7 @@ class BrpPersonenView(BaseProxyFieldsView):
         """Extra rules before passing the request to Haal Centraal"""
         super().transform_request(hc_request)  # add 'fields'
 
-        if not self.user_scopes.issuperset(SCOPE_NATIONWIDE):
+        if SCOPE_NATIONWIDE not in self.user_scopes:
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
             hc_request.setdefault("gemeenteVanInschrijving", GEMEENTE_AMSTERDAM_CODE)

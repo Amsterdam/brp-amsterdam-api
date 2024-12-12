@@ -152,7 +152,7 @@ class TestBrpPersonenView:
         view.user_scopes = {
             "benk-brp-zoekvraag-bsn",
             "benk-brp-gegevensset-1",
-            *views.SCOPE_NATIONWIDE,
+            views.SCOPE_NATIONWIDE,
         }
         hc_request = {
             "type": "RaadpleegMetBurgerservicenummer",
