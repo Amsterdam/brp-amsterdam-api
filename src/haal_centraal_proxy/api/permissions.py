@@ -245,7 +245,11 @@ def read_dataset_fields_files(file_glob) -> dict:
     :returns: Which field names (keys) are accessible for which roles (values).
     """
     scopes_for_values = defaultdict(set)
-    for file in settings.SRC_DIR.glob(file_glob):
+    files = settings.SRC_DIR.glob(file_glob)
+    if not files:
+        raise FileNotFoundError(file_glob)
+
+    for file in files:
         scope_name = file.stem
         with open(file) as f:
             for field_name in f.readlines():
