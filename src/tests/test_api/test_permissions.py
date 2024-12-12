@@ -7,6 +7,36 @@ from haal_centraal_proxy.api.permissions import (
 )
 
 
+class TestParameterPolicy:
+    """Test how the ParameterPolicy class works."""
+
+    def test_get_needed_scopes(self):
+        """Prove that the needed scopes are properly returned."""
+        policy = ParameterPolicy(
+            scopes_for_values={
+                "naam": {"role-user", "role2"},
+                "adres.*": {"role-adres"},
+                "adres.label": {"role-user", "role2"},
+            },
+            default_scope={"default"},
+        )
+        assert policy.get_needed_scopes("naam") == {"role-user", "role2"}
+        assert policy.get_needed_scopes("adres.label") == {"role-user", "role2"}
+        assert policy.get_needed_scopes("adres.misc") == {"role-adres"}
+        assert policy.get_needed_scopes("foobar") == {"default"}
+
+    def test_no_default_scope(self):
+        """Prove that a parameter is denied when there is no corresponding value."""
+        policy = ParameterPolicy(
+            scopes_for_values={
+                "naam": {"role1"},
+            }
+        )
+        assert policy.get_needed_scopes("naam") == {"role1"}
+        with pytest.raises(ValueError, match="Value not handled: foobar"):
+            policy.get_needed_scopes("foobar")
+
+
 class TestValidateParameters:
     """Test how the request is checked and transformed."""
 
