@@ -10,11 +10,9 @@ from rest_framework.views import APIView
 
 from . import permissions
 from .client import HaalCentraalClient, HaalCentraalResponse
-from .permissions import audit_log
+from .permissions import ParameterPolicy, audit_log
 
 logger = logging.getLogger(__name__)
-
-ParameterPolicy = permissions.ParameterPolicy  # shortcut
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 ALLOW_VALUE = set()  # no scopes
