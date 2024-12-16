@@ -8,7 +8,6 @@ geboorte.datum
 geslacht
 naam.aanduidingNaamgebruik
 overlijden.datum
-geheimhoudingPersoonsgegevens
 gemeenteVanInschrijving
 verblijfplaats.functieAdres
 verblijfplaats.verblijfadres.korteStraatnaam
@@ -33,10 +32,10 @@ adressering.gebruikInLopendeTekst
 gezag
 immigratie.indicatieVestigingVanuitBuitenland
 immigratie.vanuitVerblijfplaatsOnbekend
-leefijd
+leeftijd
 naam.voorletters
 naam.volledigeNaam
 ouders.naam.voorletters
-ouders.ouderaanduiding
+ouders.ouderAanduiding
 partners.naam.voorletters
 kinderen.naam.voorletters

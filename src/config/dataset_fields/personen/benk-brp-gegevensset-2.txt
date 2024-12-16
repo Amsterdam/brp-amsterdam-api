@@ -12,7 +12,6 @@ partners.naam.geslachtsnaam
 partners.aangaanHuwelijkPartnerschap.datum
 partners.ontbindingHuwelijkPartnerschap.datum
 overlijden.datum
-geheimhoudingPersoonsgegevens
 gemeenteVanInschrijving
 verblijfplaats.functieAdres
 verblijfplaats.verblijfadres.korteStraatnaam
