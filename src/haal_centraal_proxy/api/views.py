@@ -349,7 +349,7 @@ class BrpPersonenView(BaseProxyFieldsView):
             hc_response["personen"] = [
                 persoon
                 for persoon in hc_response["personen"]
-                if not persoon.get("geheimhoudingPersoonsgegevens")
+                if not int(persoon.get("geheimhoudingPersoonsgegevens", 0))  # "1" in demo data
             ]
 
 
