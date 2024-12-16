@@ -61,16 +61,16 @@ class HaalCentraalClient:
             ca_certs=certifi.where(),
         )
 
-    def call(self, data: dict | None = None) -> HaalCentraalResponse:
+    def call(self, hc_request: dict | None = None) -> HaalCentraalResponse:
         """Make an HTTP GET call. kwargs are passed to pool.request."""
-        logger.info("calling %s", self.endpoint_url)
+        logger.debug("calling %s", self.endpoint_url)
         t0 = time.perf_counter_ns()
         try:
             # Using urllib directly instead of requests for performance
             response: BaseHTTPResponse = self._pool.request(
                 "POST",
                 self.endpoint_url,
-                body=orjson.dumps(data),
+                body=orjson.dumps(hc_request),
                 timeout=60,
                 retries=False,
                 headers={
@@ -115,7 +115,10 @@ class HaalCentraalClient:
                 # For application/json and application/problem+json,
                 logger.debug(
                     "  Decoded JSON response body",
-                    extra={"json_response": orjson.loads(response.data)},
+                    extra={
+                        "hc_request": hc_request,
+                        "hc_response": orjson.loads(response.data),
+                    },
                 )
             else:
                 logger.debug("  Response body: %s", response.data)
