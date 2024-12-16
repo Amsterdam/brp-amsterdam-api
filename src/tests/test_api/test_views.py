@@ -2,7 +2,7 @@ import orjson
 import pytest
 from django.urls import reverse
 from haal_centraal_proxy.api import views
-from haal_centraal_proxy.api.permissions import read_dataset_fields_files
+from haal_centraal_proxy.api.fields import read_dataset_fields_files
 
 from tests.utils import build_jwt_token
 
@@ -188,11 +188,8 @@ class TestBrpPersonenView:
     def test_defaults_add_fields(self):
         """Prove that 'fields' and 'gemeente-filter is added."""
         set1 = sorted(
-            read_dataset_fields_files(
-                "config/dataset_fields/personen/benk-brp-gegevensset-1.txt"
-            ).keys()
+            read_dataset_fields_files("dataset_fields/personen/benk-brp-gegevensset-1.txt").keys()
         )
-        assert set1
 
         view = views.BrpPersonenView()
         view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
@@ -207,6 +204,42 @@ class TestBrpPersonenView:
             "type": "RaadpleegMetBurgerservicenummer",
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
             "fields": set1,  # added (default all allowed fields)
+        }
+
+    def test_defaults_add_fields_limited(self):
+        """Prove that 'fields' and 'gemeente-filter is added."""
+        view = views.BrpPersonenView()
+        view.user_scopes = {"benk-brp-zoekvraag-postcode-huisnummer", "benk-brp-gegevensset-1"}
+        hc_request = {
+            "type": "ZoekMetPostcodeEnHuisnummer",
+        }
+
+        view.transform_request(hc_request)
+        hc_request["fields"].sort()
+
+        assert hc_request == {
+            "type": "ZoekMetPostcodeEnHuisnummer",
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+            "fields": [
+                # added (very limited set due to constraints of both the fields CSV and scope)
+                # not: pad
+                "adressering.adresregel1",
+                "adressering.adresregel2",
+                "adressering.adresregel3",
+                "adressering.land",
+                "burgerservicenummer",
+                "geboorte.datum",
+                "geslacht",
+                "leeftijd",
+                "naam.adellijkeTitelPredicaat",
+                "naam.geslachtsnaam",
+                "naam.volledigeNaam",
+                "naam.voorletters",
+                "naam.voornamen",
+                "naam.voorvoegsel",
+                # not: adresseringBinnenland.adresregel1
+                # not: adresseringBinnenland.adresregel2
+            ],
         }
 
     def test_defaults_missing_sets(self, api_client):

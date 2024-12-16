@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import logging
 import re
-from collections import defaultdict
 from dataclasses import dataclass, field
 from functools import cached_property
 from typing import ClassVar
 
-from django.conf import settings
 from rest_framework import status
 from rest_framework.permissions import BasePermission
 
@@ -249,50 +247,3 @@ class IsUserScope(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)
-
-
-def read_dataset_fields_files(file_glob) -> dict:
-    """Read the 'gegevensset' configuration files.
-    The scopes are grouped by field name they allow.
-
-    Comments and whitespace are allowed.
-    :returns: Which field names (keys) are accessible for which roles (values).
-    """
-    scopes_for_values = defaultdict(set)
-    files = settings.SRC_DIR.glob(file_glob)
-    if not files:
-        raise FileNotFoundError(file_glob)
-
-    for file in files:
-        scope_name = file.stem
-        with open(file) as f:
-            for field_name in f.readlines():
-                # Strip comment or \n characters
-                field_name = field_name.partition("#")[0].strip()
-                if field_name:
-                    scopes_for_values[field_name].add(scope_name)
-
-    return dict(scopes_for_values)
-
-
-def compact_fields_values(allowed_values: list[str]):
-    """Determine what the "fields" parameter should be if it's not given in request.
-
-    By default, it will allow all possible field to be returned that a user has access to.
-    """
-    if not allowed_values:
-        raise ValueError("No allowed values given")
-
-    # Remove wildcard versions (e.g. remove 'naam.voornaam' when 'naam.*' is also allowed).
-    wildcards = [re.sub(r"\.?\*$", "", value) for value in allowed_values if value.endswith("*")]
-    if not wildcards:
-        return allowed_values
-
-    is_wildcard_replaced = re.compile(
-        "^({})".format(
-            "|".join(
-                re.escape(key).replace(r"\*", ".+") for key in allowed_values if key.endswith("*")
-            )
-        )
-    )
-    return [v for v in wildcards + allowed_values if not is_wildcard_replaced.match(v)]

@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from . import permissions
+from . import fields, permissions
 from .client import HaalCentraalClient, HaalCentraalResponse
 from .exceptions import ProblemJsonException
 from .permissions import ParameterPolicy, audit_log
@@ -189,10 +189,26 @@ class BaseProxyFieldsView(BaseProxyView):
     """Base proxy view that also has a default 'fields' parameter.
     Could also have been a mixin, but this seems clear too."""
 
-    def get_default_fields_value(self):
-        """Determine all values for the "fields" parameter that the user has access to."""
-        allowed_values = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
-        if not allowed_values:
+    #: Tell which fields are allowed per type (used to have a default list).
+    possible_fields_by_type: dict[str, set[str]] = {}
+
+    def get_allowed_fields(self, query_type: str) -> list[str]:
+        """Determine all values for the "fields" parameter that the user has access to.
+
+        This value is used when no default is given.
+
+        :param query_type: The "zoekvraag/doelbinding" (the "type" parameter in the request).
+        """
+        allowed_by_scope = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
+        allowed_by_type = self.possible_fields_by_type.get(query_type, None)
+
+        allowed_fields = (
+            list(set(allowed_by_type).intersection(allowed_by_scope))
+            if allowed_by_type is not None
+            else allowed_by_scope
+        )
+
+        if not allowed_fields:
             audit_log.info(
                 "Denied access to '%(service)s' no allowed values for 'fields'",
                 {"service": self.service_log_id},
@@ -210,12 +226,12 @@ class BaseProxyFieldsView(BaseProxyView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        return permissions.compact_fields_values(allowed_values)
+        return fields.compact_fields_values(allowed_fields)
 
     def transform_request(self, hc_request):
-        if "fields" not in hc_request:
+        if "fields" not in hc_request and "type" in hc_request:
             # When no 'fields' parameter is given, pass all allowed options
-            hc_request["fields"] = self.get_default_fields_value()
+            hc_request["fields"] = self.get_allowed_fields(hc_request["type"])
 
 
 class BrpPersonenView(BaseProxyFieldsView):
@@ -229,6 +245,21 @@ class BrpPersonenView(BaseProxyFieldsView):
 
     # Require extra scopes
     needed_scopes = {"benk-brp-api"}
+
+    # Which fields are allowed per type
+    FULL = fields.read_config("haal_centraal/personen/fields-Persoon.csv")
+    FILTERED = fields.read_config("haal_centraal/personen/fields-filtered-Persoon.csv")
+    FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-PersoonBeperkt.csv")
+
+    possible_fields_by_type = {
+        "RaadpleegMetBurgerservicenummer": FULL,
+        "ZoekMetAdresseerbaarObjectIdentificatie": FILTERED,
+        "ZoekMetGeslachtsnaamEnGeboortedatum": FILTERED_MIN,
+        "ZoekMetNaamEnGemeenteVanInschrijving": FILTERED_MIN,
+        "ZoekMetNummeraanduidingIdentificatie": FILTERED_MIN,
+        "ZoekMetPostcodeEnHuisnummer": FILTERED_MIN,
+        "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving": FILTERED_MIN,
+    }
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
@@ -295,7 +326,9 @@ class BrpPersonenView(BaseProxyFieldsView):
                 "verblijfplaatsBinnenland.*": None,
                 "verblijfstitel": None,
                 "verblijfstitel.*": None,
-                **permissions.read_dataset_fields_files("config/dataset_fields/personen/*.txt"),
+                **fields.read_dataset_fields_files(
+                    "dataset_fields/personen/*.txt", accepted_field_names=FULL
+                ),
             }
         ),
         # All possible search parameters are named here,

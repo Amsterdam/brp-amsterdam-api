@@ -2,8 +2,6 @@ import pytest
 from haal_centraal_proxy.api.exceptions import ProblemJsonException
 from haal_centraal_proxy.api.permissions import (
     ParameterPolicy,
-    compact_fields_values,
-    read_dataset_fields_files,
     validate_parameters,
 )
 
@@ -233,39 +231,3 @@ class TestValidateParameters:
             "dataset1|dataset2|...",
             "BRP/adres-buitenland",
         }
-
-
-class TestReadConfiguration:
-    def test_read_dataset_fields_files(self, tmp_path, settings):
-        """Prove that the collection of fields can be properly read from the configuration."""
-        dir = tmp_path.joinpath("dataset_fields")
-        dir.mkdir()
-        dir.joinpath("role1.txt").write_text("naam\nadres\nwoonplaats\n")
-        dir.joinpath("role2.txt").write_text("adres\nwoonplaats\nkinderen\n")
-        dir.joinpath("role3.txt").write_text("adres  # comment\n# woonplaats\n\nkinderen\n")
-
-        settings.SRC_DIR = tmp_path
-        scopes_for_values = read_dataset_fields_files("dataset_fields/role*.txt")
-        assert scopes_for_values == {
-            "naam": {"role1"},
-            "adres": {"role1", "role2", "role3"},
-            "woonplaats": {"role1", "role2"},
-            "kinderen": {"role2", "role3"},
-        }
-
-
-class TestCompactValues:
-
-    def test_compact_fields_values(self):
-        """Prove that wildcard values can be properly stripped from a list of allowed values."""
-        assert compact_fields_values(
-            [
-                "naam.voornaam",
-                "naam.*",
-                "naam.achternaam",
-                "adres",
-            ]
-        ) == ["naam", "adres"]
-
-        assert compact_fields_values(["naam", "naamlanger"]) == ["naam", "naamlanger"]
-        assert compact_fields_values(["naam.*", "naamlanger"]) == ["naam", "naamlanger"]
