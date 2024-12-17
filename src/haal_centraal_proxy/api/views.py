@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 ALLOW_VALUE = set()  # no scopes
-SCOPE_NATIONWIDE = "BRP/buiten-gemeente"
+
+SCOPE_NATIONWIDE = "benk-brp-landelijk"
 SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-geheimhouding-persoonsgegevens"
 
 
