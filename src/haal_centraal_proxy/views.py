@@ -55,12 +55,14 @@ def exception_handler(exc, context):
             "type": STATUS_TO_URI.get(exc.status_code),
             "title": str(exc.title),
             "status": int(exc.status_code),
-            "detail": str(exc.detail),
+            "detail": exc.detail if isinstance(exc.detail, list | dict) else str(exc.detail),
             "code": str(exc.code),
             "instance": request.path if request else None,
         }
+        if exc.invalid_params is not None:
+            normalized_fields["invalidParams"] = exc.invalid_params
+
         # This merge strategy puts the normal fields first:
-        response.data = normalized_fields | response.data
         response.data.update(normalized_fields)
         response.status_code = int(exc.status_code)
     elif isinstance(response.data.get("detail"), ErrorDetail):

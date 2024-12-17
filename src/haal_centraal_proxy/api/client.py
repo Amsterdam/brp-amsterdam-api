@@ -137,15 +137,21 @@ class HaalCentraalClient:
         detail_message = (
             response.data.decode() if not content_type.startswith("text/html") else None
         )
+        remote_json = (
+            orjson.loads(response.data)
+            if content_type in ("application/json", "application/problem+json")
+            else None
+        )
 
         if response.status == status.HTTP_400_BAD_REQUEST:
-            if content_type in ("application/json", "application/problem+json"):
+            if remote_json is not None:
                 # Translate proper "Bad Request" to REST response
                 return RemoteAPIException(
-                    title=ParseError.default_detail,
-                    detail=orjson.loads(response.data),
-                    code=ParseError.default_code,
+                    title=remote_json.get("title", ParseError.default_detail),
+                    detail=remote_json.get("detail"),
+                    code=remote_json.get("code", ParseError.default_code),
                     status=400,
+                    invalid_params=remote_json.get("invalidParams"),
                 )
             else:
                 return BadGateway(detail_message)
@@ -153,27 +159,24 @@ class HaalCentraalClient:
             # We translate 401 to 403 because 401 MUST have a WWW-Authenticate header in the
             # response, and we can't easily set that from here. Also, RFC 7235 says we MUST NOT
             # change such a header, which presumably includes making one up.
-            if content_type in ("application/json", "application/problem+json"):
-                remote_json = orjson.loads(response.data)
-                remote_detail = remote_json.get("title", "")
-            else:
-                remote_detail = repr(response.data)
-
+            remote_detail = (
+                remote_json.get("title", "") if remote_json is not None else repr(response.data)
+            )
             return RemoteAPIException(
                 title=PermissionDenied.default_detail,
                 detail=f"{response.status} from remote: {remote_detail}",
                 status=status.HTTP_403_FORBIDDEN,
-                code=PermissionDenied.default_code,
+                code=remote_json.get("code", PermissionDenied.default_code),
             )
         elif response.status == status.HTTP_404_NOT_FOUND:
             # Return 404 to client (in DRF format)
             if content_type == "application/problem+json":
                 # Forward the problem-json details, but still in a 404:
                 return RemoteAPIException(
-                    title=NotFound.default_detail,
-                    detail=orjson.loads(response.data),
+                    title=remote_json.get("title", NotFound.default_detail),
+                    detail=remote_json.get("detail"),
                     status=404,
-                    code=NotFound.default_code,
+                    code=remote_json.get("code", NotFound.default_code),
                 )
             return NotFound(detail_message)
         else:

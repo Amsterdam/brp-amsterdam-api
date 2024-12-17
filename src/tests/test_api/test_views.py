@@ -80,6 +80,60 @@ class TestBaseProxyView:
             "instance": "/api/brp/personen",
         }
 
+    def test_error_response(self, api_client, urllib3_mocker, caplog):
+        urllib3_mocker.add(
+            "POST",
+            "/haalcentraal/api/brp/personen",
+            body=orjson.dumps(
+                {
+                    "invalidParams": [
+                        {
+                            "name": "burgerservicenummer",
+                            "code": "array",
+                            "reason": "Parameter is geen array.",
+                        }
+                    ],
+                    "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+                    "title": "Een of meerdere parameters zijn niet correct.",
+                    "status": 400,
+                    "detail": "De foutieve parameter(s) zijn: burgerservicenummer.",
+                    "instance": "/haalcentraal/api/brp/personen",
+                    "code": "paramsValidation",
+                }
+            ),
+            status=400,
+            content_type="application/json",
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            ["benk-brp-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"]
+        )
+        response = api_client.post(
+            url,
+            {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "000009830"},
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 400
+        assert caplog.messages[1].startswith(
+            "Granted access for personen.RaadpleegMetBurgerservicenummer, needed:"
+        ), caplog.messages
+        assert response.json() == {
+            "code": "paramsValidation",
+            "detail": "De foutieve parameter(s) zijn: burgerservicenummer.",
+            "instance": "/api/brp/personen",
+            "invalidParams": [
+                {
+                    "code": "array",
+                    "name": "burgerservicenummer",
+                    "reason": "Parameter is geen array.",
+                }
+            ],
+            "status": 400,
+            "title": "Een of meerdere parameters zijn niet correct.",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+        }
+
 
 class TestBrpPersonenView:
     """Prove that the BRP view works as advertised.
