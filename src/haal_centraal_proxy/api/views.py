@@ -248,12 +248,12 @@ class BrpPersonenView(BaseProxyFieldsView):
     needed_scopes = {"benk-brp-api"}
 
     # Which fields are allowed per type
-    FULL = fields.read_config("haal_centraal/personen/fields-Persoon.csv")
+    ALL_FIELD_NAMES = fields.read_config("haal_centraal/personen/fields-Persoon.csv")
     FILTERED = fields.read_config("haal_centraal/personen/fields-filtered-Persoon.csv")
     FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-PersoonBeperkt.csv")
 
     possible_fields_by_type = {
-        "RaadpleegMetBurgerservicenummer": FULL,
+        "RaadpleegMetBurgerservicenummer": ALL_FIELD_NAMES,
         "ZoekMetAdresseerbaarObjectIdentificatie": FILTERED,
         "ZoekMetGeslachtsnaamEnGeboortedatum": FILTERED_MIN,
         "ZoekMetNaamEnGemeenteVanInschrijving": FILTERED_MIN,
@@ -282,55 +282,16 @@ class BrpPersonenView(BaseProxyFieldsView):
             #   https://raw.githubusercontent.com/BRP-API/Haal-Centraal-BRP-bevragen/master/features/fields-filtered-PersoonBeperkt.csv
             # - Fields/field groups that can be requested a single person by their BSN:
             #   https://raw.githubusercontent.com/BRP-API/Haal-Centraal-BRP-bevragen/master/features/fields-filtered-Persoon.csv
-            scopes_for_values={
-                # For now, still declare all known fields which are supported.
+            scopes_for_values=(
+                # Declare all known fields which are supported with a deny-permission (None).
                 # This avoids generating a '400 Bad Request' for unknown fieldnames
-                # # instead of '403 Permission Denied' responses.
-                "aNummer": None,
-                "adressering": None,
-                "adressering.*": None,
-                "adresseringBinnenland": None,
-                "adresseringBinnenland.*": None,
-                "burgerservicenummer": None,
-                "datumEersteInschrijvingGBA": None,
-                "datumInschrijvingInGemeente": None,
-                "europeesKiesrecht": None,
-                "europeesKiesrecht.*": None,
-                "geboorte": None,
-                "geboorte.*": None,
-                "gemeenteVanInschrijving": None,
-                "geslacht": None,
-                "gezag": None,
-                "immigratie": None,
-                "immigratie.*": None,
-                "indicatieCurateleRegister": None,
-                "indicatieGezagMinderjarige": None,
-                "kinderen": None,
-                "kinderen.*": None,
-                "leeftijd": None,
-                "naam": None,
-                "naam.*": None,
-                "nationaliteiten": None,
-                "nationaliteiten.*": None,
-                "ouders": None,
-                "ouders.*": None,
-                "overlijden": None,
-                "overlijden.*": None,
-                "pad": None,
-                "partners": None,
-                "partners.*": None,
-                "uitsluitingKiesrecht": None,
-                "uitsluitingKiesrecht.*": None,
-                "verblijfplaats": None,
-                "verblijfplaats.*": None,
-                "verblijfplaatsBinnenland": None,
-                "verblijfplaatsBinnenland.*": None,
-                "verblijfstitel": None,
-                "verblijfstitel.*": None,
-                **fields.read_dataset_fields_files(
-                    "dataset_fields/personen/*.txt", accepted_field_names=FULL
-                ),
-            }
+                # instead of '403 Permission Denied' responses.
+                {field_name: None for field_name in sorted(ALL_FIELD_NAMES)}
+                # And override those with the configurations for each known role / "gegevensset".
+                | fields.read_dataset_fields_files(
+                    "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
+                )
+            ),
         ),
         # All possible search parameters are named here,
         # to avoid passing through a flag that allows more access.
