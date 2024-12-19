@@ -133,3 +133,24 @@ pyenv install 3.12.4
 pyenv virtualenv 3.12.4 haal-centraal-proxy
 echo haal-centraal-proxy > .python-version
 ```
+
+## Test BSN Numbers
+
+The test dataset has many variations, we've found these to be useful:
+
+
+| Feature                    | BSN       |
+|----------------------------|-----------|
+| Met adelijke titel         | 000009830 |
+| Verblijfstitel             | 000009908 |
+| Immigratie                 | 000009842 |
+| Met parter                 | 010082426 |
+| Gescheiden                 | 999970616 |
+| Overleden                  | 999970239 |
+| Staatloos                  | 999991188 |
+| heeft ouders met bsn       | 999970665 |
+| Gezag double combo         | 999970057 |
+| Met einddatum en gezag     | 999970884 |
+| Indicatiecurateel register | 999993690 |
+| Geëmigreerd                | 999990470 |
+| inOnderzoek                | 999970008 |
