@@ -35,9 +35,18 @@ Example request (directly to the Haal Centraal Mock API):
 
 And the same can be repeated on the Django instance if you pass a token:
 
-    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $(./get-token.py benk-brp-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
+    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
+    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
 
-The *type* and *fields* are required for all request types.
+Same for search by BSN:
+
+    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
+    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
+
+
+The *type* field is required for all request types.
+The *fields* parameter is not required in the proxy, as it will be generated based on your token scopes.
+
 All possible parameters are documented in the [Haal Centraal documentation](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/).
 
 ## Using Local Python
