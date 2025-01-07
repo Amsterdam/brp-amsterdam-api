@@ -269,15 +269,20 @@ if CLOUD_ENV.startswith("azure"):
 
 # -- Third party app settings
 
-if DEBUG:
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        r"^http://localhost(?::\d+)?/",
-        r"^http://127.0.0.1(?::\d+)?/",
-    ]
-
 CORS_ALLOW_CREDENTIALS = True
-
 CORS_ALLOW_ALL_ORIGINS = env.bool("CORS_ALLOW_ALL_ORIGINS", default=False)
+CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
+CORS_ALLOWED_ORIGIN_REGEXES = env.list(
+    "CORS_ALLOWED_ORIGIN_REGEXES",
+    default=(
+        [
+            r"^http://localhost(?::\d+)?",
+            r"^http://127.0.0.1(?::\d+)?",
+        ]
+        if DEBUG
+        else []
+    ),
+)
 
 HEALTH_CHECKS = {
     "app": lambda request: True,

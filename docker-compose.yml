@@ -26,7 +26,7 @@ services:
       UWSGI_STATIC_MAP: "/haal_centraal_proxy/static=/static"
       SECRET_KEY: insecure
       #DATABASE_URL: "${DATABASE_URL:-postgresql://postgres:insecure@database/dataservices}"
-      CORS_ALLOW_ALL_ORIGINS: "${CORS_ALLOW_ALL_ORIGINS:-False}"
+      CORS_ALLOW_ALL_ORIGINS: "${CORS_ALLOW_ALL_ORIGINS:-true}"
       DJANGO_LOG_LEVEL: "${DJANGO_LOG_LEVEL:-INFO}"
       HAAL_CENTRAAL_BRP_URL: "http://localhost:5010/haalcentraal/api/brp/personen"
       LOG_LEVEL: "${LOG_LEVEL:-INFO}"
