@@ -4,9 +4,6 @@ from haal_centraal_proxy.settings import *  # noqa: F403, F405
 # of the regular project sources. Otherwise, the project needs to have
 # knowledge of the test framework.
 
-
-OAUTH_URL = ""
-
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",

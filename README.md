@@ -91,8 +91,10 @@ The following URLs are available:
 The following environment variables are useful for configuring a local development environment:
 
 * `DJANGO_DEBUG` to enable debugging (true/false).
-* `LOG_LEVEL` log level for application code.
+* `LOG_LEVEL` log level for application code (default is `DEBUG` for debug, `INFO` otherwise).
 * `AUDIT_LOG_LEVEL` log level for audit messages (default is `INFO`).
+* `DJANGO_LOG_LEVEL` log level for Django internals (default is `INFO`).
+* `PUB_JWKS` allows to give publically readable JSON Web Key Sets in JSON format (good default: `jq -c < src/jwks_test.json`).
 
 Connections:
 
@@ -110,9 +112,17 @@ Deployment:
 * `AZURE_APPI_CONNECTION_STRING` Azure Insights configuration.
 * `AZURE_APPI_AUDIT_CONNECTION_STRING` Same, for a special audit logging.
 * `CLOUD_ENV=azure` will enable Azure-specific telemetry.
-* `SECRET_KEY` is used for various encryption code.
 * `STATIC_URL` defines the base URL for static files (e.g. to point to a CDN).
-* `PUB_JWKS` or `OAUTH_JWKS_URL` point to a public JWT key.
+* `OAUTH_JWKS_URL` point to a public JSON Web Key Set, e.g. `https://login.microsoftonline.com/{tenant_uuid or 'common'}/discovery/v2.0/keys`.
+
+Hardening deployment:
+
+* `SESSION_COOKIE_SECURE` is already true in production.
+* `CSRF_COOKIE_SECURE` is already true in production.
+* `SECRET_KEY` is used for various encryption code.
+* `CORS_ALLOW_ALL_ORIGINS` can be true/false to allow all websites to connect.
+* `CORS_ALLOWED_ORIGINS` allows a list of origin URLs to use.
+* `CORS_ALLOWED_ORIGIN_REGEXES` supports a list of regex patterns fow allowed origins.
 
 # Developer Notes
 
