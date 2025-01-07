@@ -27,8 +27,6 @@ docker compose up
 
 Navigate to `localhost:8095`.
 
-The mock API uses the following data file: https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json
-
 ## Using Local Python
 
 Create a virtualenv:
@@ -158,8 +156,8 @@ echo haal-centraal-proxy > .python-version
 
 ## Test BSN Numbers
 
-The [test dataset](https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json)
-has many variations, we've found these to be useful:
+The docker mock API uses this [JSON test dataset](https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json).
+We've found these to be useful:
 
 
 
@@ -178,3 +176,6 @@ has many variations, we've found these to be useful:
 | Indicatiecurateel register | 999993690 |
 | Geëmigreerd                | 999990470 |
 | inOnderzoek                | 999970008 |
+
+The acceptance environment (proefomgeving) of Haal Centraal uses a different [GABA-V test dataset](https://www.rvig.nl/media/288)
+to simulate the production environment as best as possible.
