@@ -3,11 +3,12 @@
 import json
 import sys
 import time
+from pathlib import Path
 
 from jwcrypto.jwk import JWK
 from jwcrypto.jwt import JWT
 
-with open("jwks_test.json") as f:
+with Path(__file__).parent.joinpath("jwks_test.json").open() as f:
     key = JWK(**json.load(f)["keys"][0])
 
 # Validity period, in seconds.
