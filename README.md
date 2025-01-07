@@ -29,28 +29,7 @@ Navigate to `localhost:8095`.
 
 The mock API uses the following data file: https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json
 
-Example request (directly to the Haal Centraal Mock API):
-
-    curl -X POST http://localhost:5010/haalcentraal/api/brp/personen -H 'Content-Type: application/json' -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
-
-And the same can be repeated on the Django instance if you pass a token:
-
-    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
-
-Same for search by BSN:
-
-    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
-
-
-The *type* field is required for all request types.
-The *fields* parameter is not required in the proxy, as it will be generated based on your token scopes.
-
-All possible parameters are documented in the [Haal Centraal documentation](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/).
-
 ## Using Local Python
-
 
 Create a virtualenv:
 
@@ -74,6 +53,30 @@ export DJANGO_DEBUG=true
 
 ./manage.py runserver localhost:8000
 ```
+
+## Example Requests
+
+Example request (directly to the Haal Centraal Mock API):
+
+    curl -X POST http://localhost:5010/haalcentraal/api/brp/personen -H 'Content-Type: application/json' -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
+
+And the same can be repeated on the Django instance if you pass a token:
+
+    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
+    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
+
+Same for search by BSN:
+
+    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
+    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
+
+### Notes
+
+The *type* field is required for all request types.
+The *fields* parameter is not required in the proxy, as it will be generated based on your token scopes.
+
+All possible parameters are documented in the [Haal Centraal documentation](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/).
+
 
 ## Available Endpoints
 
@@ -155,7 +158,9 @@ echo haal-centraal-proxy > .python-version
 
 ## Test BSN Numbers
 
-The test dataset has many variations, we've found these to be useful:
+The [test dataset](https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json)
+has many variations, we've found these to be useful:
+
 
 
 | Feature                    | BSN       |
