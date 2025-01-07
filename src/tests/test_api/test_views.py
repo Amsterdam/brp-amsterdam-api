@@ -67,16 +67,17 @@ class TestBaseProxyView:
             },
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
-        assert response.status_code == 403
-        assert caplog.messages[1].startswith(
-            "Granted access for personen.ZoekMetPostcodeEnHuisnummer, needed:"
+        assert response.status_code == 502
+        assert any(
+            m.startswith("Granted access for personen.ZoekMetPostcodeEnHuisnummer, needed:")
+            for m in caplog.messages
         ), caplog.messages
         assert response.json() == {
-            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
-            "title": "You do not have permission to perform this action.",
-            "status": 403,
-            "detail": "401 from remote: Niet correct geauthenticeerd.",
-            "code": "permission_denied",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.3",
+            "title": "Connection failed (bad gateway)",
+            "status": 502,
+            "detail": "Backend is improperly configured, final endpoint rejected our credentials.",
+            "code": "backend_config",
             "instance": "/api/brp/personen",
         }
 
@@ -115,8 +116,9 @@ class TestBaseProxyView:
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
         assert response.status_code == 400
-        assert caplog.messages[1].startswith(
-            "Granted access for personen.RaadpleegMetBurgerservicenummer, needed:"
+        assert any(
+            m.startswith("Granted access for personen.RaadpleegMetBurgerservicenummer, needed:")
+            for m in caplog.messages
         ), caplog.messages
         assert response.json() == {
             "code": "paramsValidation",

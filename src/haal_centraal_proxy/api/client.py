@@ -14,7 +14,7 @@ import orjson
 import urllib3
 from more_ds.network.url import URL
 from rest_framework import status
-from rest_framework.exceptions import APIException, NotFound, ParseError, PermissionDenied
+from rest_framework.exceptions import APIException, NotFound, ParseError
 from urllib3 import BaseHTTPResponse
 
 from .exceptions import BadGateway, GatewayTimeout, RemoteAPIException, ServiceUnavailable
@@ -134,39 +134,46 @@ class HaalCentraalClient:
         # Consider the actual JSON response here,
         # unless the request hit the completely wrong page (it got an HTML page).
         content_type = response.headers.get("content-type", "")
-        detail_message = (
-            response.data.decode() if not content_type.startswith("text/html") else None
-        )
         remote_json = (
             orjson.loads(response.data)
             if content_type in ("application/json", "application/problem+json")
             else None
         )
+        detail_message = (
+            response.data.decode() if not content_type.startswith("text/html") else None
+        )
 
-        if response.status == status.HTTP_400_BAD_REQUEST:
-            if remote_json is not None:
-                # Translate proper "Bad Request" to REST response
-                return RemoteAPIException(
-                    title=remote_json.get("title", ParseError.default_detail),
-                    detail=remote_json.get("detail"),
-                    code=remote_json.get("code", ParseError.default_code),
-                    status=400,
-                    invalid_params=remote_json.get("invalidParams"),
-                )
-            else:
-                return BadGateway(detail_message)
-        elif response.status in (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN):
-            # We translate 401 to 403 because 401 MUST have a WWW-Authenticate header in the
-            # response, and we can't easily set that from here. Also, RFC 7235 says we MUST NOT
-            # change such a header, which presumably includes making one up.
-            remote_detail = (
-                remote_json.get("title", "") if remote_json is not None else repr(response.data)
+        if not remote_json:
+            # Unexpected response, call it a "Bad Gateway"
+            logger.error(
+                "Proxy call failed, unexpected status code from endpoint: %s %s",
+                response.status,
+                detail_message,
             )
+            return BadGateway(
+                detail_message or f"Unexpected HTTP {response.status} from internal endpoint"
+            )
+
+        if response.status == status.HTTP_401_UNAUTHORIZED or (
+            response.status == status.HTTP_403_FORBIDDEN
+            and remote_json is not None
+            and remote_json["title"] == "U bent niet geautoriseerd voor het gebruik van deze API."
+        ):
+            # Our API key is not configured (401) or incorrect (403). Don't blame the client.
+            # So far there is no other cause for a 403, but allow this to change.
+            raise BadGateway(
+                "Backend is improperly configured, final endpoint rejected our credentials.",
+                code="backend_config",
+            )
+        elif response.status in (status.HTTP_400_BAD_REQUEST, status.HTTP_403_FORBIDDEN):
+            # Bad request likely means the JSON parameters were invalid.
+            # Translate proper "Bad Request" to REST response
             return RemoteAPIException(
-                title=PermissionDenied.default_detail,
-                detail=f"{response.status} from remote: {remote_detail}",
-                status=status.HTTP_403_FORBIDDEN,
-                code=remote_json.get("code", PermissionDenied.default_code),
+                title=remote_json.get("title", ParseError.default_detail),
+                detail=remote_json.get("detail"),
+                code=remote_json.get("code", ParseError.default_code),
+                status=response.status,
+                invalid_params=remote_json.get("invalidParams"),
             )
         elif response.status == status.HTTP_404_NOT_FOUND:
             # Return 404 to client (in DRF format)
@@ -178,7 +185,7 @@ class HaalCentraalClient:
                     status=404,
                     code=remote_json.get("code", NotFound.default_code),
                 )
-            return NotFound(detail_message)
+            return NotFound(repr(remote_json))
         else:
             # Unexpected response, call it a "Bad Gateway"
             logger.error(
