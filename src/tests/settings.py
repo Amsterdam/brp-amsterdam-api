@@ -29,6 +29,10 @@ DATAPUNT_AUTHZ = {
 # Remove propagate=False so caplog can read those messages.
 LOGGING = {
     **LOGGING,
+    "root": {
+        "level": "DEBUG",
+        "handlers": ["console"],
+    },
     "loggers": {
         name: {
             **conf,

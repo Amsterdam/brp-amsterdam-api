@@ -341,11 +341,21 @@ class BrpPersonenView(BaseProxyFieldsView):
             # hide those persons in the response. Based on:
             # https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1756
             # https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1857
-            hc_response["personen"] = [
+            personen = [
                 persoon
                 for persoon in hc_response["personen"]
                 if not int(persoon.get("geheimhoudingPersoonsgegevens", 0))  # "1" in demo data
             ]
+            num_hidden = len(hc_response["personen"]) - len(personen)
+            if num_hidden:
+                logging.debug(
+                    "Removed %d persons from response"
+                    " (missing scope %s for to view 'geheimhoudingPersoonsgegevens')",
+                    num_hidden,
+                    SCOPE_ALLOW_CONFIDENTIAL_PERSONS,
+                )
+
+            hc_response["personen"] = personen
 
 
 class BrpBewoningenView(BaseProxyView):

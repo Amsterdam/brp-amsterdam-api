@@ -317,7 +317,7 @@ class TestBrpPersonenView:
         )
 
     @pytest.mark.parametrize("hide", [True, False])
-    def test_hide_confidential(self, api_client, urllib3_mocker, hide):
+    def test_hide_confidential(self, api_client, urllib3_mocker, hide, caplog):
         """Prove that confidential persons are hidden."""
         person1 = {
             "naam": {"geslachtsnaam": "FOO"},
@@ -359,6 +359,11 @@ class TestBrpPersonenView:
         personen = response.json()["personen"]
         expect = [person1] if hide else [person1, person2]
         assert personen == expect
+
+        if hide:
+            assert any(
+                m.startswith("Removed 1 persons from response") for m in caplog.messages
+            ), caplog.messages
 
 
 class TestBrpBewoningenView:
