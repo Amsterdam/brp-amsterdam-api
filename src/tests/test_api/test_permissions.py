@@ -1,6 +1,7 @@
 import pytest
 from haal_centraal_proxy.api.exceptions import ProblemJsonException
 from haal_centraal_proxy.api.permissions import (
+    AccessDenied,
     ParameterPolicy,
     validate_parameters,
 )
@@ -79,7 +80,7 @@ class TestValidateParameters:
         ),
         "gemeenteVanInschrijving": ParameterPolicy(
             {"0363": set()},  # ok to include ?gemeenteVanInschrijving=0363
-            default_scope={"BRP/buiten-gemeente"},  # Require a scope for unknown values
+            default_scope={"benk-brp-landelijk"},  # Require a scope for unknown values
         ),
     }
 
@@ -93,24 +94,21 @@ class TestValidateParameters:
                     "foobar": "XYZ",
                 },
                 user_scopes={"benk-brp-zoekvraag-bsn"},
-                service_log_id="personen",
             )
         assert exc_info.value.detail == "De foutieve parameter(s) zijn: foobar."
         assert not caplog.messages
 
-    def test_unknown_value_type(self, caplog):
+    def test_unknown_value_type(self):
         """Prove that only known values are accepted."""
         with pytest.raises(ProblemJsonException, match="FooBar") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={"type": "FooBar"},
                 user_scopes=set(),
-                service_log_id="personen",
             )
         assert exc_info.value.detail == "Het veld 'type' ondersteund niet de waarde(s): FooBar."
-        assert not caplog.messages
 
-    def test_unknown_value_fields(self, caplog):
+    def test_unknown_value_fields(self):
         """Prove that only known values are accepted.
         This isn't checked with the "type" argument as that is special/mandatory.
         """
@@ -122,28 +120,25 @@ class TestValidateParameters:
                     "fields": ["FooBar"],
                 },
                 user_scopes={"benk-brp-zoekvraag-bsn"},
-                service_log_id="personen",
             )
         assert exc_info.value.detail == "Het veld 'fields' ondersteund niet de waarde(s): FooBar."
-        assert not caplog.messages
 
-    def test_value_scope_check(self, caplog):
+    def test_value_scope_check(self):
         """Prove that 'type' field is checked for authorization."""
-        with pytest.raises(ProblemJsonException, match="ZoekMetPostcodeEnHuisnummer"):
+        with pytest.raises(AccessDenied, match="ZoekMetPostcodeEnHuisnummer") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={"type": "ZoekMetPostcodeEnHuisnummer"},
                 user_scopes=set(),
-                service_log_id="personen",
             )
-        assert caplog.messages[0] == (
-            "Denied access to 'personen' using type=ZoekMetPostcodeEnHuisnummer, "
-            "missing benk-brp-zoekvraag-postcode-huisnummer"
-        )
 
-    def test_deny_other_gemeente(self, caplog):
+        assert exc_info.value.field_name == "type"
+        assert exc_info.value.denied_values == ["ZoekMetPostcodeEnHuisnummer"]
+        assert exc_info.value.needed_scopes == {"benk-brp-zoekvraag-postcode-huisnummer"}
+
+    def test_deny_other_gemeente(self):
         """Prove that search outside Amsterdam is denied."""
-        with pytest.raises(ProblemJsonException, match="gemeenteVanInschrijving"):
+        with pytest.raises(AccessDenied, match="gemeenteVanInschrijving") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={
@@ -152,16 +147,14 @@ class TestValidateParameters:
                     "gemeenteVanInschrijving": "0111",
                 },
                 user_scopes={"benk-brp-zoekvraag-bsn"},
-                service_log_id="personen",
             )
-        assert caplog.messages[0] == (
-            "Denied access to 'personen' using gemeenteVanInschrijving=0111, "
-            "missing BRP/buiten-gemeente"
-        )
+        assert exc_info.value.field_name == "gemeenteVanInschrijving"
+        assert exc_info.value.denied_values == ["0111"]
+        assert exc_info.value.needed_scopes == {"benk-brp-landelijk"}
 
-    def test_deny_field_access(self, caplog):
+    def test_deny_field_access(self):
         """Prove that requesting certain fields is not possible without extra permissions."""
-        with pytest.raises(ProblemJsonException, match="adressering"):
+        with pytest.raises(AccessDenied, match="adressering") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={
@@ -169,11 +162,10 @@ class TestValidateParameters:
                     "fields": ["adressering"],
                 },
                 user_scopes={"benk-brp-zoekvraag-postcode-huisnummer"},
-                service_log_id="personen",
             )
-        assert caplog.messages[0] == (
-            "Denied access to 'personen' using fields=adressering, missing BRP/adres-buitenland"
-        )
+        assert exc_info.value.field_name == "fields"
+        assert exc_info.value.denied_values == ["adressering"]
+        assert exc_info.value.needed_scopes == {"BRP/adres-buitenland"}
 
     def test_multiple_scopes(self):
         """Prove that only one scope is needed for the value."""
@@ -184,13 +176,15 @@ class TestValidateParameters:
                 "fields": ["kinderen.naam"],
             },
             user_scopes={"benk-brp-zoekvraag-postcode-huisnummer", "dataset2"},
-            service_log_id="personen",
         )
-        assert needed == {"benk-brp-zoekvraag-postcode-huisnummer", "dataset1|dataset2|..."}
+        assert needed == {
+            "benk-brp-zoekvraag-postcode-huisnummer",
+            "dataset2",
+        }
 
-    def test_no_scopes_defined(self, caplog):
+    def test_no_scopes_defined(self):
         """Prove that having "None" as parameter value means no scopes are defined."""
-        with pytest.raises(ProblemJsonException, match="ouders"):
+        with pytest.raises(AccessDenied, match="ouders") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={
@@ -198,17 +192,11 @@ class TestValidateParameters:
                     "fields": ["ouders"],
                 },
                 user_scopes={"benk-brp-zoekvraag-postcode-huisnummer"},
-                service_log_id="personen",
             )
-        assert caplog.messages[0] == (
-            "Denied access to 'personen' using fields=ouders, missing <undefined fields=ouders>"
-        )
-        assert caplog.records[0].args == {
-            "service": "personen",
-            "field": "fields",
-            "values": "ouders",
-            "missing": "<undefined fields=ouders>",
-        }
+
+        assert exc_info.value.field_name == "fields"
+        assert exc_info.value.denied_values == ["ouders"]
+        assert exc_info.value.needed_scopes == {"<always deny fields=ouders>"}
 
     def test_satisfy_all_scopes(self):
         """Prove that access is given when all scopes are satisfied."""
@@ -224,10 +212,9 @@ class TestValidateParameters:
                 "dataset2",  # fields ok
                 "BRP/adres-buitenland",  # gemeenteVanInschrijving ok
             },
-            service_log_id="personen",
         )
         assert needed == {
             "benk-brp-zoekvraag-postcode-huisnummer",
-            "dataset1|dataset2|...",
+            "dataset2",
             "BRP/adres-buitenland",
         }

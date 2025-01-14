@@ -1,4 +1,3 @@
-import orjson
 import pytest
 from django.urls import reverse
 from haal_centraal_proxy.api import views
@@ -35,22 +34,19 @@ class TestBaseProxyView:
             "instance": url,
         }
 
-    def test_invalid_api_key(self, api_client, urllib3_mocker, caplog):
+    def test_invalid_api_key(self, api_client, requests_mock, caplog):
         """Prove that incorrect API-key settings are handled gracefully."""
-        urllib3_mocker.add(
-            "POST",
+        requests_mock.post(
             "/haalcentraal/api/brp/personen",
-            body=orjson.dumps(
-                {
-                    "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
-                    "title": "Niet correct geauthenticeerd.",
-                    "status": 401,
-                    "instance": "/haalcentraal/api/brp/personen",
-                    "code": "authentication",
-                }
-            ),
-            status=401,
-            content_type="application/json",
+            json={
+                "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
+                "title": "Niet correct geauthenticeerd.",
+                "status": 401,
+                "instance": "/haalcentraal/api/brp/personen",
+                "code": "authentication",
+            },
+            status_code=401,
+            headers={"content-type": "application/json"},
         )
 
         url = reverse("brp-personen")
@@ -69,7 +65,7 @@ class TestBaseProxyView:
         )
         assert response.status_code == 502
         assert any(
-            m.startswith("Granted access for personen.ZoekMetPostcodeEnHuisnummer, needed:")
+            m.startswith("Access granted for 'personen.ZoekMetPostcodeEnHuisnummer' to '")
             for m in caplog.messages
         ), caplog.messages
         assert response.json() == {
@@ -81,29 +77,26 @@ class TestBaseProxyView:
             "instance": "/api/brp/personen",
         }
 
-    def test_error_response(self, api_client, urllib3_mocker, caplog):
-        urllib3_mocker.add(
-            "POST",
+    def test_error_response(self, api_client, requests_mock, caplog):
+        requests_mock.post(
             "/haalcentraal/api/brp/personen",
-            body=orjson.dumps(
-                {
-                    "invalidParams": [
-                        {
-                            "name": "burgerservicenummer",
-                            "code": "array",
-                            "reason": "Parameter is geen array.",
-                        }
-                    ],
-                    "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
-                    "title": "Een of meerdere parameters zijn niet correct.",
-                    "status": 400,
-                    "detail": "De foutieve parameter(s) zijn: burgerservicenummer.",
-                    "instance": "/haalcentraal/api/brp/personen",
-                    "code": "paramsValidation",
-                }
-            ),
-            status=400,
-            content_type="application/json",
+            json={
+                "invalidParams": [
+                    {
+                        "name": "burgerservicenummer",
+                        "code": "array",
+                        "reason": "Parameter is geen array.",
+                    }
+                ],
+                "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+                "title": "Een of meerdere parameters zijn niet correct.",
+                "status": 400,
+                "detail": "De foutieve parameter(s) zijn: burgerservicenummer.",
+                "instance": "/haalcentraal/api/brp/personen",
+                "code": "paramsValidation",
+            },
+            status_code=400,
+            headers={"content-type": "application/json"},
         )
 
         url = reverse("brp-personen")
@@ -117,7 +110,7 @@ class TestBaseProxyView:
         )
         assert response.status_code == 400
         assert any(
-            m.startswith("Granted access for personen.RaadpleegMetBurgerservicenummer, needed:")
+            m.startswith("Access granted for 'personen.RaadpleegMetBurgerservicenummer' to '")
             for m in caplog.messages
         ), caplog.messages
         assert response.json() == {
@@ -161,13 +154,12 @@ class TestBrpPersonenView:
         ],
     }
 
-    def test_bsn_search(self, api_client, urllib3_mocker):
+    def test_bsn_search(self, api_client, requests_mock):
         """Prove that search is possible"""
-        urllib3_mocker.add(
-            "POST",
+        requests_mock.post(
             "/haalcentraal/api/brp/personen",
-            body=orjson.dumps(self.RESPONSE_POSTCODE_HUISNUMMER),
-            content_type="application/json",
+            json=self.RESPONSE_POSTCODE_HUISNUMMER,
+            headers={"content-type": "application/json"},
         )
 
         url = reverse("brp-personen")
@@ -185,7 +177,7 @@ class TestBrpPersonenView:
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
         assert response.status_code == 200, response.data
-        assert response.json() == self.RESPONSE_POSTCODE_HUISNUMMER
+        assert response.json() == self.RESPONSE_POSTCODE_HUISNUMMER, response.data
 
     def test_bsn_search_deny(self, api_client):
         """Prove that search is possible"""
@@ -317,7 +309,7 @@ class TestBrpPersonenView:
         )
 
     @pytest.mark.parametrize("hide", [True, False])
-    def test_hide_confidential(self, api_client, urllib3_mocker, hide, caplog):
+    def test_hide_confidential(self, api_client, requests_mock, hide, caplog):
         """Prove that confidential persons are hidden."""
         person1 = {
             "naam": {"geslachtsnaam": "FOO"},
@@ -326,16 +318,13 @@ class TestBrpPersonenView:
             "naam": {"geslachtsnaam": "BAR"},
             "geheimhoudingPersoonsgegevens": "1",
         }
-        urllib3_mocker.add(
-            "POST",
+        requests_mock.post(
             "/haalcentraal/api/brp/personen",
-            body=orjson.dumps(
-                {
-                    "type": "ZoekMetPostcodeEnHuisnummer",
-                    "personen": [person1, person2],
-                }
-            ),
-            content_type="application/json",
+            json={
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "personen": [person1, person2],
+            },
+            headers={"content-type": "application/json"},
         )
         url = reverse("brp-personen")
         scopes = [
@@ -380,14 +369,13 @@ class TestBrpBewoningenView:
         ]
     }
 
-    def test_address_id_search(self, api_client, urllib3_mocker):
+    def test_address_id_search(self, api_client, requests_mock):
         """Prove that search is possible"""
-        urllib3_mocker.add(
-            "POST",
+        requests_mock.post(
             # https://demo-omgeving.haalcentraal.nl
             "/haalcentraal/api/bewoning/bewoningen",
-            body=orjson.dumps(self.RESPONSE_BEWONINGEN),
-            content_type="application/json",
+            json=self.RESPONSE_BEWONINGEN,
+            headers={"content-type": "application/json"},
         )
 
         url = reverse("brp-bewoningen")
@@ -402,7 +390,7 @@ class TestBrpBewoningenView:
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
         assert response.status_code == 200, response
-        assert response.json() == self.RESPONSE_BEWONINGEN
+        assert response.json() == self.RESPONSE_BEWONINGEN, response.data
 
     def test_address_id_search_deny(self, api_client):
         """Prove that acess is checked"""
@@ -453,14 +441,13 @@ class BrpVerblijfsplaatsHistorieView:
         ]
     }
 
-    def test_bsn_date_search(self, api_client, urllib3_mocker):
+    def test_bsn_date_search(self, api_client, requests_mock):
         """Prove that search is possible"""
-        urllib3_mocker.add(
-            "POST",
+        requests_mock.post(
             # https://demo-omgeving.haalcentraal.nl
             "/haalcentraal/api/brphistorie/verblijfplaatshistorie",
-            body=orjson.dumps(self.RESPONSE_VERBLIJFSPLAATS),
-            content_type="application/json",
+            json=self.RESPONSE_VERBLIJFSPLAATS,
+            headers={"content-type": "application/json"},
         )
 
         url = reverse("brp-verblijfsplaatshistorie")
@@ -475,7 +462,7 @@ class BrpVerblijfsplaatsHistorieView:
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
         assert response.status_code == 200, response
-        assert response.json() == self.RESPONSE_VERBLIJFSPLAATS
+        assert response.json() == self.RESPONSE_VERBLIJFSPLAATS, response.data
 
     def test_bsn_date_search_deny(self, api_client):
         """Prove that acess is checked"""
@@ -513,14 +500,12 @@ class TestReisdocumentenView:
         ],
     }
 
-    def test_bsn_search(self, api_client, urllib3_mocker):
+    def test_bsn_search(self, api_client, requests_mock):
         """Prove that search is possible"""
-        urllib3_mocker.add(
-            "POST",
-            # https://proefomgeving.haalcentraal.nl
+        requests_mock.post(
             "/haalcentraal/api/reisdocumenten/reisdocumenten",
-            body=orjson.dumps(self.RESPONSE_REISDOCUMENTEN),
-            content_type="application/json",
+            json=self.RESPONSE_REISDOCUMENTEN,
+            headers={"content-type": "application/json"},
         )
 
         url = reverse("reisdocumenten")
@@ -541,7 +526,7 @@ class TestReisdocumentenView:
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
         assert response.status_code == 200, response.data
-        assert response.json() == self.RESPONSE_REISDOCUMENTEN
+        assert response.json() == self.RESPONSE_REISDOCUMENTEN, response.data
 
     def test_bsn_search__deny(self, api_client):
         """Prove that acess is checked"""

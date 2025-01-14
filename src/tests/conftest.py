@@ -6,7 +6,6 @@ import pytest
 from django.core.handlers.wsgi import WSGIRequest
 from rest_framework.request import Request
 from rest_framework.test import APIClient, APIRequestFactory
-from urllib3_mock import Responses
 
 from tests.utils import api_request_with_scopes, to_drf_request
 
@@ -41,13 +40,3 @@ def api_client() -> APIClient:
     api_client = APIClient()
     api_client.default_format = "json"  # instead of multipart
     return api_client
-
-
-@pytest.fixture()
-def urllib3_mocker() -> Responses:
-    """Fixture to route all urllib3 traffic to the mocker.
-    When no mock address is defined, it will return a "Connection refused" state.
-    """
-    responses = Responses()
-    with responses:
-        yield responses

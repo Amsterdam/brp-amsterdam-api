@@ -1,20 +1,23 @@
 import logging
 
 import orjson
+import requests
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.exceptions import APIException
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from . import fields, permissions
-from .client import HaalCentraalClient, HaalCentraalResponse
+from .client import HaalCentraalClient
 from .exceptions import ProblemJsonException
-from .permissions import ParameterPolicy, audit_log
+from .permissions import ParameterPolicy
 
 logger = logging.getLogger(__name__)
+audit_log = logging.getLogger("haal_centraal_proxy.audit")
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 ALLOW_VALUE = set()  # no scopes
@@ -76,52 +79,136 @@ class BaseProxyView(APIView):
         Basic checks (such as content-type validation) are already done by REST Framework.
         The API uses POST so the logs won't include personally identifiable information (PII).
         """
-        # Check the request
+        # Parse the request
         self.user_scopes = set(request.get_token_scopes)
         self.user_id = request.get_token_claims.get("email", request.get_token_subject)
         hc_request = request.data.copy()
 
+        # Allow inserting missing parameters, etc...
         self.transform_request(hc_request)
-        all_needed_scopes = permissions.validate_parameters(
-            self.parameter_ruleset,
-            hc_request,
-            self.user_scopes,
-            service_log_id=self.service_log_id,
-        )
+
+        # Perform validation
+        try:
+            needed_param_scopes = permissions.validate_parameters(
+                self.parameter_ruleset, hc_request, self.user_scopes
+            )
+        except permissions.AccessDenied as err:
+            # Logging happens at the view level, to have full context.
+            self.log_access_denied(hc_request, err)
+
+            # Return error response
+            denied_values = ", ".join(err.denied_values)
+            raise ProblemJsonException(
+                title="U bent niet geautoriseerd voor deze operatie.",
+                detail=f"U bent niet geautoriseerd voor {err.field_name} = {denied_values}.",
+                code="permissionDenied",  # Same as what Haal Centraal would do.
+                status=status.HTTP_403_FORBIDDEN,
+                invalid_params=[
+                    {"name": err.field_name, "code": "denied", "reason": "Geen toegang."}
+                ],
+            ) from err
 
         # Proxy to Haal Centraal
-        hc_response = self.client.call(hc_request)
+        try:
+            downstream_response = self.client.call(hc_request)
+        except (APIException, OSError) as e:
+            # Even when the request failed, still log that we did grant access.
+            hc_response = (
+                e.__cause__.response.json()
+                if isinstance(e.__cause__, requests.RequestException)
+                else None
+            )
+
+            self.log_access_granted(
+                request,
+                hc_request,
+                hc_response,
+                needed_scopes=self.needed_scopes | needed_param_scopes,
+                exception=e,
+            )
+            raise
 
         # Rewrite the response to pagination still works.
         # (currently in in-place)
-        self.transform_response(hc_response.data)
+        hc_response = orjson.loads(downstream_response.text)
+        self.transform_response(hc_response)
 
-        # Post it to audit logging
-        self.log_access(
+        # Post it to audit logging, both when everything went ok, or failed.
+        self.log_access_granted(
             request,
             hc_request,
             hc_response,
-            needed_scopes=all_needed_scopes,
+            needed_scopes=self.needed_scopes | needed_param_scopes,
         )
 
         # And return it.
         return HttpResponse(
-            orjson.dumps(hc_response.data),
-            content_type=hc_response.headers.get("Content-Type"),
+            orjson.dumps(hc_response),
+            content_type=downstream_response.headers.get(
+                "content-type", "application/json; charset=utf-8"
+            ),
         )
 
-    def log_access(
+    def log_access_denied(self, hc_request: dict, err: permissions.AccessDenied) -> None:
+        """Perform the audit logging for the denied request."""
+        missing = sorted(err.needed_scopes - self.user_scopes)
+        audit_log.info(
+            "Denied access to '%(service)s.%(query_type)s'"
+            " for %(field)s=%(values)s, missing %(missing)s",
+            {
+                "service": self.service_log_id,
+                "query_type": hc_request["type"],
+                "field": err.field_name,
+                "values": ",".join(err.denied_values),
+                "missing": ",".join(missing),
+            },
+            extra={
+                "service": self.service_log_id,
+                "query_type": hc_request["type"],
+                "field": err.field_name,
+                "values": err.denied_values,
+                "granted": sorted(self.user_scopes),
+                "needed": sorted(err.needed_scopes),
+                "missing": missing,
+            },
+        )
+
+    def log_access_granted(
         self,
         request,
         hc_request: dict,
-        hc_response: HaalCentraalResponse,
+        hc_response: dict | None,
         needed_scopes: set[str],
+        exception: OSError | APIException | None = None,
     ) -> None:
         """Perform the audit logging for the request/response.
 
         This is a very basic global logging.
         Per service type, it may need more refinement.
         """
+        extra = {
+            "service": self.service_log_id,
+            "query_type": hc_request["type"],
+            "user": self.user_id,
+            "granted": sorted(self.user_scopes),
+            "needed": sorted(needed_scopes),
+            "request": request.data,
+            "hc_request": hc_request,
+            "hc_response": hc_response,
+        }
+
+        if exception is None:
+            msg = (
+                "Access granted for '%(service)s.%(query_type)s' to '%(user)s'"
+                " (full request/response in detail)"
+            )
+        else:
+            msg = (
+                "Access granted for '%(service)s.%(query_type)s' to '%(user)s'"
+                ", but error returned (full request/response in detail)"
+            )
+            extra["exception"] = str(exception)
+
         # user.AuthenticatedId is already added globally.
         # TODO:
         # - Per record (in lijst) een log melding doen.
@@ -129,20 +216,13 @@ class BaseProxyView(APIView):
         # - session ID van afnemende applicatie.
         # - A-nummer in de response
         audit_log.info(
-            "Access granted to '%(service)s' for '%(user)s, full request/response",
+            msg,
             {
                 "service": self.service_log_id,
+                "query_type": hc_request["type"],
                 "user": self.user_id,
             },
-            extra={
-                "service": self.service_log_id,
-                "user": self.user_id,
-                "granted": sorted(self.user_scopes),
-                "needed": sorted(needed_scopes),
-                "request": request.data,
-                "hc_request": hc_request,
-                "hc_response": hc_response.data,
-            },
+            extra=extra,
         )
 
     def transform_request(self, hc_request: dict) -> None:
@@ -203,8 +283,9 @@ class BaseProxyFieldsView(BaseProxyView):
         allowed_by_scope = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
         allowed_by_type = self.possible_fields_by_type.get(query_type, None)
 
-        allowed_fields = (
-            list(set(allowed_by_type).intersection(allowed_by_scope))
+        # The sorting is done to have consistent logging.
+        allowed_fields = sorted(
+            set(allowed_by_type).intersection(allowed_by_scope)
             if allowed_by_type is not None
             else allowed_by_scope
         )

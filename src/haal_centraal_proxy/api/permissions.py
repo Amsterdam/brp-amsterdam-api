@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 import re
 from dataclasses import dataclass, field
 from functools import cached_property
@@ -10,8 +9,6 @@ from rest_framework import status
 from rest_framework.permissions import BasePermission
 
 from .exceptions import ProblemJsonException
-
-audit_log = logging.getLogger("haal_centraal_proxy.audit")
 
 
 @dataclass
@@ -92,18 +89,37 @@ class ParameterPolicy:
 ParameterPolicy.allow_all = ParameterPolicy(default_scope=set())
 
 
+class AccessDenied(Exception):
+    """Raise that access is denied, passing all relevant bits"""
+
+    def __init__(
+        self,
+        field_name: str,
+        denied_values: list[str],
+        needed_scopes: set[str],
+    ):
+        super().__init__(f"Access denied for {field_name}={','.join(denied_values)}")
+        self.needed_scopes = needed_scopes
+        self.field_name = field_name
+        self.denied_values = denied_values
+
+
 def validate_parameters(
     ruleset: dict[str, ParameterPolicy],
-    hc_request,
+    hc_request: dict,
     user_scopes: set[str],
-    *,
-    service_log_id: str,
 ) -> set[str]:
     """Validate the incoming request against the ruleset of allowed parameters/values.
 
     When access is denied, this will raise an exception that returns the desired error response.
     Both grants/denies are logged to the audit log as well.
 
+    :param ruleset: The ruleset that defines which scopes are required for certain parameters.
+    :param hc_request: The request that will be validated.
+    :param user_scopes: The scopes that this user has access to.
+    :param service_log_id: Which service is being accessed (used to improve log messages)
+    :param base_validated_scopes: Which scopes are already validated (used to improve log messages)
+    :raises ProblemJsonException: When parameters are missing, or values are invalid.
     :returns: The needed scopes needed to satify the request.
     """
     request_type = hc_request.get("type")
@@ -124,9 +140,7 @@ def validate_parameters(
         except KeyError:
             invalid_names.append(field_name)
         else:
-            needed_for_param = _validate_parameter_values(
-                policy, field_name, values, user_scopes, service_log_id=service_log_id
-            )
+            needed_for_param = _validate_parameter_values(policy, field_name, values, user_scopes)
             all_needed_scopes.update(needed_for_param)
 
     if invalid_names:
@@ -137,21 +151,6 @@ def validate_parameters(
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    audit_log.info(
-        "Granted access for %(service)s.%(type)s, needed: %(needed)s, granted: %(granted)s",
-        {
-            "service": service_log_id,
-            "type": request_type,
-            "needed": ",".join(sorted(all_needed_scopes)),
-            "granted": ",".join(sorted(user_scopes)),
-        },
-        extra={
-            "service": service_log_id,
-            "type": request_type,
-            "needed": sorted(all_needed_scopes),
-            "granted": sorted(user_scopes),
-        },
-    )
     return all_needed_scopes
 
 
@@ -160,7 +159,6 @@ def _validate_parameter_values(
     field_name: str,
     values: list | str,
     user_scopes: set[str],
-    service_log_id: str,
 ):
     """Check whether the given parameter values are allowed."""
     # Multiple values: will check each one
@@ -172,21 +170,31 @@ def _validate_parameter_values(
         try:
             needed_scopes = policy.get_needed_scopes(value)
         except ValueError:
-            invalid_values.append(value)
-        else:
-            if needed_scopes is None:
-                # No scopes defined for this value. Deny.
+            invalid_values.append(str(value))
+            continue
+
+        if needed_scopes is None:
+            # No scopes defined for this value. Deny.
+            denied_values.append(value)
+            all_needed_scopes.add(f"<always deny {field_name}={value}>")
+        elif needed_scopes:
+            # Not empty set, user must have ONE of these.
+            if user_scopes.isdisjoint(needed_scopes):  # OR comparison
+                # User doesn't have it.
                 denied_values.append(value)
-                all_needed_scopes.add(f"<undefined {field_name}={value}>")
-            elif needed_scopes:
-                if user_scopes.isdisjoint(needed_scopes):  # OR comparison
-                    denied_values.append(value)
 
                 # track for logging
-                log_needed = sorted(needed_scopes)
-                if len(needed_scopes) > 2:
-                    log_needed = log_needed[:2] + ["..."]
-                all_needed_scopes.add("|".join(log_needed))
+                if len(needed_scopes) > 1:
+                    log_needed = sorted(needed_scopes)
+                    if len(needed_scopes) > 3:
+                        log_needed = log_needed[:2] + ["..."]
+                    all_needed_scopes.add("|".join(log_needed))
+                else:
+                    all_needed_scopes.update(needed_scopes)
+            else:
+                # Track for logging, but reduce to what the user already has.
+                # This makes sure the "needed" list doesn't show all alternative options.
+                all_needed_scopes.update(needed_scopes & user_scopes)
 
     if invalid_values:
         raise ProblemJsonException(
@@ -200,27 +208,10 @@ def _validate_parameter_values(
         )
 
     if denied_values:
-        audit_log.info(
-            "Denied access to '%(service)s' using %(field)s=%(values)s, missing %(missing)s",
-            {
-                "service": service_log_id,
-                "field": field_name,
-                "values": ",".join(denied_values),
-                "missing": ",".join(sorted(all_needed_scopes - user_scopes)),
-            },
-            extra={
-                "service": service_log_id,
-                "field": field_name,
-                "values": denied_values,
-                "granted": sorted(user_scopes),
-                "needed": sorted(all_needed_scopes),
-            },
-        )
-        raise ProblemJsonException(
-            title="U bent niet geautoriseerd voor deze operatie.",
-            detail=f"U bent niet geautoriseerd voor {field_name} = {', '.join(denied_values)}.",
-            code="permissionDenied",  # Same as what Haal Centraal would do.
-            status=status.HTTP_403_FORBIDDEN,
+        raise AccessDenied(
+            field_name=field_name,
+            denied_values=denied_values,
+            needed_scopes=all_needed_scopes,
         )
 
     return all_needed_scopes
