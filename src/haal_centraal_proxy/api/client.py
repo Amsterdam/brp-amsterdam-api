@@ -41,7 +41,8 @@ class HaalCentraalClient:
         self._api_key = api_key
         self._host = urlparse(endpoint_url).netloc
         self._session = requests.Session()
-        self.cert = (cert_file, key_file) if cert_file is not None else None
+        if cert_file is not None:
+            self._session.cert = (cert_file, key_file)
 
     def call(self, hc_request: dict | None = None) -> requests.Response:
         """Make an HTTP GET call. kwargs are passed to pool.request."""
@@ -60,7 +61,6 @@ class HaalCentraalClient:
                     "X-API-Key": self._api_key,
                     "User-Agent": USER_AGENT,
                 },
-                cert=self.cert,
             )
         except (TimeoutError, Timeout) as e:
             # Socket timeout
