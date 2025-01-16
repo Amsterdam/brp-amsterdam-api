@@ -19,11 +19,66 @@ body:json {
   // client  --->  Proxy (stoplicht)  ---> Haal Centraal ACC / mock
 
   {
-    "type": "RaadpleegMetBurgerservicenummer",
-    "gemeenteVanInschrijving": "0518",
-    "burgerservicenummer": ["000009830"],
-    "fields": ["aNummer","adressering","burgerservicenummer","datumEersteInschrijvingGBA","datumInschrijvingInGemeente","europeesKiesrecht","geboorte","gemeenteVanInschrijving","geslacht","gezag","immigratie","indicatieCurateleRegister","indicatieGezagMinderjarige","kinderen","leeftijd","naam","nationaliteiten","ouders","overlijden","partners","uitsluitingKiesrecht","verblijfplaats","verblijfstitel","verblijfplaatsBinnenland","adresseringBinnenland"]
+      "type": "RaadpleegMetBurgerservicenummer",
+      "burgerservicenummer": [
+          "010082426"
+      ]
   }
+
+    /*,
+      "fields": [
+          "aNummer",
+          "burgerservicenummer",
+          "datumInschrijvingInGemeente",
+          "geboorte.datum",
+          "geboorte.land",
+          "geboorte.plaats",
+          "gemeenteVanInschrijving",
+          "geslacht",
+          "immigratie.datumVestigingInNederland",
+          "kinderen.burgerservicenummer",
+          "kinderen.geboorte.datum",
+          "kinderen.naam.geslachtsnaam",
+          "kinderen.naam.voornamen",
+          "kinderen.naam.voorvoegsel",
+          "naam.aanduidingNaamgebruik",
+          "naam.adellijkeTitelPredicaat",
+          "naam.geslachtsnaam",
+          "naam.voornamen",
+          "naam.voorvoegsel",
+          "nationaliteiten.nationaliteit",
+          "ouders.burgerservicenummer",
+          "ouders.geboorte.datum",
+          "ouders.naam.geslachtsnaam",
+          "ouders.naam.voornamen",
+          "ouders.naam.voorvoegsel",
+          "overlijden.datum",
+          "partners.aangaanHuwelijkPartnerschap.datum",
+          "partners.naam.geslachtsnaam",
+          "partners.naam.voorvoegsel",
+          "partners.ontbindingHuwelijkPartnerschap.datum",
+          "verblijfplaats.adresseerbaarObjectIdentificatie",
+          "verblijfplaats.datumVan",
+          "verblijfplaats.functieAdres",
+          "verblijfplaats.nummeraanduidingIdentificatie",
+          "verblijfplaats.verblijfadres.aanduidingBijHuisnummer",
+          "verblijfplaats.verblijfadres.huisletter",
+          "verblijfplaats.verblijfadres.huisnummer",
+          "verblijfplaats.verblijfadres.huisnummertoevoeging",
+          "verblijfplaats.verblijfadres.korteStraatnaam",
+          "verblijfplaats.verblijfadres.land",
+          "verblijfplaats.verblijfadres.locatiebeschrijving",
+          "verblijfplaats.verblijfadres.officieleStraatnaam",
+          "verblijfplaats.verblijfadres.postcode",
+          "verblijfplaats.verblijfadres.regel1",
+          "verblijfplaats.verblijfadres.regel2",
+          "verblijfplaats.verblijfadres.regel3",
+          "verblijfplaats.verblijfadres.woonplaats",
+          "verblijfstitel.aanduiding",
+          "verblijfstitel.datumEinde",
+          "verblijfstitel.datumIngang"
+      ]
+      */
 
 }
 
@@ -34,12 +89,15 @@ script:pre-request {
     "benk-brp-api",
     "benk-brp-zoekvraag-postcode-huisnummer",
     "benk-brp-zoekvraag-bsn",
+    "benk-brp-landelijk",
+    "benk-brp-gegevensset-3",
 
+    /*
     "BRP/adres-buitenland",
     "BRP/adres",
     "BRP/in-buitenland",
-    "BRP/buiten-gemeente",
     "BRP/x",  // nog uitsplitsen
+    */
   ]);
 
   req.setHeader("Authorization", `Bearer ${token}`);

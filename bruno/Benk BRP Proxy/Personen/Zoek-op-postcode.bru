@@ -23,7 +23,20 @@ body:json {
     "postcode": "1074VE",
     "huisnummer": 1,
     "fields": [
-      "naam", "adressering"
+      "adressering.adresregel1",
+      "adressering.adresregel2",
+      "adressering.adresregel3",
+      "adressering.land",
+      "burgerservicenummer",
+      "geboorte.datum",
+      "geslacht",
+      "leeftijd",
+      "naam.adellijkeTitelPredicaat",
+      "naam.geslachtsnaam",
+      "naam.volledigeNaam",
+      "naam.voorletters",
+      "naam.voornamen",
+      "naam.voorvoegsel",
     ]
   }
 
@@ -35,6 +48,7 @@ script:pre-request {
   const token = await getToken([
     "benk-brp-api",
     "benk-brp-zoekvraag-postcode-huisnummer",
+    "benk-brp-gegevensset-1",
     //"BRP/x",
   ]);
 
