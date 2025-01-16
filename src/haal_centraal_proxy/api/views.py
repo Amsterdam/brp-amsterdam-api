@@ -408,10 +408,18 @@ class BrpPersonenView(BaseProxyFieldsView):
         """Extra rules before passing the request to Haal Centraal"""
         super().transform_request(hc_request)  # add 'fields'
 
-        if SCOPE_NATIONWIDE not in self.user_scopes:
+        if (
+            SCOPE_NATIONWIDE not in self.user_scopes
+            and "gemeenteVanInschrijving" not in hc_request
+        ):
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
-            hc_request.setdefault("gemeenteVanInschrijving", GEMEENTE_AMSTERDAM_CODE)
+            logging.debug(
+                "User doesn't have %s scope, adding gemeenteVanInschrijving=%s",
+                SCOPE_NATIONWIDE,
+                GEMEENTE_AMSTERDAM_CODE,
+            )
+            hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
 
     def transform_response(self, hc_response: dict | list) -> None:
         """Extra rules before passing the response to the client."""
