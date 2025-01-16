@@ -159,23 +159,27 @@ echo haal-centraal-proxy > .python-version
 The docker mock API uses this [JSON test dataset](https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json).
 We've found these to be useful:
 
-
-
 | Feature                    | BSN       |
 |----------------------------|-----------|
 | Met adelijke titel         | 000009830 |
+| Met parter                 | 010082426 |
+| Gescheiden                 | 999991905 |
+| Overleden                  | 999970239 |
+| Staatloos                  | 999991504 |
 | Verblijfstitel             | 000009908 |
 | Immigratie                 | 000009842 |
-| Met parter                 | 010082426 |
-| Gescheiden                 | 999970616 |
-| Overleden                  | 999970239 |
-| Staatloos                  | 999991188 |
 | heeft ouders met bsn       | 999970665 |
 | Gezag double combo         | 999970057 |
 | Met einddatum en gezag     | 999970884 |
 | Indicatiecurateel register | 999993690 |
-| Geëmigreerd                | 999990470 |
-| inOnderzoek                | 999970008 |
+| Geëmigreerd                | 999990585 |
+| inOnderzoek                | 999990378 |
+| Nationaliteit onbekend     | 999993367 |
 
 The acceptance environment (proefomgeving) of Haal Centraal uses a different [GABA-V test dataset](https://www.rvig.nl/media/288)
-to simulate the production environment as best as possible.
+to simulate the production environment in the best possible way.
+
+Also note that this proxy can limit the results.
+
+* When the scope *benk-brp-landelijk* is missing, only results within Amsterdam are returned.
+* When the scope *benk-brp-geheimhouding-persoonsgegevens* is missing, persons with *geheimhoudingPersoonsgegevens* are omitted.
