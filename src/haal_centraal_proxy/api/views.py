@@ -266,57 +266,7 @@ class BaseProxyView(APIView):
                     self._rewrite_links(child, rewrites, in_links)
 
 
-class BaseProxyFieldsView(BaseProxyView):
-    """Base proxy view that also has a default 'fields' parameter.
-    Could also have been a mixin, but this seems clear too."""
-
-    #: Tell which fields are allowed per type (used to have a default list).
-    possible_fields_by_type: dict[str, set[str]] = {}
-
-    def get_allowed_fields(self, query_type: str) -> list[str]:
-        """Determine all values for the "fields" parameter that the user has access to.
-
-        This value is used when no default is given.
-
-        :param query_type: The "zoekvraag/doelbinding" (the "type" parameter in the request).
-        """
-        allowed_by_scope = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
-        allowed_by_type = self.possible_fields_by_type.get(query_type, None)
-
-        # The sorting is done to have consistent logging.
-        allowed_fields = sorted(
-            set(allowed_by_type).intersection(allowed_by_scope)
-            if allowed_by_type is not None
-            else allowed_by_scope
-        )
-
-        if not allowed_fields:
-            audit_log.info(
-                "Denied access to '%(service)s' no allowed values for 'fields'",
-                {"service": self.service_log_id},
-                extra={
-                    "service": self.service_log_id,
-                    "field": "fields",
-                    "values": [],
-                    "granted": sorted(self.user_scopes),
-                },
-            )
-            raise ProblemJsonException(
-                title="U bent niet geautoriseerd voor deze operatie.",
-                detail="U bent niet geautoriseerd voor een gegevensset bij deze operatie.",
-                code="permissionDenied",  # Same as what Haal Centraal would do.
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        return fields.compact_fields_values(allowed_fields)
-
-    def transform_request(self, hc_request):
-        if "fields" not in hc_request and "type" in hc_request:
-            # When no 'fields' parameter is given, pass all allowed options
-            hc_request["fields"] = self.get_allowed_fields(hc_request["type"])
-
-
-class BrpPersonenView(BaseProxyFieldsView):
+class BrpPersonenView(BaseProxyView):
     """View that proxies Haal Centraal BRP 'personen' (persons).
 
     See: https://brp-api.github.io/Haal-Centraal-BRP-bevragen/
@@ -406,7 +356,10 @@ class BrpPersonenView(BaseProxyFieldsView):
 
     def transform_request(self, hc_request: dict) -> None:
         """Extra rules before passing the request to Haal Centraal"""
-        super().transform_request(hc_request)  # add 'fields'
+        if "fields" not in hc_request and "type" in hc_request:
+            # When no 'fields' parameter is given, pass all allowed options
+            logging.debug("Auto-generating 'fields' parameter based on user scopes")
+            hc_request["fields"] = self.get_allowed_fields(hc_request["type"])
 
         if (
             SCOPE_NATIONWIDE not in self.user_scopes
@@ -445,6 +398,43 @@ class BrpPersonenView(BaseProxyFieldsView):
                 )
 
             hc_response["personen"] = personen
+
+    def get_allowed_fields(self, query_type: str) -> list[str]:
+        """Determine all values for the "fields" parameter that the user has access to.
+
+        This value is used when no default is given.
+
+        :param query_type: The "zoekvraag/doelbinding" (the "type" parameter in the request).
+        """
+        allowed_by_scope = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
+        allowed_by_type = self.possible_fields_by_type.get(query_type, None)
+
+        # The sorting is done to have consistent logging.
+        allowed_fields = sorted(
+            set(allowed_by_type).intersection(allowed_by_scope)
+            if allowed_by_type is not None
+            else allowed_by_scope
+        )
+
+        if not allowed_fields:
+            audit_log.info(
+                "Denied access to '%(service)s' no allowed values for 'fields'",
+                {"service": self.service_log_id},
+                extra={
+                    "service": self.service_log_id,
+                    "field": "fields",
+                    "values": [],
+                    "granted": sorted(self.user_scopes),
+                },
+            )
+            raise ProblemJsonException(
+                title="U bent niet geautoriseerd voor deze operatie.",
+                detail="U bent niet geautoriseerd voor een gegevensset bij deze operatie.",
+                code="permissionDenied",  # Same as what Haal Centraal would do.
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        return fields.compact_fields_values(allowed_fields)
 
 
 class BrpBewoningenView(BaseProxyView):
