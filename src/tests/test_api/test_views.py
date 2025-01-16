@@ -16,9 +16,7 @@ class TestBaseProxyView:
         [
             "/api/brp/personen",
             "/api/brp/bewoningen",
-            "/api/brp/bewoningen",
             "/api/brp/verblijfsplaatshistorie",
-            "/api/reisdocumenten/reisdocumenten",
         ],
     )
     def test_no_login(self, api_client, url):
@@ -474,76 +472,6 @@ class BrpVerblijfsplaatsHistorieView:
                 "type": "RaadpleegMetPeildatum",
                 "burgerservicenummer": "999993240",
                 "peildatum": "2020-09-24",
-            },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
-        )
-        assert response.status_code == 403, response.data
-        assert response.data["code"] == "permissionDenied"
-
-
-class TestReisdocumentenView:
-    """Prove that the API works as advertised."""
-
-    RESPONSE_REISDOCUMENTEN = {
-        "type": "ZoekMetBurgerservicenummer",
-        "reisdocumenten": [
-            {
-                "reisdocumentnummer": "NW21K79D5",
-                "soort": {"code": "PN", "omschrijving": "Nationaal paspoort"},
-                "datumEindeGeldigheid": {
-                    "type": "Datum",
-                    "datum": "2030-12-03",
-                    "langFormaat": "3 december 2030",
-                },
-                "houder": {"burgerservicenummer": "999993240"},
-            }
-        ],
-    }
-
-    def test_bsn_search(self, api_client, requests_mock):
-        """Prove that search is possible"""
-        requests_mock.post(
-            "/haalcentraal/api/reisdocumenten/reisdocumenten",
-            json=self.RESPONSE_REISDOCUMENTEN,
-            headers={"content-type": "application/json"},
-        )
-
-        url = reverse("reisdocumenten")
-        token = build_jwt_token(["benk-brp-api", "BRP/zoek-doc-bsn", "BRP/x"])
-        response = api_client.post(
-            url,
-            {
-                "type": "ZoekMetBurgerservicenummer",
-                "burgerservicenummer": "999993240",
-                "fields": [
-                    "reisdocumentnummer",
-                    "soort",
-                    "houder",
-                    "datumEindeGeldigheid",
-                    "inhoudingOfVermissing",
-                ],
-            },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
-        )
-        assert response.status_code == 200, response.data
-        assert response.json() == self.RESPONSE_REISDOCUMENTEN, response.data
-
-    def test_bsn_search__deny(self, api_client):
-        """Prove that acess is checked"""
-        url = reverse("reisdocumenten")
-        token = build_jwt_token(["benk-brp-api"])
-        response = api_client.post(
-            url,
-            {
-                "type": "ZoekMetBurgerservicenummer",
-                "burgerservicenummer": "999993240",
-                "fields": [
-                    "reisdocumentnummer",
-                    "soort",
-                    "houder",
-                    "datumEindeGeldigheid",
-                    "inhoudingOfVermissing",
-                ],
             },
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )

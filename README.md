@@ -85,7 +85,6 @@ The following URLs are available:
 | `/api/brp/personen`                  | Person details.                          | `HAAL_CENTRAAL_BRP_PERSONEN_URL`                 | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)            |
 | `/api/brp/bewoningen`                | Who lived at an address.                 | `HAAL_CENTRAAL_BRP_BEWONINGEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)            |
 | `/api/brp/verblijfsplaatshistorie`   | All addresses where someone lived.       | `HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)   |
-| `/api/reisdocumenten/reisdocumenten` | Check travel documents (e.g. passports). | `HAAL_CENTRAAL_REISDOCUMENTEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-Reisdocumenten-bevragen/) |
 
 ## Environment Settings
 
@@ -102,7 +101,6 @@ Connections:
 * `HAAL_CENTRAAL_BRP_PERSONEN_URL` endpoint for the Haal Centraal BRP Personen API.
 * `HAAL_CENTRAAL_BRP_BEWONINGEN_URL` endpoint for the BRP occupancy URL.
 * `HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL` endpoint for the address history URL.
-* `HAAL_CENTRAAL_REISDOCUMENTEN_URL` endpoint for the travel documents URL.
 * `HAAL_CENTRAAL_API_KEY` the API key for Haal Centraal
 * `HAAL_CENTRAAL_CERT_FILE` the mTLS certificate for Haal Centraal.
 * `HAAL_CENTRAAL_KEY_FILE` the mTLS key file for Haal Centraal.

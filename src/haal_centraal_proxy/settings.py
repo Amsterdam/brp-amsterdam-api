@@ -341,7 +341,3 @@ HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL = env.str(
     "HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL",
     "https://demo-omgeving.haalcentraal.nl/haalcentraal/api/brphistorie/verblijfplaatshistorie",
 )
-HAAL_CENTRAAL_REISDOCUMENTEN_URL = env.str(
-    "HAAL_CENTRAAL_REISDOCUMENTEN_URL",
-    "https://proefomgeving.haalcentraal.nl/haalcentraal/api/reisdocumenten/reisdocumenten",
-)

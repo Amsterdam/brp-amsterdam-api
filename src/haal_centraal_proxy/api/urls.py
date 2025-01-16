@@ -10,7 +10,4 @@ urlpatterns = [
         views.BrpVerblijfsplaatsHistorieView.as_view(),
         name="brp-verblijfsplaatshistorie",
     ),
-    path(
-        "reisdocumenten/reisdocumenten", views.ReisdocumentenView.as_view(), name="reisdocumenten"
-    ),
 ]
