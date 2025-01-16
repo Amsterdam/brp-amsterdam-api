@@ -368,7 +368,7 @@ class BrpPersonenView(BaseProxyView):
             # If the use may only search in Amsterdam, enforce that.
             # if a different value is set, it will be handled by the permission check later.
             logging.debug(
-                "User doesn't have %s scope, adding gemeenteVanInschrijving=%s",
+                "User doesn't have %s scope, limiting results to gemeenteVanInschrijving=%s",
                 SCOPE_NATIONWIDE,
                 GEMEENTE_AMSTERDAM_CODE,
             )
