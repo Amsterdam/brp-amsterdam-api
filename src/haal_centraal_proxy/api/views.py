@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 
 import orjson
 import requests
@@ -84,9 +85,6 @@ class BaseProxyView(APIView):
         self.user_id = request.get_token_claims.get("email", request.get_token_subject)
         hc_request = request.data.copy()
 
-        # Allow inserting missing parameters, etc...
-        self.transform_request(hc_request)
-
         # Perform validation
         try:
             needed_param_scopes = permissions.validate_parameters(
@@ -108,6 +106,9 @@ class BaseProxyView(APIView):
                 ],
             ) from err
 
+        # Allow inserting missing parameters, etc...
+        self.transform_request(hc_request)
+
         # Proxy to Haal Centraal
         try:
             downstream_response = self.client.call(hc_request)
@@ -123,6 +124,7 @@ class BaseProxyView(APIView):
                 request,
                 hc_request,
                 hc_response,
+                final_response=None,
                 needed_scopes=self.needed_scopes | needed_param_scopes,
                 exception=e,
             )
@@ -131,19 +133,21 @@ class BaseProxyView(APIView):
         # Rewrite the response to pagination still works.
         # (currently in in-place)
         hc_response = orjson.loads(downstream_response.text)
-        self.transform_response(hc_response)
+        final_response = deepcopy(hc_response)
+        self.transform_response(final_response)
 
         # Post it to audit logging, both when everything went ok, or failed.
         self.log_access_granted(
             request,
             hc_request,
             hc_response,
+            final_response,
             needed_scopes=self.needed_scopes | needed_param_scopes,
         )
 
         # And return it.
         return HttpResponse(
-            orjson.dumps(hc_response),
+            orjson.dumps(final_response),
             content_type=downstream_response.headers.get(
                 "content-type", "application/json; charset=utf-8"
             ),
@@ -178,6 +182,7 @@ class BaseProxyView(APIView):
         request,
         hc_request: dict,
         hc_response: dict | None,
+        final_response: dict | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
     ) -> None:
@@ -194,7 +199,7 @@ class BaseProxyView(APIView):
             "needed": sorted(needed_scopes),
             "request": request.data,
             "hc_request": hc_request,
-            "hc_response": hc_response,
+            "hc_response": final_response or hc_response,
         }
 
         if exception is None:
@@ -211,10 +216,8 @@ class BaseProxyView(APIView):
 
         # user.AuthenticatedId is already added globally.
         # TODO:
-        # - Per record (in lijst) een log melding doen.
         # - afnemerindicatie (client certificaat)
         # - session ID van afnemende applicatie.
-        # - A-nummer in de response
         audit_log.info(
             msg,
             {
@@ -293,6 +296,8 @@ class BrpPersonenView(BaseProxyView):
         "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving": FILTERED_MIN,
     }
 
+    always_insert_id_fields = ("aNummer", "burgerservicenummer")
+
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
         "type": ParameterPolicy(
@@ -356,10 +361,11 @@ class BrpPersonenView(BaseProxyView):
 
     def transform_request(self, hc_request: dict) -> None:
         """Extra rules before passing the request to Haal Centraal"""
-        if "fields" not in hc_request and "type" in hc_request:
+        query_type = hc_request["type"]
+        if "fields" not in hc_request:
             # When no 'fields' parameter is given, pass all allowed options
             logging.debug("Auto-generating 'fields' parameter based on user scopes")
-            hc_request["fields"] = self.get_allowed_fields(hc_request["type"])
+            hc_request["fields"] = self.get_allowed_fields(query_type)
 
         if (
             SCOPE_NATIONWIDE not in self.user_scopes
@@ -373,6 +379,17 @@ class BrpPersonenView(BaseProxyView):
                 GEMEENTE_AMSTERDAM_CODE,
             )
             hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
+
+        # Always need to log aNummer/BSN, so make sure it's requested too.
+        self.inserted_id_fields = []
+        fields_by_type = self.possible_fields_by_type.get(query_type) or []
+        for id_field in self.always_insert_id_fields:  # Not including nested fields for now
+            if id_field not in hc_request["fields"] and id_field in fields_by_type:
+                hc_request["fields"].append(id_field)
+                self.inserted_id_fields.append(id_field)
+                logging.debug(
+                    "User doesn't request ID field %s, only adding for internal logging", id_field
+                )
 
     def transform_response(self, hc_response: dict | list) -> None:
         """Extra rules before passing the response to the client."""
@@ -398,6 +415,61 @@ class BrpPersonenView(BaseProxyView):
                 )
 
             hc_response["personen"] = personen
+
+        # Remove the extra fields that were only inserted to have a BSN/aNummer in the logging,
+        # even through the user has no access to these fields.
+        if self.inserted_id_fields:
+            logging.debug(
+                "Removing additional identifier fields from response: %s",
+                ",".join(self.inserted_id_fields),
+            )
+            for persoon in hc_response["personen"]:
+                for id_field in self.inserted_id_fields:
+                    persoon.pop(id_field, None)
+
+    def log_access_granted(
+        self,
+        request,
+        hc_request: dict,
+        hc_response: dict | None,
+        final_response: dict | None,
+        needed_scopes: set[str],
+        exception: OSError | APIException | None = None,
+    ) -> None:
+        """Extend logging to also include each BSN that was returned in the response"""
+        super().log_access_granted(
+            request, hc_request, hc_response, final_response, needed_scopes, exception
+        )
+
+        if exception is None:
+            # Separate log message for every person that's being accessed.
+            for persoon in hc_response["personen"]:
+                msg_params = {}
+                extra = {}
+                msg = ["User %(user)s retrieved using '%(service)s.%(query_type)s':"]
+                for id_field in self.always_insert_id_fields:
+                    msg_params[id_field] = persoon.get(id_field, "?")
+                    extra[id_field] = persoon.get(id_field, None)
+                    msg.append(f"{id_field}=%({id_field})s")
+
+                print(msg)
+                audit_log.info(
+                    # Visible log message
+                    " ".join(msg),
+                    {
+                        "service": self.service_log_id,
+                        "query_type": hc_request["type"],
+                        "user": self.user_id,
+                        **msg_params,
+                    },
+                    # Extra JSON fields for log querying
+                    extra={
+                        "service": self.service_log_id,
+                        "query_type": hc_request["type"],
+                        "user": self.user_id,
+                        **extra,
+                    },
+                )
 
     def get_allowed_fields(self, query_type: str) -> list[str]:
         """Determine all values for the "fields" parameter that the user has access to.

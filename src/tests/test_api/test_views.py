@@ -208,10 +208,12 @@ class TestBrpPersonenView:
             "fields": ["naam.aanduidingNaamgebruik"],
         }
         view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["aNummer", "burgerservicenummer"]
 
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
-            "fields": ["naam.aanduidingNaamgebruik"],
+            # Note that the 'fields' are also updated for logging purposes
+            "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],
             # no gemeenteVanInschrijving added.
         }
 
@@ -224,10 +226,12 @@ class TestBrpPersonenView:
             "fields": ["naam.aanduidingNaamgebruik"],
         }
         view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["aNummer", "burgerservicenummer"]
 
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
-            "fields": ["naam.aanduidingNaamgebruik"],
+            # Note that the 'fields' are also updated for logging purposes
+            "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],  # added
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
         }
 
@@ -268,7 +272,6 @@ class TestBrpPersonenView:
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
             "fields": [
                 # added (very limited set due to constraints of both the fields CSV and scope)
-                # not: pad
                 "adressering.adresregel1",
                 "adressering.adresregel2",
                 "adressering.adresregel3",
@@ -351,6 +354,87 @@ class TestBrpPersonenView:
             assert any(
                 m.startswith("Removed 1 persons from response") for m in caplog.messages
             ), caplog.messages
+
+    @pytest.mark.parametrize("can_see_bsn", [True, False])
+    def test_log_retrieved_bsns(self, api_client, requests_mock, caplog, monkeypatch, can_see_bsn):
+        """Prove that retrieved BSNs are always logged.
+
+        Even when the user doesn't have access to that field, or won't request it,
+        the field will still be included in the logs - but not returned in the response.
+        """
+        if not can_see_bsn:
+            monkeypatch.setitem(
+                views.BrpPersonenView.parameter_ruleset,
+                "fields",
+                views.ParameterPolicy(
+                    scopes_for_values={"naam.geslachtsnaam": {"unittest-gegevensset-1"}},
+                    default_scope=None,
+                ),
+            )
+
+        requests_mock.post(
+            "/haalcentraal/api/brp/personen",
+            json={
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "personen": [
+                    {
+                        "naam": {"geslachtsnaam": "DUMMY_REMOVED1"},
+                        "burgerservicenummer": "999993240",
+                    },
+                    {
+                        "naam": {"geslachtsnaam": "DUMMY_REMOVED2"},
+                        "burgerservicenummer": "999993252",
+                    },
+                ],
+            },
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        scopes = [
+            "benk-brp-api",
+            "benk-brp-zoekvraag-postcode-huisnummer",
+            ("unittest-gegevensset-1" if not can_see_bsn else "benk-brp-gegevensset-1"),
+        ]
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                "fields": ["naam.geslachtsnaam"],
+            },
+            HTTP_AUTHORIZATION=f"Bearer {build_jwt_token(scopes)}",
+        )
+        assert response.status_code == 200, response.data
+        response = response.json()
+
+        assert response == {
+            "type": "ZoekMetPostcodeEnHuisnummer",
+            "personen": [
+                # burgerservicenummer retrieved from endpoint, but stripped before sending response
+                {
+                    "naam": {"geslachtsnaam": "DUMMY_REMOVED1"},
+                },
+                {
+                    "naam": {"geslachtsnaam": "DUMMY_REMOVED2"},
+                },
+            ],
+        }
+        log_messages = caplog.messages
+        for log_message in [
+            "User doesn't request ID field burgerservicenummer, only adding for internal logging",
+            "Removing additional identifier fields from response: burgerservicenummer",
+            (
+                "User text@example.com retrieved using 'personen.ZoekMetPostcodeEnHuisnummer':"
+                " aNummer=? burgerservicenummer=999993240"
+            ),
+            (
+                "User text@example.com retrieved using 'personen.ZoekMetPostcodeEnHuisnummer':"
+                " aNummer=? burgerservicenummer=999993252"
+            ),
+        ]:
+            assert log_message in log_messages
 
 
 class TestBrpBewoningenView:
