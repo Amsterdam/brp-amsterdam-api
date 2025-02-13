@@ -1,0 +1,58 @@
+from django.urls import reverse
+
+from tests.utils import build_jwt_token
+
+
+class TestBrpBewoningenView:
+    """Prove that the API works as advertised."""
+
+    RESPONSE_BEWONINGEN = {
+        "bewoningen": [
+            {
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "periode": {"datumVan": "2020-09-24", "datumTot": "2020-09-25"},
+                "bewoners": [{"burgerservicenummer": "999993240"}],
+                "mogelijkeBewoners": [],
+            }
+        ]
+    }
+
+    def test_address_id_search(self, api_client, requests_mock):
+        """Prove that search is possible"""
+        requests_mock.post(
+            # https://demo-omgeving.haalcentraal.nl
+            "/haalcentraal/api/bewoning/bewoningen",
+            json=self.RESPONSE_BEWONINGEN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-bewoningen")
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-bewoningen"])
+        response = api_client.post(
+            url,
+            {
+                "type": "BewoningMetPeildatum",
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "peildatum": "2020-09-24",
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 200, response
+        assert response.json() == self.RESPONSE_BEWONINGEN, response.data
+
+    def test_address_id_search_deny(self, api_client):
+        """Prove that acess is checked"""
+        url = reverse("brp-bewoningen")
+        token = build_jwt_token(["benk-brp-api"])
+
+        response = api_client.post(
+            url,
+            {
+                "type": "BewoningMetPeildatum",
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "peildatum": "2020-09-24",
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"

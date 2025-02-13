@@ -1,0 +1,74 @@
+from django.urls import reverse
+
+from tests.utils import build_jwt_token
+
+
+class BrpVerblijfsplaatsHistorieView:
+    """Prove that the API works as advertised."""
+
+    RESPONSE_VERBLIJFSPLAATS = {
+        "verblijfplaatsen": [
+            {
+                "type": "Adres",
+                "verblijfadres": {
+                    "officieleStraatnaam": "Erasmusweg",
+                    "korteStraatnaam": "Erasmusweg",
+                    "huisnummer": 471,
+                    "postcode": "2532CN",
+                    "woonplaats": "'s-Gravenhage",
+                },
+                "functieAdres": {"code": "W", "omschrijving": "woonadres"},
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "nummeraanduidingIdentificatie": "0518200000832199",
+                "gemeenteVanInschrijving": {"code": "0518", "omschrijving": "'s-Gravenhage"},
+                "datumVan": {
+                    "type": "Datum",
+                    "datum": "1990-04-27",
+                    "langFormaat": "27 april 1990",
+                },
+                "adressering": {
+                    "adresregel1": "Erasmusweg 471",
+                    "adresregel2": "2532 CN  'S-GRAVENHAGE",
+                },
+            }
+        ]
+    }
+
+    def test_bsn_date_search(self, api_client, requests_mock):
+        """Prove that search is possible"""
+        requests_mock.post(
+            # https://demo-omgeving.haalcentraal.nl
+            "/haalcentraal/api/brphistorie/verblijfplaatshistorie",
+            json=self.RESPONSE_VERBLIJFSPLAATS,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-verblijfsplaatshistorie")
+        token = build_jwt_token(["benk-brp-api", "BRP/zoek-historie"])
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetPeildatum",
+                "burgerservicenummer": "999993240",
+                "peildatum": "2020-09-24",
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 200, response
+        assert response.json() == self.RESPONSE_VERBLIJFSPLAATS, response.data
+
+    def test_bsn_date_search_deny(self, api_client):
+        """Prove that acess is checked"""
+        url = reverse("brp-verblijfsplaatshistorie")
+        token = build_jwt_token(["benk-brp-api"])
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetPeildatum",
+                "burgerservicenummer": "999993240",
+                "peildatum": "2020-09-24",
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"
