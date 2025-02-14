@@ -12,8 +12,6 @@ from .base import BaseProxyView, audit_log
 
 logger = logging.getLogger(__name__)
 
-ALLOW_VALUE = set()  # no scopes
-
 GEMEENTE_AMSTERDAM_CODE = "0363"
 
 SCOPE_NATIONWIDE = "benk-brp-landelijk"
@@ -100,12 +98,14 @@ class BrpPersonenView(BaseProxyView):
         "inclusiefOverledenPersonen": ParameterPolicy(
             scopes_for_values={
                 "true": {"benk-brp-inclusief-overledenen"},
-                "false": ALLOW_VALUE,
+                "false": ParameterPolicy.allow_value,
             }
         ),
         "gemeenteVanInschrijving": ParameterPolicy(
-            # NOTE: no benk-brp-amsterdam ?
-            {GEMEENTE_AMSTERDAM_CODE: ALLOW_VALUE},  # ok to include ?gemeenteVanInschrijving=0363
+            {
+                # ok to include ?gemeenteVanInschrijving=0363
+                GEMEENTE_AMSTERDAM_CODE: ParameterPolicy.allow_value
+            },
             default_scope={SCOPE_NATIONWIDE},
         ),
     }

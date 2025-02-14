@@ -35,6 +35,9 @@ class ParameterPolicy:
     #: This is the same as using `default_scope=set()`.
     allow_all: ClassVar[ParameterPolicy]
 
+    #: Singleton for convenience, to mark that a value is always allowed.
+    allow_value: ClassVar[set]
+
     #: A specific scope for each value. Multiple values acts as OR.
     #: The user needs to have one of the listed scopes.
     scopes_for_values: dict[str | None, set[str] | None] = field(default_factory=dict)
@@ -85,8 +88,76 @@ class ParameterPolicy:
             if key.endswith("*")
         ]
 
+    def validate_values(
+        self, field_name: str, values: list | str, user_scopes: set[str]
+    ) -> set[str]:
+        """Check whether the given parameter values are allowed.
+
+        :param field_name: The field being checked
+        :param values: The values parsed for the field.
+        :param user_scopes: Granted scopes of the current user.
+        :raises AccessDenied: When the user should be denied
+        :raises ProblemJsonException: When the value is not supported.
+        :returns: The scopes that were used to access.
+        """
+        # Multiple values: will check each one
+        values = [values] if not isinstance(values, list) else values
+        invalid_values = []
+        denied_values = []
+        all_needed_scopes = set()
+        for value in values:
+            try:
+                needed_scopes = self.get_needed_scopes(value)
+            except ValueError:
+                invalid_values.append(str(value))
+                continue
+
+            if needed_scopes is None:
+                # No scopes defined for this value. Deny.
+                denied_values.append(value)
+                all_needed_scopes.add(f"<always deny {field_name}={value}>")
+            elif needed_scopes:
+                # Not empty set, user must have ONE of these.
+                if user_scopes.isdisjoint(needed_scopes):  # OR comparison
+                    # User doesn't have it.
+                    denied_values.append(value)
+
+                    # track for logging
+                    if len(needed_scopes) > 1:
+                        log_needed = sorted(needed_scopes)
+                        if len(needed_scopes) > 3:
+                            log_needed = log_needed[:2] + ["..."]
+                        all_needed_scopes.add("|".join(log_needed))
+                    else:
+                        all_needed_scopes.update(needed_scopes)
+                else:
+                    # Track for logging, but reduce to what the user already has.
+                    # This makes sure the "needed" list doesn't show all alternative options.
+                    all_needed_scopes.update(needed_scopes & user_scopes)
+
+        if invalid_values:
+            raise ProblemJsonException(
+                title="Een of meerdere veldnamen zijn niet correct.",
+                detail=(
+                    f"Het veld '{field_name}' ondersteund niet"
+                    f" de waarde(s): {', '.join(invalid_values)}."
+                ),
+                code="paramsValidation",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if denied_values:
+            raise AccessDenied(
+                field_name=field_name,
+                denied_values=denied_values,
+                needed_scopes=all_needed_scopes,
+            )
+
+        return all_needed_scopes
+
 
 ParameterPolicy.allow_all = ParameterPolicy(default_scope=set())
+ParameterPolicy.allow_value = frozenset()
 
 
 class AccessDenied(Exception):
@@ -120,7 +191,7 @@ def validate_parameters(
     :param service_log_id: Which service is being accessed (used to improve log messages)
     :param base_validated_scopes: Which scopes are already validated (used to improve log messages)
     :raises ProblemJsonException: When parameters are missing, or values are invalid.
-    :returns: The needed scopes needed to satify the request.
+    :returns: The needed scopes needed to satisfy the request.
     """
     request_type = hc_request.get("type")
     if not request_type:
@@ -140,7 +211,7 @@ def validate_parameters(
         except KeyError:
             invalid_names.append(field_name)
         else:
-            needed_for_param = _validate_parameter_values(policy, field_name, values, user_scopes)
+            needed_for_param = policy.validate_values(field_name, values, user_scopes)
             all_needed_scopes.update(needed_for_param)
 
     if invalid_names:
@@ -149,69 +220,6 @@ def validate_parameters(
             detail=f"De foutieve parameter(s) zijn: {', '.join(invalid_names)}.",
             code="paramsValidation",
             status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    return all_needed_scopes
-
-
-def _validate_parameter_values(
-    policy: ParameterPolicy,
-    field_name: str,
-    values: list | str,
-    user_scopes: set[str],
-):
-    """Check whether the given parameter values are allowed."""
-    # Multiple values: will check each one
-    values = [values] if not isinstance(values, list) else values
-    invalid_values = []
-    denied_values = []
-    all_needed_scopes = set()
-    for value in values:
-        try:
-            needed_scopes = policy.get_needed_scopes(value)
-        except ValueError:
-            invalid_values.append(str(value))
-            continue
-
-        if needed_scopes is None:
-            # No scopes defined for this value. Deny.
-            denied_values.append(value)
-            all_needed_scopes.add(f"<always deny {field_name}={value}>")
-        elif needed_scopes:
-            # Not empty set, user must have ONE of these.
-            if user_scopes.isdisjoint(needed_scopes):  # OR comparison
-                # User doesn't have it.
-                denied_values.append(value)
-
-                # track for logging
-                if len(needed_scopes) > 1:
-                    log_needed = sorted(needed_scopes)
-                    if len(needed_scopes) > 3:
-                        log_needed = log_needed[:2] + ["..."]
-                    all_needed_scopes.add("|".join(log_needed))
-                else:
-                    all_needed_scopes.update(needed_scopes)
-            else:
-                # Track for logging, but reduce to what the user already has.
-                # This makes sure the "needed" list doesn't show all alternative options.
-                all_needed_scopes.update(needed_scopes & user_scopes)
-
-    if invalid_values:
-        raise ProblemJsonException(
-            title="Een of meerdere veldnamen zijn niet correct.",
-            detail=(
-                f"Het veld '{field_name}' ondersteund niet"
-                f" de waarde(s): {', '.join(invalid_values)}."
-            ),
-            code="paramsValidation",
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-
-    if denied_values:
-        raise AccessDenied(
-            field_name=field_name,
-            denied_values=denied_values,
-            needed_scopes=all_needed_scopes,
         )
 
     return all_needed_scopes
