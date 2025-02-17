@@ -359,8 +359,9 @@ cryptography==43.0.3 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django @ https://github.com/Amsterdam/authorization_django/archive/refs/tags/v1.3.4.tar.gz \
-    --hash=sha256:e5e300dc6e9bd93ba5109f04d50666441208e890933d984b3e9739e184f4711c
+datapunt-authorization-django==1.4.0 \
+    --hash=sha256:275038acca712139d68041cfd987c9e6d2aa1bcfb7e73d37d27abed64b8f2386 \
+    --hash=sha256:dd51ccdaf6a7b330cca7826d9570c11f97af3853e8ff184bb9c8345d52f847df
     # via -r ./requirements.in
 deprecated==1.2.14 \
     --hash=sha256:6fac8b097794a90302bdbb17b9b815e732d3c4720583ff1b198499d78470466c \
