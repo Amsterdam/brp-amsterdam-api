@@ -10,6 +10,7 @@ from haal_centraal_proxy.api.exceptions import ProblemJsonException
 
 STATUS_TO_URI = {
     status.HTTP_400_BAD_REQUEST: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
+    status.HTTP_401_UNAUTHORIZED: "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
     status.HTTP_403_FORBIDDEN: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
     status.HTTP_404_NOT_FOUND: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.4",
     status.HTTP_405_METHOD_NOT_ALLOWED: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.5",
@@ -30,6 +31,12 @@ class RootView(View):
 def _get_unique_trace_id(request):
     unique_id = request.headers.get("X-Unique-ID")  # X-Unique-ID wordt in haproxy gezet
     return f"X-Unique-ID:{unique_id}" if unique_id else request.build_absolute_uri()
+
+
+def _to_camel_case(snake_str):
+    """Simple to-camel-case, taken from DRF."""
+    components = snake_str.split("_")
+    return components[0] + "".join(x.title() for x in components[1:])
 
 
 def exception_handler(exc, context):
@@ -71,7 +78,7 @@ def exception_handler(exc, context):
         default_detail = getattr(exc, "default_detail", None)
         response.data = {
             "type": STATUS_TO_URI.get(exc.status_code),
-            "code": detail.code,
+            "code": _to_camel_case(detail.code),  # permission_denied -> permissionDenied
             "title": default_detail if default_detail else str(exc),
             "detail": str(detail) if detail != default_detail else "",
             "status": response.status_code,

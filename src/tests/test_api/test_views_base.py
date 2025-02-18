@@ -20,13 +20,13 @@ class TestBaseProxyView:
     def test_no_login(self, api_client, url):
         """Prove that accessing the view fails without a login token."""
         response = api_client.post(url)
-        assert response.status_code == 403
+        assert response.status_code == 401
         assert response.data == {
-            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
-            "code": "not_authenticated",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
+            "code": "notAuthenticated",
             "title": "Authentication credentials were not provided.",
             "detail": "",
-            "status": 403,
+            "status": 401,
             "instance": url,
         }
 
@@ -69,7 +69,7 @@ class TestBaseProxyView:
             "title": "Connection failed (bad gateway)",
             "status": 502,
             "detail": "Backend is improperly configured, final endpoint rejected our credentials.",
-            "code": "backend_config",
+            "code": "backendConfig",
             "instance": "/api/brp/personen",
         }
 

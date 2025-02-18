@@ -12,7 +12,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from haal_centraal_proxy.api import permissions
+from haal_centraal_proxy.api import authentication, permissions
 from haal_centraal_proxy.api.client import HaalCentraalClient
 from haal_centraal_proxy.api.exceptions import ProblemJsonException
 from haal_centraal_proxy.api.permissions import ParameterPolicy
@@ -30,6 +30,8 @@ class BaseProxyView(APIView):
 
     #: Define which additional scopes are needed
     client_class = HaalCentraalClient
+
+    authentication_classes = [authentication.JWTAuthentication]
 
     # Need to define for every subclass:
 

@@ -41,10 +41,9 @@ class TestBrpBewoningenView:
         assert response.json() == self.RESPONSE_BEWONINGEN, response.data
 
     def test_address_id_search_deny(self, api_client):
-        """Prove that acess is checked"""
+        """Prove that access is checked"""
         url = reverse("brp-bewoningen")
-        token = build_jwt_token(["benk-brp-api"])
-
+        token = build_jwt_token(["benk-brp-SOME-OTHER-api"])
         response = api_client.post(
             url,
             {
@@ -56,3 +55,11 @@ class TestBrpBewoningenView:
         )
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
+        assert response.data == {
+            "code": "permissionDenied",
+            "detail": "",
+            "instance": "/api/brp/bewoningen",
+            "status": 403,
+            "title": "You do not have permission to perform this action.",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
+        }
