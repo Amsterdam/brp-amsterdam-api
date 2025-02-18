@@ -4,6 +4,7 @@ from haal_centraal_proxy.api.fields import read_dataset_fields_files
 from haal_centraal_proxy.api.permissions import ParameterPolicy
 from haal_centraal_proxy.api.views.personen import (
     SCOPE_ALLOW_CONFIDENTIAL_PERSONS,
+    SCOPE_INCLUDE_DECEASED,
     SCOPE_NATIONWIDE,
     BrpPersonenView,
 )
@@ -45,7 +46,11 @@ class TestBrpPersonenView:
 
         url = reverse("brp-personen")
         token = build_jwt_token(
-            ["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer", "benk-brp-gegevensset-1"]
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-gegevensset-1",
+            ]
         )
         response = api_client.post(
             url,
@@ -63,7 +68,7 @@ class TestBrpPersonenView:
     def test_bsn_search_deny(self, api_client):
         """Prove that search is possible"""
         url = reverse("brp-personen")
-        token = build_jwt_token(["benk-brp-api"])
+        token = build_jwt_token(["benk-brp-personen-api"])
 
         response = api_client.post(
             url,
@@ -98,6 +103,28 @@ class TestBrpPersonenView:
             # Note that the 'fields' are also updated for logging purposes
             "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],
             # no gemeenteVanInschrijving added.
+        }
+
+    def test_defaults_allow_deceased(self):
+        """Prove that 'inclusiefOverledenPersonen' is automatically added for the scope."""
+        view = BrpPersonenView()
+        view.user_scopes = {
+            "benk-brp-zoekvraag-bsn",
+            "benk-brp-gegevensset-1",
+            SCOPE_NATIONWIDE,
+            SCOPE_INCLUDE_DECEASED,
+        }
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+        }
+        view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["aNummer", "burgerservicenummer"]
+
+        assert hc_request == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],
+            "inclusiefOverledenPersonen": True,
         }
 
     def test_defaults_enforce_municipality(self):
@@ -178,7 +205,7 @@ class TestBrpPersonenView:
         """Prove that not having access to a set is handled gracefully."""
         url = reverse("brp-personen")
         token = build_jwt_token(
-            ["benk-brp-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-foobar"]
+            ["benk-brp-personen-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-foobar"]
         )
 
         response = api_client.post(
@@ -212,7 +239,7 @@ class TestBrpPersonenView:
         )
         url = reverse("brp-personen")
         scopes = [
-            "benk-brp-api",
+            "benk-brp-personen-api",
             "benk-brp-zoekvraag-postcode-huisnummer",
             "benk-brp-gegevensset-1",
         ]
@@ -247,7 +274,7 @@ class TestBrpPersonenView:
         """
         if not can_see_bsn:
             monkeypatch.setitem(
-                BrpPersonenView.parameter_ruleset,
+                BrpPersonenView.parameter_ruleset_by_type["ZoekMetPostcodeEnHuisnummer"],
                 "fields",
                 ParameterPolicy(
                     scopes_for_values={"naam.geslachtsnaam": {"unittest-gegevensset-1"}},
@@ -275,7 +302,7 @@ class TestBrpPersonenView:
 
         url = reverse("brp-personen")
         scopes = [
-            "benk-brp-api",
+            "benk-brp-personen-api",
             "benk-brp-zoekvraag-postcode-huisnummer",
             ("unittest-gegevensset-1" if not can_see_bsn else "benk-brp-gegevensset-1"),
         ]

@@ -47,7 +47,11 @@ class TestBaseProxyView:
 
         url = reverse("brp-personen")
         token = build_jwt_token(
-            ["benk-brp-api", "benk-brp-zoekvraag-postcode-huisnummer", "benk-brp-gegevensset-1"]
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-gegevensset-1",
+            ]
         )
         response = api_client.post(
             url,
@@ -97,7 +101,7 @@ class TestBaseProxyView:
 
         url = reverse("brp-personen")
         token = build_jwt_token(
-            ["benk-brp-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"]
+            ["benk-brp-personen-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"]
         )
         response = api_client.post(
             url,

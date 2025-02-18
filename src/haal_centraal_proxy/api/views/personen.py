@@ -14,8 +14,21 @@ logger = logging.getLogger(__name__)
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 
+SEARCH_ZIPCODE_NUMBER = "ZoekMetPostcodeEnHuisnummer"
+
 SCOPE_NATIONWIDE = "benk-brp-landelijk"
-SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-geheimhouding-persoonsgegevens"
+SCOPE_INCLUDE_DECEASED = "benk-brp-inclusief-overledenen"
+SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-inclusief-geheim"
+SCOPE_SEARCH_POSTCODE_NATIONWIDE = "benk-brp-zoekvraag-postcode-huisnummer-landelijk"
+
+# Which fields are allowed per type
+ALL_FIELD_NAMES = fields.read_config("haal_centraal/personen/fields-Persoon.csv")
+FILTERED = fields.read_config("haal_centraal/personen/fields-filtered-Persoon.csv")
+FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-PersoonBeperkt.csv")
+
+SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
+    "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
+)
 
 
 class BrpPersonenView(BaseProxyView):
@@ -28,12 +41,7 @@ class BrpPersonenView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_BRP_URL
 
     # Require extra scopes
-    needed_scopes = {"benk-brp-api"}
-
-    # Which fields are allowed per type
-    ALL_FIELD_NAMES = fields.read_config("haal_centraal/personen/fields-Persoon.csv")
-    FILTERED = fields.read_config("haal_centraal/personen/fields-filtered-Persoon.csv")
-    FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-PersoonBeperkt.csv")
+    needed_scopes = {"benk-brp-personen-api"}
 
     possible_fields_by_type = {
         "RaadpleegMetBurgerservicenummer": ALL_FIELD_NAMES,
@@ -51,15 +59,28 @@ class BrpPersonenView(BaseProxyView):
     parameter_ruleset = {
         "type": ParameterPolicy(
             scopes_for_values={
-                "RaadpleegMetBurgerservicenummer": {"benk-brp-zoekvraag-bsn"},
+                "RaadpleegMetBurgerservicenummer": {
+                    "benk-brp-zoekvraag-bsn",
+                },
                 "ZoekMetGeslachtsnaamEnGeboortedatum": {
                     "benk-brp-zoekvraag-geslachtsnaam-geboortedatum"
                 },
-                "ZoekMetNaamEnGemeenteVanInschrijving": {"BRP/zoek-naam-gemeente"},
-                "ZoekMetAdresseerbaarObjectIdentificatie": {"BRP/zoek-adres-id"},
-                "ZoekMetNummeraanduidingIdentificatie": {"BRP/zoek-nummeraand-id"},
-                "ZoekMetPostcodeEnHuisnummer": {"benk-brp-zoekvraag-postcode-huisnummer"},
-                "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving": {"BRP/zoek-straat"},
+                "ZoekMetNaamEnGemeenteVanInschrijving": {
+                    "benk-brp-zoekvraag-naam-gemeente",
+                },
+                "ZoekMetAdresseerbaarObjectIdentificatie": {
+                    "benk-brp-zoekvraag-adresseerbaar-object"
+                },
+                "ZoekMetNummeraanduidingIdentificatie": {
+                    "benk-brp-zoekvraag-nummeraanduiding",
+                },
+                "ZoekMetPostcodeEnHuisnummer": {
+                    "benk-brp-zoekvraag-postcode-huisnummer",
+                    SCOPE_SEARCH_POSTCODE_NATIONWIDE,
+                },
+                "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving": {
+                    "benk-brp-zoekvraag-straatnaam-huisnummer"
+                },
             }
         ),
         "fields": ParameterPolicy(
@@ -73,9 +94,7 @@ class BrpPersonenView(BaseProxyView):
                 # instead of '403 Permission Denied' responses.
                 {field_name: None for field_name in sorted(ALL_FIELD_NAMES)}
                 # And override those with the configurations for each known role / "gegevensset".
-                | fields.read_dataset_fields_files(
-                    "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
-                )
+                | SCOPES_FOR_FIELDS
             ),
         ),
         # All possible search parameters are named here,
@@ -93,11 +112,13 @@ class BrpPersonenView(BaseProxyView):
         "postcode": ParameterPolicy.allow_all,
         "nummeraanduidingIdentificatie": ParameterPolicy.allow_all,
         "adresseerbaarObjectIdentificatie": ParameterPolicy.allow_all,
-        "verblijfplaats": ParameterPolicy.for_all_values({"BRP/in-buitenland"}),
+        # Note: Using 'verblijfplaats' in the search will be limited to NL-only results
+        # when it's combined with fields=verblijfplaatsBinnenland instead of fields=verblijfplaats.
+        "verblijfplaats": ParameterPolicy.allow_all,
         "burgerservicenummer": ParameterPolicy.for_all_values({"benk-brp-zoekvraag-bsn"}),
         "inclusiefOverledenPersonen": ParameterPolicy(
             scopes_for_values={
-                "true": {"benk-brp-inclusief-overledenen"},
+                "true": {SCOPE_INCLUDE_DECEASED},
                 "false": ParameterPolicy.allow_value,
             }
         ),
@@ -109,6 +130,22 @@ class BrpPersonenView(BaseProxyView):
             default_scope={SCOPE_NATIONWIDE},
         ),
     }
+
+    # Special rules for some query types:
+    parameter_ruleset_by_type = {
+        "ZoekMetPostcodeEnHuisnummer": {
+            **parameter_ruleset,
+            # Also allow searching outside Amsterdam for postcode search.
+            "gemeenteVanInschrijving": ParameterPolicy(
+                {GEMEENTE_AMSTERDAM_CODE: ParameterPolicy.allow_value},
+                default_scope={SCOPE_NATIONWIDE, SCOPE_SEARCH_POSTCODE_NATIONWIDE},
+            ),
+        }
+    }
+
+    def get_parameter_ruleset(self, hc_request: dict) -> dict[str, ParameterPolicy]:
+        """Allow a different parameter ruleset for some type of requests."""
+        return self.parameter_ruleset_by_type.get(hc_request.get("type"), self.parameter_ruleset)
 
     def transform_request(self, hc_request: dict) -> None:
         """Extra rules before passing the request to Haal Centraal"""
@@ -122,16 +159,39 @@ class BrpPersonenView(BaseProxyView):
             SCOPE_NATIONWIDE not in self.user_scopes
             and "gemeenteVanInschrijving" not in hc_request
         ):
-            # If the use may only search in Amsterdam, enforce that.
-            # if a different value is set, it will be handled by the permission check later.
+            if (
+                query_type == "ZoekMetPostcodeEnHuisnummer"
+                and SCOPE_SEARCH_POSTCODE_NATIONWIDE in self.user_scopes
+            ):
+                # Avoid limiting the request if a nationwide search on postcode is allowed.
+                # The ruleset also allows this situation.
+                logging.debug(
+                    "User doesn't have %s scope, "
+                    "but still allowing to search nationwide because of %s",
+                    SCOPE_NATIONWIDE,
+                    SCOPE_SEARCH_POSTCODE_NATIONWIDE,
+                )
+            else:
+                # If the use may only search in Amsterdam, enforce that.
+                # if a different value is set, it will be handled by the permission check later.
+                logging.debug(
+                    "User doesn't have %s scope, limiting results to gemeenteVanInschrijving=%s",
+                    SCOPE_NATIONWIDE,
+                    GEMEENTE_AMSTERDAM_CODE,
+                )
+                hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
+
+        if (
+            SCOPE_INCLUDE_DECEASED in self.user_scopes
+            and "inclusiefOverledenPersonen" not in hc_request
+        ):
             logging.debug(
-                "User doesn't have %s scope, limiting results to gemeenteVanInschrijving=%s",
-                SCOPE_NATIONWIDE,
-                GEMEENTE_AMSTERDAM_CODE,
+                "User has %s scope, adding inclusiefOverledenPersonen=true", SCOPE_INCLUDE_DECEASED
             )
-            hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
+            hc_request["inclusiefOverledenPersonen"] = True
 
         # Always need to log aNummer/BSN, so make sure it's requested too.
+        query_type = hc_request["type"]
         self.inserted_id_fields = []
         fields_by_type = self.possible_fields_by_type.get(query_type) or []
         for id_field in self.always_insert_id_fields:  # Not including nested fields for now

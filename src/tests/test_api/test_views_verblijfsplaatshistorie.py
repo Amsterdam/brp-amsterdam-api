@@ -44,7 +44,7 @@ class TestBrpVerblijfsplaatsHistorieView:
         )
 
         url = reverse("brp-verblijfsplaatshistorie")
-        token = build_jwt_token(["benk-brp-api", "BRP/zoek-historie"])
+        token = build_jwt_token(["benk-brp-verblijfplaatshistorie-api"])
         response = api_client.post(
             url,
             {

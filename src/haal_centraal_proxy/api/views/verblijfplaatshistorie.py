@@ -15,14 +15,14 @@ class BrpVerblijfsplaatsHistorieView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL
 
     # Require extra scopes
-    needed_scopes = {"benk-brp-api"}
+    needed_scopes = {"benk-brp-verblijfplaatshistorie-api"}
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
         "type": ParameterPolicy(
             scopes_for_values={
-                "RaadpleegMetPeildatum": {"BRP/zoek-historie"},
-                "RaadpleegMetPeriode": {"BRP/zoek-historie"},
+                "RaadpleegMetPeildatum": {"benk-brp-verblijfplaatshistorie-api"},
+                "RaadpleegMetPeriode": {"benk-brp-verblijfplaatshistorie-api"},
             }
         ),
         "burgerservicenummer": ParameterPolicy.allow_all,  # used for both request types.

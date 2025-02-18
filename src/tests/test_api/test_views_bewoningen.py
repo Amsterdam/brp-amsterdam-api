@@ -27,7 +27,7 @@ class TestBrpBewoningenView:
         )
 
         url = reverse("brp-bewoningen")
-        token = build_jwt_token(["benk-brp-api", "BRP/zoek-bewoningen"])
+        token = build_jwt_token(["benk-brp-bewoning-api"])
         response = api_client.post(
             url,
             {

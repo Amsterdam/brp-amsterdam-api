@@ -15,14 +15,14 @@ class BrpBewoningenView(BaseProxyView):
     endpoint_url = settings.HAAL_CENTRAAL_BRP_BEWONINGEN_URL
 
     # Require extra scopes
-    needed_scopes = {"benk-brp-api"}
+    needed_scopes = {"benk-brp-bewoning-api"}
 
     # Validate the access to various parameters:
     parameter_ruleset = {
         "type": ParameterPolicy(
             scopes_for_values={
-                "BewoningMetPeildatum": {"BRP/zoek-bewoningen"},
-                "BewoningMetPeriode": {"BRP/zoek-bewoningen"},
+                "BewoningMetPeildatum": {"benk-brp-bewoning-api"},
+                "BewoningMetPeriode": {"benk-brp-bewoning-api"},
             }
         ),
         "adresseerbaarObjectIdentificatie": ParameterPolicy.allow_all,  # used for both types.

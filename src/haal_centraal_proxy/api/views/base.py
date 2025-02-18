@@ -71,6 +71,10 @@ class BaseProxyView(APIView):
 
         return super().get_permissions() + [permissions.IsUserScope(self.needed_scopes)]
 
+    def get_parameter_ruleset(self, hc_request: dict) -> dict[str, ParameterPolicy]:
+        """Allow overriding which parameter ruleset to use."""
+        return self.parameter_ruleset
+
     def post(self, request: Request, *args, **kwargs):
         """Handle the incoming POST request.
         Basic checks (such as content-type validation) are already done by REST Framework.
@@ -84,7 +88,7 @@ class BaseProxyView(APIView):
         # Perform validation
         try:
             needed_param_scopes = permissions.validate_parameters(
-                self.parameter_ruleset, hc_request, self.user_scopes
+                self.get_parameter_ruleset(hc_request), hc_request, self.user_scopes
             )
         except permissions.AccessDenied as err:
             # Logging happens at the view level, to have full context.
