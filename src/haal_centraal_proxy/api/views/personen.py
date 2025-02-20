@@ -4,7 +4,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.exceptions import APIException
 
-from haal_centraal_proxy.api import fields
+from haal_centraal_proxy.api import fields, types
 from haal_centraal_proxy.api.exceptions import ProblemJsonException
 from haal_centraal_proxy.api.permissions import ParameterPolicy
 
@@ -26,6 +26,7 @@ ALL_FIELD_NAMES = fields.read_config("haal_centraal/personen/fields-Persoon.csv"
 FILTERED = fields.read_config("haal_centraal/personen/fields-filtered-Persoon.csv")
 FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-PersoonBeperkt.csv")
 
+# Which fields are allowed for each scope
 SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
     "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
 )
@@ -88,6 +89,8 @@ class BrpPersonenView(BaseProxyView):
             #   https://raw.githubusercontent.com/BRP-API/Haal-Centraal-BRP-bevragen/master/features/fields-filtered-PersoonBeperkt.csv
             # - Fields/field groups that can be requested a single person by their BSN:
             #   https://raw.githubusercontent.com/BRP-API/Haal-Centraal-BRP-bevragen/master/features/fields-filtered-Persoon.csv
+            # - Some fields will be included automatically:
+            #   https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#standaard-geleverde-velden
             scopes_for_values=(
                 # Declare all known fields which are supported with a deny-permission (None).
                 # This avoids generating a '400 Bad Request' for unknown fieldnames
@@ -110,11 +113,11 @@ class BrpPersonenView(BaseProxyView):
         "huisnummer": ParameterPolicy.allow_all,
         "huisnummertoevoeging": ParameterPolicy.allow_all,
         "postcode": ParameterPolicy.allow_all,
-        "nummeraanduidingIdentificatie": ParameterPolicy.allow_all,
-        "adresseerbaarObjectIdentificatie": ParameterPolicy.allow_all,
         # Note: Using 'verblijfplaats' in the search will be limited to NL-only results
         # when it's combined with fields=verblijfplaatsBinnenland instead of fields=verblijfplaats.
         "verblijfplaats": ParameterPolicy.allow_all,
+        "nummeraanduidingIdentificatie": ParameterPolicy.allow_all,
+        "adresseerbaarObjectIdentificatie": ParameterPolicy.allow_all,
         "burgerservicenummer": ParameterPolicy.for_all_values({"benk-brp-zoekvraag-bsn"}),
         "inclusiefOverledenPersonen": ParameterPolicy(
             scopes_for_values={
@@ -143,106 +146,15 @@ class BrpPersonenView(BaseProxyView):
         }
     }
 
-    def get_parameter_ruleset(self, hc_request: dict) -> dict[str, ParameterPolicy]:
+    def get_parameter_ruleset(self, hc_request: types.PersonenQuery) -> dict[str, ParameterPolicy]:
         """Allow a different parameter ruleset for some type of requests."""
         return self.parameter_ruleset_by_type.get(hc_request.get("type"), self.parameter_ruleset)
-
-    def transform_request(self, hc_request: dict) -> None:
-        """Extra rules before passing the request to Haal Centraal"""
-        query_type = hc_request["type"]
-        if "fields" not in hc_request:
-            # When no 'fields' parameter is given, pass all allowed options
-            logging.debug("Auto-generating 'fields' parameter based on user scopes")
-            hc_request["fields"] = self.get_allowed_fields(query_type)
-
-        if (
-            SCOPE_NATIONWIDE not in self.user_scopes
-            and "gemeenteVanInschrijving" not in hc_request
-        ):
-            if (
-                query_type == "ZoekMetPostcodeEnHuisnummer"
-                and SCOPE_SEARCH_POSTCODE_NATIONWIDE in self.user_scopes
-            ):
-                # Avoid limiting the request if a nationwide search on postcode is allowed.
-                # The ruleset also allows this situation.
-                logging.debug(
-                    "User doesn't have %s scope, "
-                    "but still allowing to search nationwide because of %s",
-                    SCOPE_NATIONWIDE,
-                    SCOPE_SEARCH_POSTCODE_NATIONWIDE,
-                )
-            else:
-                # If the use may only search in Amsterdam, enforce that.
-                # if a different value is set, it will be handled by the permission check later.
-                logging.debug(
-                    "User doesn't have %s scope, limiting results to gemeenteVanInschrijving=%s",
-                    SCOPE_NATIONWIDE,
-                    GEMEENTE_AMSTERDAM_CODE,
-                )
-                hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
-
-        if (
-            SCOPE_INCLUDE_DECEASED in self.user_scopes
-            and "inclusiefOverledenPersonen" not in hc_request
-        ):
-            logging.debug(
-                "User has %s scope, adding inclusiefOverledenPersonen=true", SCOPE_INCLUDE_DECEASED
-            )
-            hc_request["inclusiefOverledenPersonen"] = True
-
-        # Always need to log aNummer/BSN, so make sure it's requested too.
-        query_type = hc_request["type"]
-        self.inserted_id_fields = []
-        fields_by_type = self.possible_fields_by_type.get(query_type) or []
-        for id_field in self.always_insert_id_fields:  # Not including nested fields for now
-            if id_field not in hc_request["fields"] and id_field in fields_by_type:
-                hc_request["fields"].append(id_field)
-                self.inserted_id_fields.append(id_field)
-                logging.debug(
-                    "User doesn't request ID field %s, only adding for internal logging", id_field
-                )
-
-    def transform_response(self, hc_response: dict | list) -> None:
-        """Extra rules before passing the response to the client."""
-        super().transform_response(hc_response)  # rewrite links
-
-        if SCOPE_ALLOW_CONFIDENTIAL_PERSONS not in self.user_scopes:
-            # If the user may not see persons with confidential data,
-            # hide those persons in the response. Based on:
-            # https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1756
-            # https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1857
-            personen = [
-                persoon
-                for persoon in hc_response["personen"]
-                if not int(persoon.get("geheimhoudingPersoonsgegevens", 0))  # "1" in demo data
-            ]
-            num_hidden = len(hc_response["personen"]) - len(personen)
-            if num_hidden:
-                logging.debug(
-                    "Removed %d persons from response"
-                    " (missing scope %s for to view 'geheimhoudingPersoonsgegevens')",
-                    num_hidden,
-                    SCOPE_ALLOW_CONFIDENTIAL_PERSONS,
-                )
-
-            hc_response["personen"] = personen
-
-        # Remove the extra fields that were only inserted to have a BSN/aNummer in the logging,
-        # even through the user has no access to these fields.
-        if self.inserted_id_fields:
-            logging.debug(
-                "Removing additional identifier fields from response: %s",
-                ",".join(self.inserted_id_fields),
-            )
-            for persoon in hc_response["personen"]:
-                for id_field in self.inserted_id_fields:
-                    persoon.pop(id_field, None)
 
     def log_access_granted(
         self,
         request,
-        hc_request: dict,
-        hc_response: dict | None,
+        hc_request: types.PersonenQuery,
+        hc_response: types.PersonenResponse | None,
         final_response: dict | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
@@ -282,7 +194,28 @@ class BrpPersonenView(BaseProxyView):
                     },
                 )
 
-    def get_allowed_fields(self, query_type: str) -> list[str]:
+    def transform_request(self, hc_request: types.PersonenQuery) -> None:
+        """Extra rules before passing the request to Haal Centraal"""
+        if "fields" not in hc_request:
+            self._add_fields_filter(hc_request)
+
+        if (
+            SCOPE_NATIONWIDE not in self.user_scopes
+            and "gemeenteVanInschrijving" not in hc_request
+        ):
+            self._add_municipality_filter(hc_request)
+
+        if (
+            SCOPE_INCLUDE_DECEASED in self.user_scopes
+            and "inclusiefOverledenPersonen" not in hc_request
+        ):
+            self._add_deceased_filter(hc_request)
+
+        # Always need to log aNummer/BSN, so make sure it's requested too.
+        self.inserted_id_fields = []
+        self._add_identifier_fields(hc_request)
+
+    def _add_fields_filter(self, hc_request: types.PersonenQuery) -> None:
         """Determine all values for the "fields" parameter that the user has access to.
 
         This value is used when no default is given.
@@ -290,7 +223,7 @@ class BrpPersonenView(BaseProxyView):
         :param query_type: The "zoekvraag/doelbinding" (the "type" parameter in the request).
         """
         allowed_by_scope = self.parameter_ruleset["fields"].get_allowed_values(self.user_scopes)
-        allowed_by_type = self.possible_fields_by_type.get(query_type, None)
+        allowed_by_type = self.possible_fields_by_type.get(hc_request["type"], None)
 
         # The sorting is done to have consistent logging.
         allowed_fields = sorted(
@@ -317,4 +250,106 @@ class BrpPersonenView(BaseProxyView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        return fields.compact_fields_values(allowed_fields)
+        # When no 'fields' parameter is given, pass all allowed options
+        logging.debug("Auto-generating 'fields' parameter based on user scopes")
+        hc_request["fields"] = fields.compact_fields_values(allowed_fields)
+
+    def _add_municipality_filter(self, hc_request: types.PersonenQuery) -> None:
+        """Restrict the search to a single municipality."""
+        if (
+            hc_request["type"] == "ZoekMetPostcodeEnHuisnummer"
+            and SCOPE_SEARCH_POSTCODE_NATIONWIDE in self.user_scopes
+        ):
+            # Avoid limiting the request if a nationwide search on postcode is allowed.
+            # The ruleset also allows this situation.
+            logging.debug(
+                "User doesn't have %s scope, "
+                "but still allowing to search nationwide because of %s",
+                SCOPE_NATIONWIDE,
+                SCOPE_SEARCH_POSTCODE_NATIONWIDE,
+            )
+        else:
+            # If the use may only search in Amsterdam, enforce that.
+            # if a different value is set, it will be handled by the permission check later.
+            logging.debug(
+                "User doesn't have %s scope, limiting results to gemeenteVanInschrijving=%s",
+                SCOPE_NATIONWIDE,
+                GEMEENTE_AMSTERDAM_CODE,
+            )
+            hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
+
+    def _add_deceased_filter(self, hc_request: types.PersonenQuery) -> None:
+        """When the user profile may access deceased persons, include that."""
+        logging.debug(
+            "User has %s scope, adding inclusiefOverledenPersonen=true", SCOPE_INCLUDE_DECEASED
+        )
+        hc_request["inclusiefOverledenPersonen"] = True
+
+    def _add_identifier_fields(self, hc_request: types.PersonenQuery) -> None:
+        """Add identifier fields in the request.
+        These are needed to perform logging statements.
+        When the user didn't request them (or didn't have access),
+        they will be requested internally, and removed before the response returns.
+        """
+        query_type = hc_request["type"]
+        fields_by_type = self.possible_fields_by_type.get(query_type) or []
+        for id_field in self.always_insert_id_fields:  # Not including nested fields for now
+            if id_field not in hc_request["fields"] and id_field in fields_by_type:
+                hc_request["fields"].append(id_field)
+                self.inserted_id_fields.append(id_field)
+                logging.debug(
+                    "User doesn't request ID field %s, only adding for internal logging", id_field
+                )
+
+    def transform_response(self, hc_response: types.PersonenResponse) -> None:
+        """Extra rules before passing the response to the client."""
+        super().transform_response(hc_response)  # rewrite links
+
+        # Remove persons that the calling organisation may not see.
+        if SCOPE_ALLOW_CONFIDENTIAL_PERSONS not in self.user_scopes:
+            self._hide_confidential_persons(hc_response)
+
+        # Remove the extra fields that were only inserted to have a BSN/aNummer in the logging,
+        # even through the user has no access to these fields.
+        if self.inserted_id_fields:
+            self._hide_inserted_identifiers(hc_response)
+
+    def _hide_confidential_persons(self, hc_response: types.PersonenResponse) -> None:
+        """
+        If the user may not see persons with confidential data,
+        hide those persons in the response.
+
+        This is a flag that data may not be shared with
+        organisations such as churches, sports clubs and charities.
+
+        Based on:
+        https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1756
+        https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/issues/1857
+        """
+        personen = [
+            persoon
+            for persoon in hc_response["personen"]
+            if not int(persoon.get("geheimhoudingPersoonsgegevens", 0))  # "1" in demo data
+        ]
+        num_hidden = len(hc_response["personen"]) - len(personen)
+        if num_hidden:
+            logging.debug(
+                "Removed %d persons from response"
+                " (missing scope %s for to view 'geheimhoudingPersoonsgegevens')",
+                num_hidden,
+                SCOPE_ALLOW_CONFIDENTIAL_PERSONS,
+            )
+
+        hc_response["personen"] = personen
+
+    def _hide_inserted_identifiers(self, hc_response: types.PersonenResponse) -> None:
+        """Any additional identifiers that we requested internally, need to be removed.
+        The client was not allowed to see these.
+        """
+        logging.debug(
+            "Removing additional identifier fields from response: %s",
+            ",".join(self.inserted_id_fields),
+        )
+        for persoon in hc_response["personen"]:
+            for id_field in self.inserted_id_fields:
+                persoon.pop(id_field, None)
