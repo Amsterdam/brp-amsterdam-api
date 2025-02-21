@@ -12,6 +12,13 @@ from haal_centraal_proxy.api.views.personen import (
 from tests.utils import build_jwt_token
 
 
+@pytest.fixture
+def gegevensset_1():
+    return sorted(
+        read_dataset_fields_files("dataset_fields/personen/benk-brp-gegevensset-1.txt").keys()
+    )
+
+
 class TestBrpPersonenView:
     """Prove that the BRP view works as advertised.
 
@@ -36,7 +43,7 @@ class TestBrpPersonenView:
         ],
     }
 
-    def test_bsn_search(self, api_client, requests_mock):
+    def test_postcode_search(self, api_client, requests_mock):
         """Prove that search is possible"""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
@@ -65,7 +72,7 @@ class TestBrpPersonenView:
         assert response.status_code == 200, response.data
         assert response.json() == self.RESPONSE_POSTCODE_HUISNUMMER, response.data
 
-    def test_bsn_search_deny(self, api_client):
+    def test_postcode_search_deny(self, api_client):
         """Prove that search is possible"""
         url = reverse("brp-personen")
         token = build_jwt_token(["benk-brp-personen-api"])
@@ -83,7 +90,7 @@ class TestBrpPersonenView:
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
 
-    def test_defaults_allow_nationwide(self):
+    def test_transform_allow_nationwide(self):
         """Prove that 'gemeenteVanInschrijving' won't be added if there is nationwide access."""
         view = BrpPersonenView()
         view.user_scopes = {
@@ -105,7 +112,25 @@ class TestBrpPersonenView:
             # no gemeenteVanInschrijving added.
         }
 
-    def test_defaults_allow_deceased(self):
+    def test_transform_enforce_municipality(self):
+        """Prove that 'gemeenteVanInschrijving' will be added."""
+        view = BrpPersonenView()
+        view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+        }
+        view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["aNummer", "burgerservicenummer"]
+
+        assert hc_request == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            # Note that the 'fields' are also updated for logging purposes
+            "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],  # added
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+        }
+
+    def test_transform_allow_deceased(self):
         """Prove that 'inclusiefOverledenPersonen' is automatically added for the scope."""
         view = BrpPersonenView()
         view.user_scopes = {
@@ -127,30 +152,8 @@ class TestBrpPersonenView:
             "inclusiefOverledenPersonen": True,
         }
 
-    def test_defaults_enforce_municipality(self):
-        """Prove that 'gemeenteVanInschrijving' will be added."""
-        view = BrpPersonenView()
-        view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
-        hc_request = {
-            "type": "RaadpleegMetBurgerservicenummer",
-            "fields": ["naam.aanduidingNaamgebruik"],
-        }
-        view.transform_request(hc_request)
-        assert view.inserted_id_fields == ["aNummer", "burgerservicenummer"]
-
-        assert hc_request == {
-            "type": "RaadpleegMetBurgerservicenummer",
-            # Note that the 'fields' are also updated for logging purposes
-            "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],  # added
-            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
-        }
-
-    def test_defaults_add_fields(self):
+    def test_transform_add_fields(self, gegevensset_1):
         """Prove that 'fields' and 'gemeente-filter is added."""
-        set1 = sorted(
-            read_dataset_fields_files("dataset_fields/personen/benk-brp-gegevensset-1.txt").keys()
-        )
-
         view = BrpPersonenView()
         view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
         hc_request = {
@@ -163,10 +166,10 @@ class TestBrpPersonenView:
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
-            "fields": set1,  # added (default all allowed fields)
+            "fields": gegevensset_1,  # added (default all allowed fields)
         }
 
-    def test_defaults_add_fields_limited(self):
+    def test_transform_add_fields_limited(self):
         """Prove that 'fields' and 'gemeente-filter is added."""
         view = BrpPersonenView()
         view.user_scopes = {"benk-brp-zoekvraag-postcode-huisnummer", "benk-brp-gegevensset-1"}
@@ -201,7 +204,7 @@ class TestBrpPersonenView:
             ],
         }
 
-    def test_defaults_missing_sets(self, api_client):
+    def test_transform_missing_sets(self, api_client):
         """Prove that not having access to a set is handled gracefully."""
         url = reverse("brp-personen")
         token = build_jwt_token(
@@ -220,7 +223,7 @@ class TestBrpPersonenView:
         )
 
     @pytest.mark.parametrize("hide", [True, False])
-    def test_hide_confidential(self, api_client, requests_mock, hide, caplog):
+    def test_transform_hide_confidential(self, api_client, requests_mock, hide, caplog):
         """Prove that confidential persons are hidden."""
         person1 = {
             "naam": {"geslachtsnaam": "FOO"},
