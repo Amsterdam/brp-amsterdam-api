@@ -134,7 +134,7 @@ class BaseProxyView(APIView):
         # (currently in in-place)
         hc_response = orjson.loads(downstream_response.text)
         final_response = deepcopy(hc_response)
-        self.transform_response(final_response)
+        self.transform_response(hc_request, final_response)
 
         # Post it to audit logging, both when everything went ok, or failed.
         self.log_access_granted(
@@ -233,7 +233,7 @@ class BaseProxyView(APIView):
         It may perform in-place replacements of the request.
         """
 
-    def transform_response(self, hc_response: dict | list) -> None:
+    def transform_response(self, hc_request: dict, hc_response: dict | list) -> None:
         """Replace hrefs in _links sections by whatever fn returns for them.
 
         May modify data in-place.

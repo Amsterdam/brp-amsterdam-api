@@ -7,6 +7,7 @@ from haal_centraal_proxy.api.views.personen import (
     SCOPE_INCLUDE_DECEASED,
     SCOPE_NATIONWIDE,
     BrpPersonenView,
+    _group_dotted_names,
 )
 
 from tests.utils import build_jwt_token
@@ -43,6 +44,11 @@ class TestBrpPersonenView:
         ],
     }
 
+    RESPONSE_BSN = {
+        **RESPONSE_POSTCODE_HUISNUMMER,
+        "type": "RaadpleegMetBurgerservicenummer",
+    }
+
     def test_postcode_search(self, api_client, requests_mock):
         """Prove that search is possible"""
         requests_mock.post(
@@ -65,7 +71,7 @@ class TestBrpPersonenView:
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "postcode": "1074VE",
                 "huisnummer": 1,
-                "fields": ["naam.aanduidingNaamgebruik"],
+                "fields": ["naam.aanduidingNaamgebruik"],  # no-op for mocked response.
             },
             HTTP_AUTHORIZATION=f"Bearer {token}",
         )
@@ -89,6 +95,108 @@ class TestBrpPersonenView:
         )
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
+
+    def test_transform_include_nulls_zipcode(self, api_client, requests_mock):
+        """Prove that search is possible"""
+        requests_mock.post(
+            "/haalcentraal/api/brp/personen",
+            json=self.RESPONSE_POSTCODE_HUISNUMMER,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-gegevensset-1",
+            ]
+        )
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                # No fields, is auto filled with all options of gegevensset-1.
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 200, response.data
+        assert response.json() == {
+            "type": "ZoekMetPostcodeEnHuisnummer",
+            "personen": [
+                {
+                    "naam": {
+                        "aanduidingNaamgebruik": {
+                            "code": "E",
+                            "omschrijving": "eigen geslachtsnaam",
+                        },
+                        "geslachtsnaam": "Moes",
+                        "volledigeNaam": "Ronald Franciscus Maria Moes",
+                        "voorletters": "R.F.M.",
+                        "voornamen": "Ronald Franciscus Maria",
+                        "voorvoegsel": None,  # included this missing field
+                        "adellijkeTitelPredicaat": None,
+                    },
+                    "burgerservicenummer": None,  # included this missing field
+                    "leeftijd": None,  # included this missing field
+                    "geslacht": None,  # empty object
+                }
+            ],
+        }
+
+    def test_transform_include_nulls_bsn(self, api_client, requests_mock):
+        """Prove that search is possible"""
+        requests_mock.post(
+            "/haalcentraal/api/brp/personen",
+            json=self.RESPONSE_BSN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+            ]
+        )
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [""],
+                # No fields, is auto filled with all options of gegevensset-1.
+            },
+            HTTP_AUTHORIZATION=f"Bearer {token}",
+        )
+        assert response.status_code == 200, response.data
+        assert response.json() == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "personen": [
+                {
+                    "naam": {
+                        "aanduidingNaamgebruik": {
+                            "code": "E",
+                            "omschrijving": "eigen geslachtsnaam",
+                        },
+                        "geslachtsnaam": "Moes",
+                        "volledigeNaam": "Ronald Franciscus Maria Moes",
+                        "voorletters": "R.F.M.",
+                        "voornamen": "Ronald Franciscus Maria",
+                        "voorvoegsel": None,  # included this missing field
+                        "adellijkeTitelPredicaat": None,  # included this
+                    },
+                    "burgerservicenummer": None,  # included this missing field
+                    "leeftijd": None,  # included this missing field
+                    "aNummer": None,
+                    "gemeenteVanInschrijving": None,  # empty object
+                    "geslacht": None,  # empty object
+                    "gezag": [],  # empty array
+                }
+            ],
+        }
 
     def test_transform_allow_nationwide(self):
         """Prove that 'gemeenteVanInschrijving' won't be added if there is nationwide access."""
@@ -348,3 +456,25 @@ class TestBrpPersonenView:
             ),
         ]:
             assert log_message in log_messages
+
+
+def test_group_dotted_names():
+    """Test whether the nested ?_expandScope can be parsed to a tree."""
+    result = _group_dotted_names(
+        [
+            "user",
+            "user.group",
+            "user.permissions",
+            "group",
+            "group.permissions",
+        ]
+    )
+    assert result == {
+        "user": {
+            "group": {},
+            "permissions": {},
+        },
+        "group": {
+            "permissions": {},
+        },
+    }

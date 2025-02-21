@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Iterable
 
 from django.conf import settings
 from rest_framework import status
@@ -11,6 +12,8 @@ from haal_centraal_proxy.api.permissions import ParameterPolicy
 from .base import BaseProxyView, audit_log
 
 logger = logging.getLogger(__name__)
+
+DictOfDicts = dict[str, dict[str, dict]]
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 
@@ -30,6 +33,17 @@ FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-Persoo
 SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
     "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
 )
+
+TOP_LEVEL_ARRAY_FIELDS = [
+    # Hard-coded list here of all array fields (which shouldn't get null-defaults).
+    # This is based on the output of the get-openapi.py script.
+    "ouders",
+    "kinderen",
+    "nationaliteiten",
+    "partners",
+    "gezag",
+    "rni",
+]
 
 
 class BrpPersonenView(BaseProxyView):
@@ -307,9 +321,13 @@ class BrpPersonenView(BaseProxyView):
                     "User doesn't request ID field %s, only adding for internal logging", id_field
                 )
 
-    def transform_response(self, hc_response: types.PersonenResponse) -> None:
+    def transform_response(
+        self,
+        hc_request: types.PersonenQuery,
+        hc_response: types.PersonenResponse,
+    ) -> None:
         """Extra rules before passing the response to the client."""
-        super().transform_response(hc_response)  # rewrite links
+        super().transform_response(hc_request, hc_response)  # rewrite links
 
         # Remove persons that the calling organisation may not see.
         if SCOPE_ALLOW_CONFIDENTIAL_PERSONS not in self.user_scopes:
@@ -318,7 +336,10 @@ class BrpPersonenView(BaseProxyView):
         # Remove the extra fields that were only inserted to have a BSN/aNummer in the logging,
         # even through the user has no access to these fields.
         if self.inserted_id_fields:
-            self._hide_inserted_identifiers(hc_response)
+            self._hide_inserted_identifiers(hc_request, hc_response)
+
+        # Restore sending null values for empty fields
+        self._insert_null_values(hc_request["fields"], hc_response)
 
     def _hide_confidential_persons(self, hc_response: types.PersonenResponse) -> None:
         """
@@ -348,7 +369,7 @@ class BrpPersonenView(BaseProxyView):
 
         hc_response["personen"] = personen
 
-    def _hide_inserted_identifiers(self, hc_response: types.PersonenResponse) -> None:
+    def _hide_inserted_identifiers(self, hc_request, hc_response: types.PersonenResponse) -> None:
         """Any additional identifiers that we requested internally, need to be removed.
         The client was not allowed to see these.
         """
@@ -359,3 +380,53 @@ class BrpPersonenView(BaseProxyView):
         for persoon in hc_response["personen"]:
             for id_field in self.inserted_id_fields:
                 persoon.pop(id_field, None)
+
+        # Also clean up from request before logging it.
+        # Also makes sure the null-inserted fields won't include these.
+        for id_field in self.inserted_id_fields:
+            hc_request["fields"].remove(id_field)
+
+    def _insert_null_values(self, fields: list[str], hc_response: types.PersonenResponse) -> None:
+        """Insert any null values that the user does have access to.
+        This allows the client to distinguish between having 'no value' instead of 'no access'.
+        """
+        request_fields = _group_dotted_names(fields)
+        _include_nulls(request_fields, hc_response["personen"])
+
+
+def _include_nulls(request_fields: DictOfDicts, item: list | dict, parent_path=""):
+    """Include null values based on the collection of requested fields"""
+    if isinstance(item, list):
+        for sub_item in item:
+            _include_nulls(request_fields, sub_item, parent_path=parent_path)
+    elif isinstance(item, dict):
+        for key, sub_level in request_fields.items():
+            if not sub_level:
+                if not parent_path and key in TOP_LEVEL_ARRAY_FIELDS:
+                    item.setdefault(key, [])
+                else:
+                    # None for object, string, etc..
+                    item.setdefault(key, None)
+            else:
+                try:
+                    sub_item = item[key]
+                except KeyError:
+                    # Missing group nodes are ignored for now,
+                    # can't determine whether it's an array or object.
+                    pass
+                else:
+                    _include_nulls(
+                        sub_level,
+                        sub_item,
+                        parent_path=f"{parent_path}.{key}" if parent_path else key,
+                    )
+
+
+def _group_dotted_names(dotted_field_names: Iterable[str]) -> DictOfDicts:
+    """Convert a list of dotted names to tree."""
+    result = {}
+    for dotted_name in dotted_field_names:
+        tree_level = result
+        for path_item in dotted_name.split("."):
+            tree_level = tree_level.setdefault(path_item, {})
+    return result
