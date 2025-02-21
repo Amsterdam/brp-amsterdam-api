@@ -36,6 +36,13 @@ class BrpPersonenView(BaseProxyView):
     """View that proxies Haal Centraal BRP 'personen' (persons).
 
     See: https://brp-api.github.io/Haal-Centraal-BRP-bevragen/
+
+    The while OpenAPI spec for the original endpoint can be found
+    at: https://raw.githubusercontent.com/BRP-API/Haal-Centraal-BRP-bevragen/master/specificatie/resolved/openapi.yaml
+
+    This endpoint has some small differences; the "fields" parameter is not required.
+    The request is mostly proxied as-is, and some parameters get default values
+    based on the user role.
     """
 
     service_log_id = "personen"
