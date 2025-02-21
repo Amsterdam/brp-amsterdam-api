@@ -182,7 +182,6 @@ class BrpPersonenView(BaseProxyView):
                     extra[id_field] = persoon.get(id_field, None)
                     msg.append(f"{id_field}=%({id_field})s")
 
-                print(msg)
                 audit_log.info(
                     # Visible log message
                     " ".join(msg),
