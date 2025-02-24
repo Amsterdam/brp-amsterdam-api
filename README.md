@@ -60,12 +60,12 @@ Example request (directly to the Haal Centraal Mock API):
 
 And the same can be repeated on the Django instance if you pass a token:
 
-    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
+    export TOKEN="$(./get-token.py benk-brp-personen-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
+    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1}'
 
 Same for search by BSN:
 
-    export TOKEN="$(./get-token.py benk-brp-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
+    export TOKEN="$(./get-token.py benk-brp-personen-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
     curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
 
 ### Notes
@@ -74,6 +74,36 @@ The *type* field is required for all request types.
 The *fields* parameter is not required in the proxy, as it will be generated based on your token scopes.
 
 All possible parameters are documented in the [Haal Centraal documentation](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/).
+
+
+## Applied Request Transformations
+
+For the *personen* endpoint, some parameters are automatically filled in based on the token permissions if these are missing in the original request.
+
+* **fields** will be automatically filled in based on the permissions.
+* **gemeenteVanInschrijving** will be limited to Amsterdam unless the user may search nationwide (for *type=ZoekMetPostcodeEnHuisnummer* or scope *benk-brp-zoekvraag-postcode-huisnummer-landelijk*).
+* **inclusiefOverledenPersonen=true** will be included when the *benk-brp-inclusief-overledenen* scope is present and the *type* supports this parameter.
+
+This behavior can be overwritten by providing the parameter in the original request.
+Those parameters will be validated against the ruleset.
+In practice, this means that using *inclusiefOverledenPersonen=false* would work,
+but specifying *true* requires the token scope to be there.
+
+## Applied Response Transformations
+
+The *personen* endpoint will transform the responses:
+
+Empty fields are explicitly included as `null` values or empty arrays,
+except for the [automatically included fields](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#standaard-geleverde-velden).
+This overrides the logic from Haal Centraal to [hide empty/null/false values](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#geennullfalse-waarde-leeg-object-waarde-en-standaard-waarde).
+As such, clients can detect whether a field was actually empty, or omitted due to permissions.
+
+When the scope *benk-brp-inclusief-geheim* is missing, persons with *geheimhoudingPersoonsgegevens=1* will be omitted from the response.
+That flags indicates that data may not be shared with organisations such as churches, sports clubs and charities.
+
+In case more permisions are missing from the expected response,
+most likely the scope *benk-brp-zoekvraag-postcode-huisnummer-landelijk* is missing
+so the search was  limited to persons within Amsterdam only.
 
 
 ## Available Endpoints
@@ -85,6 +115,7 @@ The following URLs are available:
 | `/api/brp/personen`                  | Person details.                          | `HAAL_CENTRAAL_BRP_PERSONEN_URL`                 | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)            |
 | `/api/brp/bewoningen`                | Who lived at an address.                 | `HAAL_CENTRAAL_BRP_BEWONINGEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)            |
 | `/api/brp/verblijfsplaatshistorie`   | All addresses where someone lived.       | `HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)   |
+
 
 ## Environment Settings
 
