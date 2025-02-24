@@ -19,6 +19,15 @@ GEMEENTE_AMSTERDAM_CODE = "0363"
 
 SEARCH_ZIPCODE_NUMBER = "ZoekMetPostcodeEnHuisnummer"
 
+SEARCH_INCLUDE_DECEASED = {
+    "ZoekMetAdresseerbaarObjectIdentificatie",
+    "ZoekMetGeslachtsnaamEnGeboortedatum",
+    "ZoekMetNaamEnGemeenteVanInschrijving",
+    "ZoekMetNummeraanduidingIdentificatie",
+    "ZoekMetPostcodeEnHuisnummer",
+    "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
+}
+
 SCOPE_NATIONWIDE = "benk-brp-landelijk"
 SCOPE_INCLUDE_DECEASED = "benk-brp-inclusief-overledenen"
 SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-inclusief-geheim"
@@ -227,6 +236,7 @@ class BrpPersonenView(BaseProxyView):
 
         if (
             SCOPE_INCLUDE_DECEASED in self.user_scopes
+            and hc_request["type"] in SEARCH_INCLUDE_DECEASED
             and "inclusiefOverledenPersonen" not in hc_request
         ):
             self._add_deceased_filter(hc_request)
