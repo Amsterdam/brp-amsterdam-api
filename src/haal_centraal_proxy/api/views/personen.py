@@ -76,7 +76,7 @@ class BrpPersonenView(BaseProxyView):
 
     possible_fields_by_type = {
         "RaadpleegMetBurgerservicenummer": ALL_FIELD_NAMES,
-        "ZoekMetAdresseerbaarObjectIdentificatie": FILTERED,
+        "ZoekMetAdresseerbaarObjectIdentificatie": FILTERED_MIN,
         "ZoekMetGeslachtsnaamEnGeboortedatum": FILTERED_MIN,
         "ZoekMetNaamEnGemeenteVanInschrijving": FILTERED_MIN,
         "ZoekMetNummeraanduidingIdentificatie": FILTERED_MIN,
