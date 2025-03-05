@@ -421,15 +421,15 @@ def _include_nulls(request_fields: DictOfDicts, item: list | dict, parent_path="
                 try:
                     sub_item = item[key]
                 except KeyError:
-                    # Missing group nodes are ignored for now,
-                    # can't determine whether it's an array or object.
-                    pass
-                else:
-                    _include_nulls(
-                        sub_level,
-                        sub_item,
-                        parent_path=f"{parent_path}.{key}" if parent_path else key,
-                    )
+                    # Add an empty dict to allow recursion to fill the missing keys
+                    item.setdefault(key, {})
+                    sub_item = item[key]
+
+                _include_nulls(
+                    sub_level,
+                    sub_item,
+                    parent_path=f"{parent_path}.{key}" if parent_path else key,
+                )
 
 
 def _group_dotted_names(dotted_field_names: Iterable[str]) -> DictOfDicts:

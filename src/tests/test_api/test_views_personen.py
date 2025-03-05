@@ -139,7 +139,16 @@ class TestBrpPersonenView:
                         "voorvoegsel": None,  # included this missing field
                         "adellijkeTitelPredicaat": None,
                     },
+                    "adressering": {  # included this missing object
+                        "adresregel1": None,  # included this missing field
+                        "adresregel2": None,  # included this missing field
+                        "adresregel3": None,  # included this missing field
+                        "land": None,  # included this missing field
+                    },
                     "burgerservicenummer": None,  # included this missing field
+                    "geboorte": {  # included this missing object
+                        "datum": None,  # included this missing field
+                    },
                     "leeftijd": None,  # included this missing field
                     "geslacht": None,  # empty object
                 }
@@ -188,12 +197,66 @@ class TestBrpPersonenView:
                         "voorvoegsel": None,  # included this missing field
                         "adellijkeTitelPredicaat": None,  # included this
                     },
+                    "adressering": {  # included this missing object
+                        "aanhef": None,  # included this missing field
+                        "aanschrijfwijze": {  # included this missing object
+                            "aanspreekvorm": None,  # included this missing field
+                            "naam": None,  # included this missing field
+                        },
+                        "adresregel1": None,  # included this missing field
+                        "adresregel2": None,  # included this missing field
+                        "adresregel3": None,  # included this missing field
+                        "gebruikInLopendeTekst": None,  # included this missing field
+                        "land": None,  # included this missing field
+                    },
+                    "geboorte": {  # included this missing object
+                        "datum": None,  # included this missing field
+                    },
+                    "immigratie": {  # included this missing object
+                        "indicatieVestigingVanuitBuitenland": None,  # included this missing field
+                        "vanuitVerblijfplaatsOnbekend": None,  # included this missing field
+                    },
+                    "kinderen": {  # included this missing object
+                        "naam": {  # included this missing object
+                            "voorletters": None,  # included this missing field
+                        },
+                    },
                     "burgerservicenummer": None,  # included this missing field
                     "leeftijd": None,  # included this missing field
                     "aNummer": None,
                     "gemeenteVanInschrijving": None,  # empty object
                     "geslacht": None,  # empty object
                     "gezag": [],  # empty array
+                    "ouders": {  # included this missing object
+                        "naam": {  # included this missing object
+                            "voorletters": None,  # included this missing field
+                        },
+                        "ouderAanduiding": None,  # included this missing field
+                    },
+                    "overlijden": {  # included this missing object
+                        "datum": None,  # included this missing field
+                    },
+                    "partners": {  # included this missing object
+                        "naam": {  # included this missing object
+                            "voorletters": None,  # included this missing field
+                        },
+                    },
+                    "verblijfplaats": {  # included this missing object
+                        "adresseerbaarObjectIdentificatie": None,  # included this missing field
+                        "functieAdres": None,  # included this missing field
+                        "nummeraanduidingIdentificatie": None,  # included this missing field
+                        "verblijfadres": {  # included this missing object
+                            "aanduidingBijHuisnummer": None,  # included this missing field
+                            "huisletter": None,  # included this missing field
+                            "huisnummer": None,  # included this missing field
+                            "huisnummertoevoeging": None,  # included this missing field
+                            "korteStraatnaam": None,  # included this missing field
+                            "locatiebeschrijving": None,  # included this missing field
+                            "officieleStraatnaam": None,  # included this missing field
+                            "postcode": None,  # included this missing field
+                            "woonplaats": None,  # included this missing field
+                        },
+                    },
                 }
             ],
         }
