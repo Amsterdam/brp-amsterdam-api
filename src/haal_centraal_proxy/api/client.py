@@ -1,4 +1,4 @@
-"""Client for Haal Centraal API. """
+"""Client for Haal Centraal API."""
 
 import logging
 import time
