@@ -238,8 +238,10 @@ class TestBrpPersonenView:
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
         }
 
-    def test_transform_allow_deceased(self):
-        """Prove that 'inclusiefOverledenPersonen' is automatically added for the scope."""
+    def test_transform_do_not_allow_deceased_for_bsn_search(self):
+        """Prove that 'inclusiefOverledenPersonen' is not automatically added for the scope.
+        When searched on BSN.
+        """
         view = BrpPersonenView()
         view.user_scopes = {
             "benk-brp-zoekvraag-bsn",
@@ -257,6 +259,27 @@ class TestBrpPersonenView:
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
             "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],
+        }
+
+    def test_transform_allow_deceased(self):
+        """Prove that 'inclusiefOverledenPersonen' is automatically added for the scope."""
+        view = BrpPersonenView()
+        view.user_scopes = {
+            "benk-brp-zoekvraag-bsn",
+            "benk-brp-gegevensset-1",
+            SCOPE_NATIONWIDE,
+            SCOPE_INCLUDE_DECEASED,
+        }
+        hc_request = {
+            "type": "ZoekMetPostcodeEnHuisnummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+        }
+        view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["burgerservicenummer"]
+
+        assert hc_request == {
+            "type": "ZoekMetPostcodeEnHuisnummer",
+            "fields": ["naam.aanduidingNaamgebruik", "burgerservicenummer"],
             "inclusiefOverledenPersonen": True,
         }
 
