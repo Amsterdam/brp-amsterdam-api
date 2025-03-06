@@ -143,7 +143,6 @@ class TestBrpPersonenView:
                         "adresregel1": None,  # included this missing field
                         "adresregel2": None,  # included this missing field
                         "adresregel3": None,  # included this missing field
-                        "land": None,  # included this missing field
                     },
                     "burgerservicenummer": None,  # included this missing field
                     "geboorte": {  # included this missing object
@@ -201,25 +200,34 @@ class TestBrpPersonenView:
                         "aanhef": None,  # included this missing field
                         "aanschrijfwijze": {  # included this missing object
                             "aanspreekvorm": None,  # included this missing field
-                            "naam": None,  # included this missing field
                         },
                         "adresregel1": None,  # included this missing field
                         "adresregel2": None,  # included this missing field
                         "adresregel3": None,  # included this missing field
                         "gebruikInLopendeTekst": None,  # included this missing field
-                        "land": None,  # included this missing field
                     },
+                    "datumInschrijvingInGemeente": None,
                     "geboorte": {  # included this missing object
                         "datum": None,  # included this missing field
                     },
                     "immigratie": {  # included this missing object
-                        "indicatieVestigingVanuitBuitenland": None,  # included this missing field
-                        "vanuitVerblijfplaatsOnbekend": None,  # included this missing field
+                        "datumVestigingInNederland": None,  # included this missing field
                     },
+                    "indicatieCurateleRegister": None,
                     "kinderen": {  # included this missing object
-                        "naam": {  # included this missing object
-                            "voorletters": None,  # included this missing field
+                        "burgerservicenummer": None,
+                        "geboorte": {  # included this missing object
+                            "datum": None,  # included this missing field
                         },
+                        "naam": {  # included this missing object
+                            "geslachtsnaam": None,  # included this missing field
+                            "voorletters": None,  # included this missing field
+                            "voornamen": None,  # included this missing field
+                            "voorvoegsel": None,  # included this missing field
+                        },
+                    },
+                    "nationaliteiten": {  # included this missing object
+                        "nationaliteit": None,  # included this missing field
                     },
                     "burgerservicenummer": None,  # included this missing field
                     "leeftijd": None,  # included this missing field
@@ -228,21 +236,41 @@ class TestBrpPersonenView:
                     "geslacht": None,  # empty object
                     "gezag": [],  # empty array
                     "ouders": {  # included this missing object
-                        "naam": {  # included this missing object
-                            "voorletters": None,  # included this missing field
+                        "burgerservicenummer": None,  # included this missing field
+                        "geboorte": {  # included this missing object
+                            "datum": None,  # included this missing field
                         },
-                        "ouderAanduiding": None,  # included this missing field
+                        "naam": {  # included this missing object
+                            "geslachtsnaam": None,  # included this missing field
+                            "voorletters": None,  # included this missing field
+                            "voornamen": None,  # included this missing field
+                            "voorvoegsel": None,  # included this missing field
+                        },
                     },
                     "overlijden": {  # included this missing object
                         "datum": None,  # included this missing field
                     },
                     "partners": {  # included this missing object
+                        "aangaanHuwelijkPartnerschap": {  # included this missing object
+                            "datum": None,  # included this missing field
+                        },
+                        "burgerservicenummer": None,  # included this missing field
+                        "geboorte": {  # included this missing object
+                            "datum": None,  # included this missing field
+                        },
                         "naam": {  # included this missing object
+                            "geslachtsnaam": None,  # included this missing field
                             "voorletters": None,  # included this missing field
+                            "voornamen": None,  # included this missing field
+                            "voorvoegsel": None,  # included this missing field
+                        },
+                        "ontbindingHuwelijkPartnerschap": {  # included this missing object
+                            "datum": None,  # included this missing field
                         },
                     },
                     "verblijfplaats": {  # included this missing object
                         "adresseerbaarObjectIdentificatie": None,  # included this missing field
+                        "datumVan": None,  # included this missing field
                         "functieAdres": None,  # included this missing field
                         "nummeraanduidingIdentificatie": None,  # included this missing field
                         "verblijfadres": {  # included this missing object
@@ -251,11 +279,20 @@ class TestBrpPersonenView:
                             "huisnummer": None,  # included this missing field
                             "huisnummertoevoeging": None,  # included this missing field
                             "korteStraatnaam": None,  # included this missing field
+                            "land": None,  # included this missing field
                             "locatiebeschrijving": None,  # included this missing field
                             "officieleStraatnaam": None,  # included this missing field
                             "postcode": None,  # included this missing field
+                            "regel1": None,  # included this missing field
+                            "regel2": None,  # included this missing field
+                            "regel3": None,  # included this missing field
                             "woonplaats": None,  # included this missing field
                         },
+                    },
+                    "verblijfstitel": {  # included this missing object
+                        "aanduiding": None,  # included this missing field
+                        "datumEinde": None,  # included this missing field
+                        "datumIngang": None,  # included this missing field
                     },
                 }
             ],
@@ -382,7 +419,6 @@ class TestBrpPersonenView:
                 "adressering.adresregel1",
                 "adressering.adresregel2",
                 "adressering.adresregel3",
-                "adressering.land",
                 "burgerservicenummer",
                 "geboorte.datum",
                 "geslacht",
