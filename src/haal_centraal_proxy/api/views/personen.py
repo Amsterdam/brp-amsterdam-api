@@ -51,7 +51,6 @@ TOP_LEVEL_ARRAY_FIELDS = [
     "nationaliteiten",
     "partners",
     "gezag",
-    "rni",
 ]
 
 
@@ -404,31 +403,36 @@ class BrpPersonenView(BaseProxyView):
         _include_nulls(request_fields, hc_response["personen"])
 
 
-def _include_nulls(request_fields: DictOfDicts, item: list | dict, parent_path=""):
+def _include_nulls(request_fields: DictOfDicts, item: list | dict, parent_path=()):
     """Include null values based on the collection of requested fields"""
     if isinstance(item, list):
         for sub_item in item:
             _include_nulls(request_fields, sub_item, parent_path=parent_path)
     elif isinstance(item, dict):
         for key, sub_level in request_fields.items():
-            if not sub_level:
+            try:
+                sub_item = item[key]
+            except KeyError:
+                # Element is missing
                 if not parent_path and key in TOP_LEVEL_ARRAY_FIELDS:
-                    item.setdefault(key, [])
-                else:
-                    # None for object, string, etc..
-                    item.setdefault(key, None)
-            else:
-                try:
-                    sub_item = item[key]
-                except KeyError:
-                    # Add an empty dict to allow recursion to fill the missing keys
-                    item.setdefault(key, {})
-                    sub_item = item[key]
+                    # Array fields can't be expanded.
+                    item[key] = []
+                    continue
 
+                if not sub_level:
+                    # This is a leaf node
+                    # Empty array for no items, None for object, string, etc..
+                    item[key] = None
+                    continue
+
+                # New item is empty object, will be filled with its keys.
+                sub_item = item.setdefault(key, {})
+
+            if sub_level:
                 _include_nulls(
                     sub_level,
                     sub_item,
-                    parent_path=f"{parent_path}.{key}" if parent_path else key,
+                    parent_path=parent_path + (key,),
                 )
 
 

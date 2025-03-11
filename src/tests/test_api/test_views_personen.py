@@ -216,60 +216,19 @@ class TestBrpPersonenView:
                         "datumVestigingInNederland": None,  # included this missing field
                     },
                     "indicatieCurateleRegister": None,
-                    "kinderen": {  # included this missing object
-                        "burgerservicenummer": None,
-                        "geboorte": {  # included this missing object
-                            "datum": None,  # included this missing field
-                        },
-                        "naam": {  # included this missing object
-                            "geslachtsnaam": None,  # included this missing field
-                            "voorletters": None,  # included this missing field
-                            "voornamen": None,  # included this missing field
-                            "voorvoegsel": None,  # included this missing field
-                        },
-                    },
-                    "nationaliteiten": {  # included this missing object
-                        "nationaliteit": None,  # included this missing field
-                    },
+                    "kinderen": [],  #  included empty array
+                    "nationaliteiten": [],  # included empty array
                     "burgerservicenummer": None,  # included this missing field
                     "leeftijd": None,  # included this missing field
                     "aNummer": None,
                     "gemeenteVanInschrijving": None,  # empty object
-                    "geslacht": None,  # empty object
-                    "gezag": [],  # empty array
-                    "ouders": {  # included this missing object
-                        "burgerservicenummer": None,  # included this missing field
-                        "geboorte": {  # included this missing object
-                            "datum": None,  # included this missing field
-                        },
-                        "naam": {  # included this missing object
-                            "geslachtsnaam": None,  # included this missing field
-                            "voorletters": None,  # included this missing field
-                            "voornamen": None,  # included this missing field
-                            "voorvoegsel": None,  # included this missing field
-                        },
-                    },
+                    "geslacht": None,  # empty object (not expanded)
+                    "gezag": [],  # included empty array
+                    "ouders": [],  # included this missing object
                     "overlijden": {  # included this missing object
                         "datum": None,  # included this missing field
                     },
-                    "partners": {  # included this missing object
-                        "aangaanHuwelijkPartnerschap": {  # included this missing object
-                            "datum": None,  # included this missing field
-                        },
-                        "burgerservicenummer": None,  # included this missing field
-                        "geboorte": {  # included this missing object
-                            "datum": None,  # included this missing field
-                        },
-                        "naam": {  # included this missing object
-                            "geslachtsnaam": None,  # included this missing field
-                            "voorletters": None,  # included this missing field
-                            "voornamen": None,  # included this missing field
-                            "voorvoegsel": None,  # included this missing field
-                        },
-                        "ontbindingHuwelijkPartnerschap": {  # included this missing object
-                            "datum": None,  # included this missing field
-                        },
-                    },
+                    "partners": [],  # included empty array
                     "verblijfplaats": {  # included this missing object
                         "adresseerbaarObjectIdentificatie": None,  # included this missing field
                         "datumVan": None,  # included this missing field
