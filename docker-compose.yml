@@ -3,7 +3,7 @@ services:
     # from https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/docker-compose-mock.yml
     container_name: personen-mock
     build:
-      dockerfile: DockerfilePersonenMock
+      dockerfile: ./src/haal_centraal_mock/Dockerfile
       args:
         - JSON_URL=https://raw.githubusercontent.com/BRP-API/personen-informatie-service/refs/heads/main/src/config/BrpService/test-data.json
     environment:
