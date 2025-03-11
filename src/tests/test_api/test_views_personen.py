@@ -143,6 +143,7 @@ class TestBrpPersonenView:
                         "adresregel1": None,  # included this missing field
                         "adresregel2": None,  # included this missing field
                         "adresregel3": None,  # included this missing field
+                        "land": None,  # included this missing field
                     },
                     "burgerservicenummer": None,  # included this missing field
                     "geboorte": {  # included this missing object
@@ -205,6 +206,7 @@ class TestBrpPersonenView:
                         "adresregel2": None,  # included this missing field
                         "adresregel3": None,  # included this missing field
                         "gebruikInLopendeTekst": None,  # included this missing field
+                        "land": None,  # included this missing field
                     },
                     "datumInschrijvingInGemeente": None,
                     "geboorte": {  # included this missing object
@@ -419,6 +421,7 @@ class TestBrpPersonenView:
                 "adressering.adresregel1",
                 "adressering.adresregel2",
                 "adressering.adresregel3",
+                "adressering.land",
                 "burgerservicenummer",
                 "geboorte.datum",
                 "geslacht",

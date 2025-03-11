@@ -56,7 +56,8 @@ immigratie.datumVestigingInNederland
 verblijfplaats.verblijfadres.officieleStraatnaam
 adressering.adresregel1
 adressering.adresregel2
-adressering.adresregel 3
+adressering.adresregel3
+adressering.land
 indicatieVastgesteldVerblijftNietOpAdres
 kinderen.burgerservicenummer
 kinderen.naam.voornamen

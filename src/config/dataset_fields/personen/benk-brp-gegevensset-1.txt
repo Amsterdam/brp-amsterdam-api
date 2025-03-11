@@ -58,6 +58,7 @@ verblijfplaats.verblijfadres.officieleStraatnaam
 adressering.adresregel1
 adressering.adresregel2
 adressering.adresregel3
+adressering.land
 kinderen.burgerservicenummer
 kinderen.naam.voornamen
 kinderen.naam.voorletters
