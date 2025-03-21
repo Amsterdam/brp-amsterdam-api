@@ -131,9 +131,9 @@ _json_log_formatter = {
     "format": "%(asctime)s $(levelname)s %(name)s %(message)s",  # parsed as a fields list.
 }
 
-DJANGO_LOG_LEVEL = env.str("DJANGO_LOG_LEVEL", "INFO")
-LOG_LEVEL = env.str("LOG_LEVEL", "DEBUG" if DEBUG else "INFO")
-AUDIT_LOG_LEVEL = env.str("AUDIT_LOG_LEVEL", "INFO")
+DJANGO_LOG_LEVEL = env.str("DJANGO_LOG_LEVEL", "INFO").upper()
+LOG_LEVEL = env.str("LOG_LEVEL", "DEBUG" if DEBUG else "INFO").upper()
+AUDIT_LOG_LEVEL = env.str("AUDIT_LOG_LEVEL", "INFO").upper()
 
 LOGGING = {
     "version": 1,
