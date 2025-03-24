@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
 from functools import cached_property
@@ -9,6 +10,9 @@ from rest_framework import status
 from rest_framework.permissions import BasePermission
 
 from .exceptions import ProblemJsonException
+
+logger = logging.getLogger(__name__)
+audit_log = logging.getLogger("haal_centraal_proxy.audit")
 
 
 @dataclass
@@ -242,6 +246,18 @@ class IsUserScope(BasePermission):
 
         # This calls into 'authorization_django middleware',
         # and logs when the access wasn't granted.
+        missing = sorted(self.needed_scopes - user_scopes)
+        logger.info(
+            "Denied overall access to '%(path)s', missing %(missing)s",
+            {"path": request.path, "missing": ",".join(missing)},
+            extra={
+                "path": request.path,
+                "granted": sorted(user_scopes),
+                "needed": sorted(self.needed_scopes),
+                "missing": missing,
+            },
+        )
+
         return request.is_authorized_for(*self.needed_scopes)
 
     def has_object_permission(self, request, view, obj):
