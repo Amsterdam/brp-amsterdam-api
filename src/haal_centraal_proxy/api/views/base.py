@@ -1,4 +1,5 @@
 import logging
+import time
 from copy import deepcopy
 
 import orjson
@@ -8,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -44,13 +45,34 @@ class BaseProxyView(APIView):
     #: The ruleset which parameters are allowed, or require additional roles.
     parameter_ruleset: dict[str, ParameterPolicy] = None
 
-    def setup(self, request, *args, **kwargs):
-        """Configure the view before the request handling starts.
-        This is the main Django view setup.
-        """
-        super().setup(request, *args, **kwargs)
+    def initial(self, request: Request, *args, **kwargs):
+        """DRF-level initialization for all request types."""
         self._base_url = reverse(request.resolver_match.view_name)
         self.client = self.get_client()
+        self.start_time = time.perf_counter_ns()
+
+        # Perform authorization, permission checks and throttles.
+        super().initial(request, *args, **kwargs)
+
+        # Token is validated, extract token scopes that are set by the middleware
+        self.user_scopes = set(request.get_token_scopes)
+        self.user_id = request.get_token_claims.get("email", request.get_token_subject)
+
+        try:
+            # request.data is only available in initial(), not in setup()
+            self.default_log_fields = {
+                "service": self.service_log_id,
+                "query_type": request.data.get("type", None),
+                "user": self.user_id,
+                "X-User": self.request.headers["X-User"],
+                "X-Correlation-ID": self.request.headers["X-Correlation-ID"],
+                "X-Task-Description": self.request.headers["X-Task-Description"],
+                "granted": sorted(self.user_scopes),
+            }
+        except KeyError as e:
+            raise PermissionDenied(
+                f"A required header is missing: {e.args[0]}", code="missingHeaders"
+            ) from None
 
     def get_client(self) -> HaalCentraalClient:
         """Provide the Haal Centraal client. This can be overwritten per view if needed."""
@@ -69,7 +91,10 @@ class BaseProxyView(APIView):
         if not self.needed_scopes:
             raise ImproperlyConfigured("needed_scopes is not set")
 
-        return super().get_permissions() + [permissions.IsUserScope(self.needed_scopes)]
+        return super().get_permissions() + [
+            permissions.IsUserScope(self.needed_scopes),
+            permissions.HasRequiredHeaders(),
+        ]
 
     def get_parameter_ruleset(self, hc_request: dict) -> dict[str, ParameterPolicy]:
         """Allow overriding which parameter ruleset to use."""
@@ -80,9 +105,6 @@ class BaseProxyView(APIView):
         Basic checks (such as content-type validation) are already done by REST Framework.
         The API uses POST so the logs won't include personally identifiable information (PII).
         """
-        # Parse the request
-        self.user_scopes = set(request.get_token_scopes)
-        self.user_id = request.get_token_claims.get("email", request.get_token_subject)
         hc_request = request.data.copy()
 
         # Perform validation
@@ -167,13 +189,12 @@ class BaseProxyView(APIView):
                 "missing": ",".join(missing),
             },
             extra={
-                "service": self.service_log_id,
-                "query_type": hc_request["type"],
+                **self.default_log_fields,
                 "field": err.field_name,
                 "values": err.denied_values,
-                "granted": sorted(self.user_scopes),
                 "needed": sorted(err.needed_scopes),
                 "missing": missing,
+                "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
             },
         )
 
@@ -192,14 +213,12 @@ class BaseProxyView(APIView):
         Per service type, it may need more refinement.
         """
         extra = {
-            "service": self.service_log_id,
-            "query_type": hc_request["type"],
-            "user": self.user_id,
-            "granted": sorted(self.user_scopes),
+            **self.default_log_fields,
             "needed": sorted(needed_scopes),
             "request": request.data,
             "hc_request": hc_request,
             "hc_response": final_response or hc_response,
+            "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
         }
 
         if exception is None:

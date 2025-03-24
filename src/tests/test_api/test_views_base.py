@@ -30,7 +30,7 @@ class TestBaseProxyView:
             "instance": url,
         }
 
-    def test_invalid_api_key(self, api_client, requests_mock, caplog):
+    def test_invalid_api_key(self, api_client, requests_mock, caplog, common_headers):
         """Prove that incorrect API-key settings are handled gracefully."""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
@@ -61,7 +61,10 @@ class TestBaseProxyView:
                 "huisnummer": 1,
                 "fields": ["naam.aanduidingNaamgebruik"],
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 502
         assert any(
@@ -77,7 +80,37 @@ class TestBaseProxyView:
             "instance": "/api/brp/personen",
         }
 
-    def test_error_response(self, api_client, requests_mock, caplog):
+    @pytest.mark.parametrize("remove_header", ["X-Correlation-ID", "X-User", "X-Task-Description"])
+    def test_missing_common_headers(self, api_client, common_headers, remove_header):
+        """Prove that not providing the common headers is accurately reported back"""
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            ["benk-brp-personen-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"]
+        )
+        headers = {
+            "Authorization": f"Bearer {token}",
+            **common_headers,
+        }
+        del headers[remove_header]
+        response = api_client.post(
+            url,
+            {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "000009830"},
+            headers=headers,
+        )
+        assert response.status_code == 403
+        assert response.json() == {
+            "code": "missingHeaders",
+            "detail": (
+                "The following headers are required: X-User, X-Correlation-ID, X-Task-Description."
+            ),
+            "instance": "/api/brp/personen",
+            "status": 403,
+            "title": "You do not have permission to perform this action.",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
+        }
+
+    def test_error_response(self, api_client, requests_mock, caplog, common_headers):
+        """Prove that Haal Centraal errors are handled gracefully."""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
             json={
@@ -106,7 +139,10 @@ class TestBaseProxyView:
         response = api_client.post(
             url,
             {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "000009830"},
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 400
         assert any(

@@ -49,7 +49,7 @@ class TestBrpPersonenView:
         "type": "RaadpleegMetBurgerservicenummer",
     }
 
-    def test_postcode_search(self, api_client, requests_mock):
+    def test_postcode_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
@@ -73,12 +73,15 @@ class TestBrpPersonenView:
                 "huisnummer": 1,
                 "fields": ["naam.aanduidingNaamgebruik"],  # no-op for mocked response.
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 200, response.data
         assert response.json() == self.RESPONSE_POSTCODE_HUISNUMMER, response.data
 
-    def test_postcode_search_deny(self, api_client):
+    def test_postcode_search_deny(self, api_client, common_headers):
         """Prove that search is possible"""
         url = reverse("brp-personen")
         token = build_jwt_token(["benk-brp-personen-api"])
@@ -91,12 +94,15 @@ class TestBrpPersonenView:
                 "huisnummer": 1,
                 "fields": ["naam"],
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
 
-    def test_transform_include_nulls_zipcode(self, api_client, requests_mock):
+    def test_transform_include_nulls_zipcode(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
@@ -120,7 +126,10 @@ class TestBrpPersonenView:
                 "huisnummer": 1,
                 # No fields, is auto filled with all options of gegevensset-1.
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 200, response.data
         assert response.json() == {
@@ -155,7 +164,7 @@ class TestBrpPersonenView:
             ],
         }
 
-    def test_transform_include_nulls_bsn(self, api_client, requests_mock):
+    def test_transform_include_nulls_bsn(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
@@ -178,7 +187,10 @@ class TestBrpPersonenView:
                 "burgerservicenummer": [""],
                 # No fields, is auto filled with all options of gegevensset-1.
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 200, response.data
         assert response.json() == {
@@ -396,7 +408,7 @@ class TestBrpPersonenView:
             ],
         }
 
-    def test_transform_missing_sets(self, api_client):
+    def test_transform_missing_sets(self, api_client, common_headers):
         """Prove that not having access to a set is handled gracefully."""
         url = reverse("brp-personen")
         token = build_jwt_token(
@@ -406,7 +418,10 @@ class TestBrpPersonenView:
         response = api_client.post(
             url,
             {"type": "RaadpleegMetBurgerservicenummer"},
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
@@ -415,7 +430,9 @@ class TestBrpPersonenView:
         )
 
     @pytest.mark.parametrize("hide", [True, False])
-    def test_transform_hide_confidential(self, api_client, requests_mock, hide, caplog):
+    def test_transform_hide_confidential(
+        self, api_client, requests_mock, hide, caplog, common_headers
+    ):
         """Prove that confidential persons are hidden."""
         person1 = {
             "naam": {"geslachtsnaam": "FOO"},
@@ -448,7 +465,10 @@ class TestBrpPersonenView:
                 "huisnummer": 1,
                 "fields": ["naam.geslachtsnaam"],
             },
-            HTTP_AUTHORIZATION=f"Bearer {build_jwt_token(scopes)}",
+            headers={
+                "Authorization": f"Bearer {build_jwt_token(scopes)}",
+                **common_headers,
+            },
         )
         assert response.status_code == 200, response.data
         personen = response.json()["personen"]
@@ -461,7 +481,9 @@ class TestBrpPersonenView:
             ), caplog.messages
 
     @pytest.mark.parametrize("can_see_bsn", [True, False])
-    def test_log_retrieved_bsns(self, api_client, requests_mock, caplog, monkeypatch, can_see_bsn):
+    def test_log_retrieved_bsns(
+        self, api_client, requests_mock, caplog, monkeypatch, can_see_bsn, common_headers
+    ):
         """Prove that retrieved BSNs are always logged.
 
         Even when the user doesn't have access to that field, or won't request it,
@@ -509,7 +531,10 @@ class TestBrpPersonenView:
                 "huisnummer": 1,
                 "fields": ["naam.geslachtsnaam"],
             },
-            HTTP_AUTHORIZATION=f"Bearer {build_jwt_token(scopes)}",
+            headers={
+                "Authorization": f"Bearer {build_jwt_token(scopes)}",
+                **common_headers,
+            },
         )
         assert response.status_code == 200, response.data
         response = response.json()

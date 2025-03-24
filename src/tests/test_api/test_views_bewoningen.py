@@ -17,7 +17,7 @@ class TestBrpBewoningenView:
         ]
     }
 
-    def test_address_id_search(self, api_client, requests_mock):
+    def test_address_id_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
             # https://demo-omgeving.haalcentraal.nl
@@ -35,12 +35,15 @@ class TestBrpBewoningenView:
                 "adresseerbaarObjectIdentificatie": "0518010000832200",
                 "peildatum": "2020-09-24",
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 200, response
         assert response.json() == self.RESPONSE_BEWONINGEN, response.data
 
-    def test_address_id_search_deny(self, api_client):
+    def test_address_id_search_deny(self, api_client, common_headers):
         """Prove that access is checked"""
         url = reverse("brp-bewoningen")
         token = build_jwt_token(["benk-brp-SOME-OTHER-api"])
@@ -51,13 +54,16 @@ class TestBrpBewoningenView:
                 "adresseerbaarObjectIdentificatie": "0518010000832200",
                 "peildatum": "2020-09-24",
             },
-            HTTP_AUTHORIZATION=f"Bearer {token}",
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
         )
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
         assert response.data == {
             "code": "permissionDenied",
-            "detail": "",
+            "detail": "Required scopes not given in token.",
             "instance": "/api/brp/bewoningen",
             "status": 403,
             "title": "You do not have permission to perform this action.",

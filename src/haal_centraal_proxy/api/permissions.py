@@ -232,6 +232,9 @@ def validate_parameters(
 class IsUserScope(BasePermission):
     """Permission check, wrapped in a DRF permissions adapter"""
 
+    message = "Required scopes not given in token."
+    code = "permissionDenied"
+
     def __init__(self, needed_scopes):
         self.needed_scopes = frozenset(needed_scopes)
 
@@ -247,11 +250,14 @@ class IsUserScope(BasePermission):
         # This calls into 'authorization_django middleware',
         # and logs when the access wasn't granted.
         missing = sorted(self.needed_scopes - user_scopes)
-        logger.info(
+        audit_log.info(
             "Denied overall access to '%(path)s', missing %(missing)s",
             {"path": request.path, "missing": ",".join(missing)},
             extra={
                 "path": request.path,
+                "X-User": request.headers.get("X-User", None),
+                "X-Correlation-ID": request.headers.get("X-Correlation-ID", None),
+                "X-Task-Description": request.headers.get("X-Task-Description", None),
                 "granted": sorted(user_scopes),
                 "needed": sorted(self.needed_scopes),
                 "missing": missing,
@@ -259,6 +265,20 @@ class IsUserScope(BasePermission):
         )
 
         return request.is_authorized_for(*self.needed_scopes)
+
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
+
+
+class HasRequiredHeaders(BasePermission):
+    """Permission check to check whether expected headers are present."""
+
+    required_headers = ("X-User", "X-Correlation-ID", "X-Task-Description")
+    message = f"The following headers are required: {', '.join(required_headers)}."
+    code = "missingHeaders"  # this helps both clients and unittest to see the difference.
+
+    def has_permission(self, request, view):
+        return all(request.headers.get(header) for header in self.required_headers)
 
     def has_object_permission(self, request, view, obj):
         return self.has_permission(request, view)

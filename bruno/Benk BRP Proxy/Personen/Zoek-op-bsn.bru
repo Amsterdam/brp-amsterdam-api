@@ -13,6 +13,9 @@ post {
 headers {
   Content-Type: application/json
   Authorization: Bearer {{TOKEN}}
+  X-User: foobar
+  X-Correlation-ID: foobar
+  X-Task-Description: foobar
 }
 
 body:json {
@@ -21,6 +24,7 @@ body:json {
   {
       "type": "RaadpleegMetBurgerservicenummer",
       "burgerservicenummer": [
+          "010082426",
           "999999667"
       ]
   }

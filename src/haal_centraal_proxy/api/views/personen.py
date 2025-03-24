@@ -215,9 +215,7 @@ class BrpPersonenView(BaseProxyView):
                     },
                     # Extra JSON fields for log querying
                     extra={
-                        "service": self.service_log_id,
-                        "query_type": hc_request["type"],
-                        "user": self.user_id,
+                        **self.default_log_fields,
                         **extra,
                     },
                 )
@@ -266,10 +264,9 @@ class BrpPersonenView(BaseProxyView):
                 "Denied access to '%(service)s' no allowed values for 'fields'",
                 {"service": self.service_log_id},
                 extra={
-                    "service": self.service_log_id,
+                    **self.default_log_fields,
                     "field": "fields",
                     "values": [],
-                    "granted": sorted(self.user_scopes),
                 },
             )
             raise ProblemJsonException(
