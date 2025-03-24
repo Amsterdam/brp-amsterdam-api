@@ -36,7 +36,7 @@ body:json {
       "naam.volledigeNaam",
       "naam.voorletters",
       "naam.voornamen",
-      "naam.voorvoegsel",
+      "naam.voorvoegsel"
     ]
   }
 
@@ -46,7 +46,7 @@ script:pre-request {
   const getToken = require('./get-token');
 
   const token = await getToken([
-    "benk-brp-api",
+    "benk-brp-personen-api",
     "benk-brp-zoekvraag-postcode-huisnummer",
     "benk-brp-gegevensset-1",
     //"BRP/x",

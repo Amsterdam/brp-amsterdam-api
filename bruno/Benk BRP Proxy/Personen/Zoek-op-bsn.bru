@@ -21,7 +21,7 @@ body:json {
   {
       "type": "RaadpleegMetBurgerservicenummer",
       "burgerservicenummer": [
-          "010082426"
+          "999999667"
       ]
   }
 
@@ -86,7 +86,7 @@ script:pre-request {
   const getToken = require('./get-token');
 
   const token = await getToken([
-    "benk-brp-api",
+    "benk-brp-personen-api",
     "benk-brp-zoekvraag-postcode-huisnummer",
     "benk-brp-zoekvraag-bsn",
     "benk-brp-landelijk",
