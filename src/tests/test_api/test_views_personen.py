@@ -119,7 +119,7 @@ class TestBrpPersonenView:
             ]
         )
         response = api_client.post(
-            url,
+            f"{url}?resultaatFormaat=volledig",
             {
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "postcode": "1074VE",
@@ -181,7 +181,7 @@ class TestBrpPersonenView:
             ]
         )
         response = api_client.post(
-            url,
+            f"{url}?resultaatFormaat=volledig",
             {
                 "type": "RaadpleegMetBurgerservicenummer",
                 "burgerservicenummer": [""],

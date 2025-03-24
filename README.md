@@ -93,17 +93,18 @@ but specifying *true* requires the token scope to be there.
 
 The *personen* endpoint will transform the responses:
 
-Empty fields are explicitly included as `null` values or empty arrays,
-except for the [automatically included fields](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#standaard-geleverde-velden).
-This overrides the logic from Haal Centraal to [hide empty/null/false values](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#geennullfalse-waarde-leeg-object-waarde-en-standaard-waarde).
+By default, Haal Centraal [hides empty/null/false values](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#geennullfalse-waarde-leeg-object-waarde-en-standaard-waarde).
+This can be overwritten by adding ``?resultaatFormaat=volledig`` to the URL,
+so explicit `null` values or empty arrays are included.
 As such, clients can detect whether a field was actually empty, or omitted due to permissions.
+Note this does not apply to the  [automatically included fields](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#standaard-geleverde-velden).
 
 When the scope *benk-brp-inclusief-geheim* is missing, persons with *geheimhoudingPersoonsgegevens=1* will be omitted from the response.
 That flags indicates that data may not be shared with organisations such as churches, sports clubs and charities.
 
-In case more permisions are missing from the expected response,
-most likely the scope *benk-brp-zoekvraag-postcode-huisnummer-landelijk* is missing
-so the search was  limited to persons within Amsterdam only.
+In case more permisions are missing from the expected response, or a BSN search returns no results,
+most likely the scope *benk-brp-landelijk* or *benk-brp-zoekvraag-postcode-huisnummer-landelijk* is missing.
+This will limit the search to persons within Amsterdam only.
 
 
 ## Available Endpoints
