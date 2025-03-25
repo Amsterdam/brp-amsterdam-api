@@ -94,7 +94,7 @@ but specifying *true* requires the token scope to be there.
 The *personen* endpoint will transform the responses:
 
 By default, Haal Centraal [hides empty/null/false values](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#geennullfalse-waarde-leeg-object-waarde-en-standaard-waarde).
-This can be overwritten by adding ``?resultaatFormaat=volledig`` to the URL,
+This can be overwritten by adding ``?resultaat-formaat=volledig`` to the URL,
 so explicit `null` values or empty arrays are included.
 As such, clients can detect whether a field was actually empty, or omitted due to permissions.
 Note this does not apply to the  [automatically included fields](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#standaard-geleverde-velden).
