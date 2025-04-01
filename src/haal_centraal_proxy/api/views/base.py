@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.urls import reverse
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
@@ -50,6 +51,7 @@ class BaseProxyView(APIView):
         self._base_url = reverse(request.resolver_match.view_name)
         self.client = self.get_client()
         self.start_time = time.perf_counter_ns()
+        self.start_date = now()
 
         # Perform authorization, permission checks and throttles.
         super().initial(request, *args, **kwargs)
@@ -196,6 +198,8 @@ class BaseProxyView(APIView):
                 "values": err.denied_values,
                 "needed": sorted(err.needed_scopes),
                 "missing": missing,
+                "request_started": self.start_date,
+                "request_processed": now(),
                 "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
             },
         )
@@ -220,6 +224,8 @@ class BaseProxyView(APIView):
             "request": request.data,
             "hc_request": hc_request,
             "hc_response": final_response or hc_response,
+            "request_started": self.start_date,
+            "request_processed": now(),
             "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
         }
 
