@@ -184,7 +184,7 @@ class BrpPersonenView(BaseProxyView):
         request,
         hc_request: types.PersonenQuery,
         hc_response: types.PersonenResponse | None,
-        final_response: dict | None,
+        final_response: types.PersonenResponse | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
     ) -> None:

@@ -1,7 +1,11 @@
 from typing import Literal, NotRequired, TypedDict
 
 
-class BasePersonenQuery(TypedDict):
+class BaseQuery(TypedDict):
+    type: str
+
+
+class BasePersonenQuery(BaseQuery):
     """Typing interface for the incoming request to Haal Centraal.
     Some bits are required by Haal Centraal, but not required in this API.
     When they are omitted, defaults will be inserted.
@@ -43,7 +47,11 @@ class PersonenQuery(BasePersonenQuery):
     adresseerbaarObjectIdentificatie: NotRequired[str]
 
 
-class PersonenResponse(TypedDict):
+class BaseResponse(TypedDict):
+    type: str
+
+
+class PersonenResponse(BaseResponse):
     """Stub for the Haal Centraal response"""
 
     type: str

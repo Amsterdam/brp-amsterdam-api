@@ -13,7 +13,7 @@ from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from haal_centraal_proxy.api import authentication, permissions
+from haal_centraal_proxy.api import authentication, permissions, types
 from haal_centraal_proxy.api.client import HaalCentraalClient
 from haal_centraal_proxy.api.exceptions import ProblemJsonException
 from haal_centraal_proxy.api.permissions import ParameterPolicy
@@ -96,7 +96,7 @@ class BaseProxyView(APIView):
             permissions.HasRequiredHeaders(),
         ]
 
-    def get_parameter_ruleset(self, hc_request: dict) -> dict[str, ParameterPolicy]:
+    def get_parameter_ruleset(self, hc_request: types.BaseQuery) -> dict[str, ParameterPolicy]:
         """Allow overriding which parameter ruleset to use."""
         return self.parameter_ruleset
 
@@ -175,7 +175,9 @@ class BaseProxyView(APIView):
             ),
         )
 
-    def log_access_denied(self, hc_request: dict, err: permissions.AccessDenied) -> None:
+    def log_access_denied(
+        self, hc_request: types.BaseQuery, err: permissions.AccessDenied
+    ) -> None:
         """Perform the audit logging for the denied request."""
         missing = sorted(err.needed_scopes - self.user_scopes)
         audit_log.info(
@@ -201,9 +203,9 @@ class BaseProxyView(APIView):
     def log_access_granted(
         self,
         request,
-        hc_request: dict,
-        hc_response: dict | None,
-        final_response: dict | None,
+        hc_request: types.BaseQuery,
+        hc_response: types.BaseResponse | None,
+        final_response: types.BaseResponse | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
     ) -> None:
@@ -247,12 +249,14 @@ class BaseProxyView(APIView):
             extra=extra,
         )
 
-    def transform_request(self, hc_request: dict) -> None:
+    def transform_request(self, hc_request: types.BaseQuery) -> None:
         """This method can be overwritten to provide extra request parameter handling per endpoint.
         It may perform in-place replacements of the request.
         """
 
-    def transform_response(self, hc_request: dict, hc_response: dict | list) -> None:
+    def transform_response(
+        self, hc_request: types.BaseQuery, hc_response: types.BaseResponse | list
+    ) -> None:
         """Replace hrefs in _links sections by whatever fn returns for them.
 
         May modify data in-place.
