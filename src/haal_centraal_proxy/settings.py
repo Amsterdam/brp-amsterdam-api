@@ -337,7 +337,7 @@ HAAL_CENTRAAL_BRP_BEWONINGEN_URL = env.str(
     "HAAL_CENTRAAL_BRP_BEWONINGEN_URL",
     "https://demo-omgeving.haalcentraal.nl/haalcentraal/api/bewoning/bewoningen",
 )
-HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL = env.str(
-    "HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL",
+HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL = env.str(
+    "HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL",
     "https://demo-omgeving.haalcentraal.nl/haalcentraal/api/brphistorie/verblijfplaatshistorie",
 )

@@ -3,7 +3,7 @@ from django.urls import reverse
 from tests.utils import build_jwt_token
 
 
-class TestBrpVerblijfsplaatsHistorieView:
+class TestBrpVerblijfplaatshistorieView:
     """Prove that the API works as advertised."""
 
     RESPONSE_VERBLIJFSPLAATS = {
@@ -43,7 +43,7 @@ class TestBrpVerblijfsplaatsHistorieView:
             headers={"content-type": "application/json"},
         )
 
-        url = reverse("brp-verblijfsplaatshistorie")
+        url = reverse("brp-verblijfplaatshistorie")
         token = build_jwt_token(["benk-brp-verblijfplaatshistorie-api"])
         response = api_client.post(
             url,
@@ -62,7 +62,7 @@ class TestBrpVerblijfsplaatsHistorieView:
 
     def test_bsn_date_search_deny(self, api_client, common_headers):
         """Prove that access is checked"""
-        url = reverse("brp-verblijfsplaatshistorie")
+        url = reverse("brp-verblijfplaatshistorie")
         token = build_jwt_token(["benk-brp-SOME-OTHER-api"])
         response = api_client.post(
             url,
@@ -81,7 +81,7 @@ class TestBrpVerblijfsplaatsHistorieView:
         assert response.data == {
             "code": "permissionDenied",
             "detail": "Required scopes not given in token.",
-            "instance": "/api/brp/verblijfsplaatshistorie",
+            "instance": "/api/brp/verblijfplaatshistorie",
             "status": 403,
             "title": "You do not have permission to perform this action.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",

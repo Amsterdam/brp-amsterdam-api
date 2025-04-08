@@ -14,7 +14,7 @@ class TestBaseProxyView:
         [
             "/api/brp/personen",
             "/api/brp/bewoningen",
-            "/api/brp/verblijfsplaatshistorie",
+            "/api/brp/verblijfplaatshistorie",
         ],
     )
     def test_no_login(self, api_client, url):

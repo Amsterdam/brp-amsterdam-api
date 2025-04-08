@@ -5,14 +5,14 @@ from haal_centraal_proxy.api.permissions import ParameterPolicy
 from .base import BaseProxyView
 
 
-class BrpVerblijfsplaatsHistorieView(BaseProxyView):
+class BrpVerblijfplaatshistorieView(BaseProxyView):
     """View that proxies Haal Centraal BRP Verblijfplaatshistorie of a person (residence history).
 
     See: https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/
     """
 
-    service_log_id = "verblijfsplaatshistorie"
-    endpoint_url = settings.HAAL_CENTRAAL_BRP_VERBLIJFSPLAATS_HISTORIE_URL
+    service_log_id = "verblijfplaatshistorie"
+    endpoint_url = settings.HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL
 
     # Require extra scopes
     needed_scopes = {"benk-brp-verblijfplaatshistorie-api"}
