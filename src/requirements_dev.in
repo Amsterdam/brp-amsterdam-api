@@ -15,4 +15,4 @@ termcolor==2.5.0
 
 # Debugging
 django-debug-toolbar==5.0.1
-django-extensions==3.2.3
+django-extensions==4.0
