@@ -14,6 +14,11 @@ adressering.aanschrijfwijze.aanspreekvorm
 adressering.aanschrijfwijze.naam
 adressering.gebruikInLopendeTekst
 leeftijd
+partners.naam.voorletters
+partners.naam.voorvoegsel
+partners.naam.geslachtsnaam
+partners.aangaanHuwelijkPartnerschap.datum
+partners.ontbindingHuwelijkPartnerschap.datum
 overlijden.datum
 gemeenteVanInschrijving
 verblijfplaats.functieAdres
@@ -37,3 +42,4 @@ adressering.adresregel1
 adressering.adresregel2
 adressering.adresregel3
 adressering.land
+indicatieCurateleRegister

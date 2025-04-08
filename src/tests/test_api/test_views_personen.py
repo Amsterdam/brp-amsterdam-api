@@ -177,7 +177,7 @@ class TestBrpPersonenView:
             [
                 "benk-brp-personen-api",
                 "benk-brp-zoekvraag-bsn",
-                "benk-brp-gegevensset-1",
+                "benk-brp-gegevensset-9",
             ]
         )
         response = api_client.post(
@@ -213,6 +213,7 @@ class TestBrpPersonenView:
                         "aanhef": None,  # included this missing field
                         "aanschrijfwijze": {  # included this missing object
                             "aanspreekvorm": None,  # included this missing field
+                            "naam": None,  # included this missing field
                         },
                         "adresregel1": None,  # included this missing field
                         "adresregel2": None,  # included this missing field

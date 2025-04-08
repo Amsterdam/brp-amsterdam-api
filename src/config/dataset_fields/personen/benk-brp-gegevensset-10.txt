@@ -6,6 +6,8 @@ naam.adellijkeTitelPredicaat
 naam.voorvoegsel
 naam.geslachtsnaam
 geboorte.datum
+geboorte.plaats
+geboorte.land
 geslacht
 naam.aanduidingNaamgebruik
 naam.volledigeNaam
@@ -14,6 +16,11 @@ adressering.aanschrijfwijze.aanspreekvorm
 adressering.aanschrijfwijze.naam
 adressering.gebruikInLopendeTekst
 leeftijd
+partners.naam.voorletters
+partners.naam.voorvoegsel
+partners.naam.geslachtsnaam
+partners.aangaanHuwelijkPartnerschap.datum
+partners.ontbindingHuwelijkPartnerschap.datum
 overlijden.datum
 gemeenteVanInschrijving
 verblijfplaats.functieAdres
