@@ -1,4 +1,4 @@
-name: CI
+name: Build AKS Image
 
 # Run this workflow every time a commit is pushed to main or a pull request is opened against main
 # The `workflow_dispatch` had been added to be able to run the
@@ -11,7 +11,7 @@ on:
 
 jobs:
     build:
-        name: Call Build AKS Azure Pipeline
+        name: Call Azure Pipeline
         runs-on: ubuntu-latest
         steps:
         - name: Call Azure
