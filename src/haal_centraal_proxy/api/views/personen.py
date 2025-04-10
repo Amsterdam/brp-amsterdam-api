@@ -345,7 +345,7 @@ class BrpPersonenView(BaseProxyView):
             self._hide_inserted_identifiers(hc_request, hc_response)
 
         # Restore sending null values for empty fields
-        if self.request.GET.get("resultaat-formaat", None) == "volledig":
+        if self.request.GET.get("resultaatFormaat", None) == "volledig":
             self._insert_null_values(hc_request["fields"], hc_response)
 
     def _hide_confidential_persons(self, hc_response: types.PersonenResponse) -> None:
