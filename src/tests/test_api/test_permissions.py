@@ -1,6 +1,6 @@
 import pytest
-from haal_centraal_proxy.api.exceptions import ProblemJsonException
-from haal_centraal_proxy.api.permissions import (
+from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
+from haal_centraal_proxy.bevragingen.permissions import (
     AccessDenied,
     ParameterPolicy,
     validate_parameters,

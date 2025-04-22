@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from haal_centraal_proxy.api.permissions import ParameterPolicy
+from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
 from .base import BaseProxyView
 

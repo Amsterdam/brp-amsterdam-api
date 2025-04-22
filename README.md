@@ -61,12 +61,12 @@ Example request (directly to the Haal Centraal Mock API):
 And the same can be repeated on the Django instance if you pass a token:
 
     export TOKEN="$(./get-token.py benk-brp-personen-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1}'
+    curl -X POST http://localhost:8000/bevragingen/v1/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1}'
 
 Same for search by BSN:
 
     export TOKEN="$(./get-token.py benk-brp-personen-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/api/brp/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
+    curl -X POST http://localhost:8000/bevragingen/v1/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
 
 ### Notes
 
@@ -111,11 +111,11 @@ This will limit the search to persons within Amsterdam only.
 
 The following URLs are available:
 
-| API                                 | Description                              | Setting for Proxy URL                           | Docs                                                                     |
-|-------------------------------------|------------------------------------------|-------------------------------------------------|--------------------------------------------------------------------------|
-| `/api/brp/personen`                 | Person details.                          | `HAAL_CENTRAAL_BRP_PERSONEN_URL`                | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)            |
-| `/api/brp/bewoningen`               | Who lived at an address.                 | `HAAL_CENTRAAL_BRP_BEWONINGEN_URL`              | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)            |
-| `/api/brp/verblijfplaatshistorie`   | All addresses where someone lived.       | `HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)   |
+| API                                      | Description                              | Setting for Proxy URL                           | Docs                                                                     |
+|------------------------------------------|------------------------------------------|-------------------------------------------------|--------------------------------------------------------------------------|
+| `/bevragingen/v1/personen`               | Person details.                          | `HAAL_CENTRAAL_BRP_PERSONEN_URL`                | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)            |
+| `/bevragingen/v1/bewoningen`             | Who lived at an address.                 | `HAAL_CENTRAAL_BRP_BEWONINGEN_URL`              | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)            |
+| `/bevragingen/v1/verblijfplaatshistorie` | All addresses where someone lived.       | `HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)   |
 
 
 ## Environment Settings

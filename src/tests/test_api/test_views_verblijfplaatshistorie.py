@@ -81,7 +81,7 @@ class TestBrpVerblijfplaatshistorieView:
         assert response.data == {
             "code": "permissionDenied",
             "detail": "Required scopes not given in token.",
-            "instance": "/api/brp/verblijfplaatshistorie",
+            "instance": "/bevragingen/v1/verblijfplaatshistorie",
             "status": 403,
             "title": "You do not have permission to perform this action.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",

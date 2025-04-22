@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.exceptions import APIException, ErrorDetail
 from rest_framework.views import exception_handler as drf_exception_handler
 
-from haal_centraal_proxy.api.exceptions import ProblemJsonException
+from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
 
 STATUS_TO_URI = {
     status.HTTP_400_BAD_REQUEST: "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",

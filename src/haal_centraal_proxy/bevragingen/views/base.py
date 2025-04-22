@@ -14,10 +14,10 @@ from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from haal_centraal_proxy.api import authentication, permissions, types
-from haal_centraal_proxy.api.client import HaalCentraalClient
-from haal_centraal_proxy.api.exceptions import ProblemJsonException
-from haal_centraal_proxy.api.permissions import ParameterPolicy
+from haal_centraal_proxy.bevragingen import authentication, permissions, types
+from haal_centraal_proxy.bevragingen.client import HaalCentraalClient
+from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
+from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
 logger = logging.getLogger(__name__)
 audit_log = logging.getLogger("haal_centraal_proxy.audit")

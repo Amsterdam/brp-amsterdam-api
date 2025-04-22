@@ -1,8 +1,8 @@
 import pytest
 from django.urls import reverse
-from haal_centraal_proxy.api.fields import read_dataset_fields_files
-from haal_centraal_proxy.api.permissions import ParameterPolicy
-from haal_centraal_proxy.api.views.personen import (
+from haal_centraal_proxy.bevragingen.fields import read_dataset_fields_files
+from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
+from haal_centraal_proxy.bevragingen.views.personen import (
     SCOPE_ALLOW_CONFIDENTIAL_PERSONS,
     SCOPE_INCLUDE_DECEASED,
     SCOPE_NATIONWIDE,

@@ -5,7 +5,7 @@ from rest_framework.request import Request
 class JWTAuthentication(BaseAuthentication):
     """Bridge the JWT authentication from authorization-django to DRF views."""
 
-    www_authenticate_realm = "api"
+    www_authenticate_realm = "brp-bevragingen-api"
 
     def authenticate(self, request):
         """Tell REST Framework that we do have an authentication header.

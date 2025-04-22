@@ -12,9 +12,9 @@ class TestBaseProxyView:
     @pytest.mark.parametrize(
         "url",
         [
-            "/api/brp/personen",
-            "/api/brp/bewoningen",
-            "/api/brp/verblijfplaatshistorie",
+            "/bevragingen/v1/personen",
+            "/bevragingen/v1/bewoningen",
+            "/bevragingen/v1/verblijfplaatshistorie",
         ],
     )
     def test_no_login(self, api_client, url):
@@ -77,7 +77,7 @@ class TestBaseProxyView:
             "status": 502,
             "detail": "Backend is improperly configured, final endpoint rejected our credentials.",
             "code": "backendConfig",
-            "instance": "/api/brp/personen",
+            "instance": "/bevragingen/v1/personen",
         }
 
     @pytest.mark.parametrize("remove_header", ["X-Correlation-ID", "X-User", "X-Task-Description"])
@@ -103,7 +103,7 @@ class TestBaseProxyView:
             "detail": (
                 "The following headers are required: X-User, X-Correlation-ID, X-Task-Description."
             ),
-            "instance": "/api/brp/personen",
+            "instance": "/bevragingen/v1/personen",
             "status": 403,
             "title": "You do not have permission to perform this action.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
@@ -152,7 +152,7 @@ class TestBaseProxyView:
         assert response.json() == {
             "code": "paramsValidation",
             "detail": "De foutieve parameter(s) zijn: burgerservicenummer.",
-            "instance": "/api/brp/personen",
+            "instance": "/bevragingen/v1/personen",
             "invalidParams": [
                 {
                     "code": "array",

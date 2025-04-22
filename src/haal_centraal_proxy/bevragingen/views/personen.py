@@ -5,9 +5,9 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.exceptions import APIException
 
-from haal_centraal_proxy.api import fields, types
-from haal_centraal_proxy.api.exceptions import ProblemJsonException
-from haal_centraal_proxy.api.permissions import ParameterPolicy
+from haal_centraal_proxy.bevragingen import fields, types
+from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
+from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
 from .base import BaseProxyView, audit_log
 

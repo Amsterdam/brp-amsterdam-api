@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 
-import haal_centraal_proxy.api.urls
+import haal_centraal_proxy.bevragingen.urls
 
 from . import views
 
@@ -11,7 +11,7 @@ handler404 = views.not_found
 handler500 = views.server_error
 
 urlpatterns = [
-    path("api/", include(haal_centraal_proxy.api.urls)),
+    path("bevragingen/", include(haal_centraal_proxy.bevragingen.urls)),
     path("", views.RootView.as_view()),
 ]
 
