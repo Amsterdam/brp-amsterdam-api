@@ -129,6 +129,27 @@ class BaseProxyView(APIView):
                     {"name": err.field_name, "code": "denied", "reason": "Geen toegang."}
                 ],
             ) from err
+        except permissions.InvalidParameters as err:
+            # The parameter values are incorrect
+            logger.info("Invalid parameter names: %s", err.invalid_names)
+            raise ProblemJsonException(
+                title="Een of meerdere parameters zijn niet correct.",
+                detail=f"De foutieve parameter(s) zijn: {', '.join(err.invalid_names)}.",
+                code="paramsValidation",
+                status=status.HTTP_400_BAD_REQUEST,
+            ) from err
+        except permissions.InvalidValues as err:
+            # The unsupported values
+            logger.info("Invalid parameter values for %s: %s", err.field_name, err.invalid_values)
+            raise ProblemJsonException(
+                title="Een of meerdere veldnamen zijn niet correct.",
+                detail=(
+                    f"Het veld '{err.field_name}' ondersteund niet"
+                    f" de waarde(s): {', '.join(err.invalid_values)}."
+                ),
+                code="paramsValidation",
+                status=status.HTTP_400_BAD_REQUEST,
+            ) from err
 
         # Allow inserting missing parameters, etc...
         self.transform_request(hc_request)

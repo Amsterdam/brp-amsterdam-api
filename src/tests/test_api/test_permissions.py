@@ -1,7 +1,8 @@
 import pytest
-from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
 from haal_centraal_proxy.bevragingen.permissions import (
     AccessDenied,
+    InvalidParameters,
+    InvalidValues,
     ParameterPolicy,
     validate_parameters,
 )
@@ -86,7 +87,7 @@ class TestValidateParameters:
 
     def test_unknown_key(self, caplog):
         """Prove that only known fields are accepted."""
-        with pytest.raises(ProblemJsonException, match="foobar") as exc_info:
+        with pytest.raises(InvalidParameters, match="foobar") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={
@@ -95,24 +96,25 @@ class TestValidateParameters:
                 },
                 user_scopes={"benk-brp-zoekvraag-bsn"},
             )
-        assert exc_info.value.detail == "De foutieve parameter(s) zijn: foobar."
+        assert exc_info.value.invalid_names == ["foobar"]
         assert not caplog.messages
 
     def test_unknown_value_type(self):
         """Prove that only known values are accepted."""
-        with pytest.raises(ProblemJsonException, match="FooBar") as exc_info:
+        with pytest.raises(InvalidValues, match="FooBar") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={"type": "FooBar"},
                 user_scopes=set(),
             )
-        assert exc_info.value.detail == "Het veld 'type' ondersteund niet de waarde(s): FooBar."
+        assert exc_info.value.field_name == "type"
+        assert exc_info.value.invalid_values == ["FooBar"]
 
     def test_unknown_value_fields(self):
         """Prove that only known values are accepted.
         This isn't checked with the "type" argument as that is special/mandatory.
         """
-        with pytest.raises(ProblemJsonException, match="FooBar") as exc_info:
+        with pytest.raises(InvalidValues, match="FooBar") as exc_info:
             validate_parameters(
                 ruleset=self.RULESET,
                 hc_request={
@@ -121,7 +123,8 @@ class TestValidateParameters:
                 },
                 user_scopes={"benk-brp-zoekvraag-bsn"},
             )
-        assert exc_info.value.detail == "Het veld 'fields' ondersteund niet de waarde(s): FooBar."
+        assert exc_info.value.field_name == "fields"
+        assert exc_info.value.invalid_values == ["FooBar"]
 
     def test_value_scope_check(self):
         """Prove that 'type' field is checked for authorization."""

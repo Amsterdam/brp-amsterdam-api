@@ -6,10 +6,7 @@ from dataclasses import dataclass, field
 from functools import cached_property
 from typing import ClassVar
 
-from rest_framework import status
 from rest_framework.permissions import BasePermission
-
-from .exceptions import ProblemJsonException
 
 logger = logging.getLogger(__name__)
 audit_log = logging.getLogger("haal_centraal_proxy.audit")
@@ -140,15 +137,7 @@ class ParameterPolicy:
                     all_needed_scopes.update(needed_scopes & user_scopes)
 
         if invalid_values:
-            raise ProblemJsonException(
-                title="Een of meerdere veldnamen zijn niet correct.",
-                detail=(
-                    f"Het veld '{field_name}' ondersteund niet"
-                    f" de waarde(s): {', '.join(invalid_values)}."
-                ),
-                code="paramsValidation",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            raise InvalidValues(field_name, invalid_values)
 
         if denied_values:
             raise AccessDenied(
@@ -179,6 +168,23 @@ class AccessDenied(Exception):
         self.denied_values = denied_values
 
 
+class InvalidParameters(Exception):
+    """Raise that invalid values are provided."""
+
+    def __init__(self, invalid_names: list[str]):
+        super().__init__(f"Invalid parameters: {','.join(invalid_names)}")
+        self.invalid_names = invalid_names
+
+
+class InvalidValues(Exception):
+    """Raise that invalid values are provided."""
+
+    def __init__(self, field_name: str, invalid_values: list[str]):
+        super().__init__(f"Invalid values for {field_name}={','.join(invalid_values)}")
+        self.field_name = field_name
+        self.invalid_values = invalid_values
+
+
 def validate_parameters(
     ruleset: dict[str, ParameterPolicy],
     hc_request: dict,
@@ -199,12 +205,7 @@ def validate_parameters(
     """
     request_type = hc_request.get("type")
     if not request_type:
-        raise ProblemJsonException(
-            title="Een of meerdere parameters zijn niet correct.",
-            status=400,
-            detail="De foutieve parameter(s) zijn: types.",
-            code="paramsValidation",
-        )
+        raise InvalidParameters(["type"])
 
     # Check whether certain parameters are allowed:
     invalid_names = []
@@ -219,12 +220,7 @@ def validate_parameters(
             all_needed_scopes.update(needed_for_param)
 
     if invalid_names:
-        raise ProblemJsonException(
-            title="Een of meerdere parameters zijn niet correct.",
-            detail=f"De foutieve parameter(s) zijn: {', '.join(invalid_names)}.",
-            code="paramsValidation",
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        raise InvalidParameters(invalid_names)
 
     return all_needed_scopes
 
