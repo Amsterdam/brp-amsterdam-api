@@ -145,6 +145,7 @@ Deployment:
 * `CLOUD_ENV=azure` will enable Azure-specific telemetry.
 * `STATIC_URL` defines the base URL for static files (e.g. to point to a CDN).
 * `OAUTH_JWKS_URL` point to a public JSON Web Key Set, e.g. `https://login.microsoftonline.com/{tenant_uuid or 'common'}/discovery/v2.0/keys`.
+* `OAUTH_CHECK_CLAIMS` should be `aud=AUDIENCE-IN-TOKEN,iss=ISSUER-IN-TOKEN`.
 
 Hardening deployment:
 
