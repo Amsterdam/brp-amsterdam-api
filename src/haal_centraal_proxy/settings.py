@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import environ
+from corsheaders.defaults import default_headers
 from pythonjsonlogger import jsonlogger
 
 env = environ.Env()
@@ -282,6 +283,9 @@ CORS_ALLOWED_ORIGIN_REGEXES = env.list(
         if DEBUG
         else []
     ),
+)
+CORS_ALLOW_HEADERS = list(default_headers) + env.list(
+    "CORS_ALLOW_HEADERS", default=["x-user", "x-correlation-id", "x-task-description"]
 )
 
 HEALTH_CHECKS = {
