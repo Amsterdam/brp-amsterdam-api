@@ -9,11 +9,11 @@ python-json-logger==3.3.0
 requests == 2.32.3
 #sentry-sdk == 2.13.0
 more-ds == 0.0.6
-orjson == 3.10.16
+orjson == 3.10.18
 whitenoise == 6.9.0
 
 # Monitoring
-azure-monitor-opentelemetry == 1.6.6
+azure-monitor-opentelemetry == 1.6.8
 azure-identity == 1.21.0
 uwsgitop == 0.12
 uwsgi-readiness-check == 0.2.0
