@@ -6,7 +6,7 @@ from tests.utils import build_jwt_token
 class TestBrpVerblijfplaatshistorieView:
     """Prove that the API works as advertised."""
 
-    RESPONSE_VERBLIJFSPLAATS = {
+    RESPONSE_VERBLIJFPLAATS = {
         "verblijfplaatsen": [
             {
                 "type": "Adres",
@@ -39,7 +39,7 @@ class TestBrpVerblijfplaatshistorieView:
         requests_mock.post(
             # https://demo-omgeving.haalcentraal.nl
             "/haalcentraal/api/brphistorie/verblijfplaatshistorie",
-            json=self.RESPONSE_VERBLIJFSPLAATS,
+            json=self.RESPONSE_VERBLIJFPLAATS,
             headers={"content-type": "application/json"},
         )
 
@@ -58,7 +58,7 @@ class TestBrpVerblijfplaatshistorieView:
             },
         )
         assert response.status_code == 200, response
-        assert response.json() == self.RESPONSE_VERBLIJFSPLAATS, response.data
+        assert response.json() == self.RESPONSE_VERBLIJFPLAATS, response.data
 
     def test_bsn_date_search_deny(self, api_client, common_headers):
         """Prove that access is checked"""
