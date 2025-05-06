@@ -61,12 +61,12 @@ Example request (directly to the Haal Centraal Mock API):
 And the same can be repeated on the Django instance if you pass a token:
 
     export TOKEN="$(./get-token.py benk-brp-personen-api benk-brp-zoekvraag-postcode-huisnummer benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/bevragingen/v1/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1}'
+    curl -X POST http://localhost:8000/bevragingen/v1/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -H "X-User: foo" -H "X-Task-Description: foo" -X "X-Correlation-ID: foo" -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1}'
 
 Same for search by BSN:
 
     export TOKEN="$(./get-token.py benk-brp-personen-api benk-brp-zoekvraag-bsn benk-brp-gegevensset-1)"
-    curl -X POST http://localhost:8000/bevragingen/v1/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
+    curl -X POST http://localhost:8000/bevragingen/v1/personen -H 'Content-Type: application/json' -H "Authorization: Bearer $TOKEN" -H "X-User: foo" -H "X-Task-Description: foo" -X "X-Correlation-ID: foo" -d '{"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": ["010082426"]}'
 
 ### Notes
 
