@@ -1,7 +1,10 @@
+from copy import deepcopy
+
 import pytest
 from django.urls import reverse
 from haal_centraal_proxy.bevragingen.fields import read_dataset_fields_files
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
+from haal_centraal_proxy.bevragingen.views.base import SCOPE_ENCRYPT_BSN
 from haal_centraal_proxy.bevragingen.views.personen import (
     SCOPE_ALLOW_CONFIDENTIAL_PERSONS,
     SCOPE_INCLUDE_DECEASED,
@@ -48,6 +51,9 @@ class TestBrpPersonenView:
         **RESPONSE_POSTCODE_HUISNUMMER,
         "type": "RaadpleegMetBurgerservicenummer",
     }
+
+    RESPONSE_ENCRYPT_BSN = deepcopy(RESPONSE_POSTCODE_HUISNUMMER)
+    RESPONSE_ENCRYPT_BSN["personen"][0]["burgerservicenummer"] = "999993367"
 
     def test_postcode_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
@@ -566,6 +572,128 @@ class TestBrpPersonenView:
             ),
         ]:
             assert log_message in log_messages
+
+    def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
+        """Prove that not having access to a set is handled gracefully."""
+        requests_mock.post(
+            "/haalcentraal/api/brp/personen",
+            json=self.RESPONSE_ENCRYPT_BSN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                "benk-brp-encrypt-bsn",
+            ]
+        )
+        response = api_client.post(
+            f"{url}?resultaatFormaat=volledig",
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                # No fields, is autofilled with all options of gegevensset-1.
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
+        response = response.json()
+
+        # Expect BSN to be encrypted
+        burgerservicenummer = response["personen"][0]["burgerservicenummer"]
+        assert burgerservicenummer != "999993367"
+
+        # Test to see if the encrypted bsn can be used in subsequent calls
+        requests_mock.reset_mock()
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                "benk-brp-encrypt-bsn",
+            ]
+        )
+        response = api_client.post(
+            f"{url}?resultaatFormaat=volledig",
+            {
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [burgerservicenummer],
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
+
+        # Get the last call to the API to see if we've successfully decrypted the BSN
+        request_data = requests_mock.request_history[0].json()
+        assert request_data["burgerservicenummer"][0] == "999993367"
+
+        # Expect the unencrypted bsn to show up in the logs
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "User text@example.com retrieved using 'personen.ZoekMetPostcodeEnHuisnummer':"
+                " aNummer=? burgerservicenummer=999993367"
+            ),
+            (
+                "User text@example.com retrieved using 'personen.RaadpleegMetBurgerservicenummer':"
+                " aNummer=? burgerservicenummer=999993367"
+            ),
+        ]:
+            assert log_message in log_messages
+
+    def test_decrypt_unencrypted_bsn(self, api_client, requests_mock, caplog, common_headers):
+        """Prove that not having access to a set is handled gracefully."""
+        requests_mock.post(
+            "/haalcentraal/api/brp/personen",
+            json=self.RESPONSE_ENCRYPT_BSN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                "benk-brp-encrypt-bsn",
+            ]
+        )
+        response = api_client.post(
+            f"{url}?resultaatFormaat=volledig",
+            {
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": ["999993367"],
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 403, response.data
+
+        # Expect permission denied and the SCOPE_ENCRYPT_BSN to show up in the logs
+        access_denied_message = (
+            "Denied access to 'personen.RaadpleegMetBurgerservicenummer' "
+            "for unencrypted burgerservicenummer with scopes"
+        )
+
+        log_messages = caplog.messages
+        assert any(
+            m.startswith(access_denied_message) and SCOPE_ENCRYPT_BSN in m for m in log_messages
+        )
 
 
 def test_group_dotted_names():

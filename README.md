@@ -106,6 +106,14 @@ In case more permisions are missing from the expected response, or a BSN search 
 most likely the scope *benk-brp-landelijk* or *benk-brp-zoekvraag-postcode-huisnummer-landelijk* is missing.
 This will limit the search to persons within Amsterdam only.
 
+## Encryption/decryption of burgerservicenummers
+
+For users with the scope *benk-brp-encrypt-bsn* all burgerservicenummers in the response will be
+encrypted. Subsequent calls to the API can be made with the encrypted burgerservicenummers and will
+be decrypted when the scope is present. The audit logs will still contain the original value.
+
+When unecrypted burgerservicenummers are in requests with the scope present, a permission denied
+response will be returned.
 
 ## Available Endpoints
 
@@ -155,6 +163,8 @@ Hardening deployment:
 * `CORS_ALLOW_ALL_ORIGINS` can be true/false to allow all websites to connect.
 * `CORS_ALLOWED_ORIGINS` allows a list of origin URLs to use.
 * `CORS_ALLOWED_ORIGIN_REGEXES` supports a list of regex patterns fow allowed origins.
+* `HAAL_CENTRAAL_BRP_ENCRYPTION_SALTS` a list of salts used to encrypt data. The first item will be used to encrypt
+   new values, the other values can be used for rotation.
 
 # Developer Notes
 

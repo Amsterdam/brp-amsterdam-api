@@ -1,4 +1,6 @@
 from django.urls import reverse
+from haal_centraal_proxy.bevragingen import encryption
+from haal_centraal_proxy.bevragingen.views.base import SCOPE_ENCRYPT_BSN
 
 from tests.utils import build_jwt_token
 
@@ -86,3 +88,42 @@ class TestBrpVerblijfplaatshistorieView:
             "title": "You do not have permission to perform this action.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
         }
+
+    def test_encrypted_bsn(self, api_client, requests_mock, common_headers, caplog):
+        """Prove that search is possible"""
+        requests_mock.post(
+            # https://demo-omgeving.haalcentraal.nl
+            "/haalcentraal/api/brphistorie/verblijfplaatshistorie",
+            json=self.RESPONSE_VERBLIJFPLAATS,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-verblijfplaatshistorie")
+        token = build_jwt_token(["benk-brp-verblijfplaatshistorie-api", "benk-brp-encrypt-bsn"])
+
+        # Create an encrypted BSN to use in the request
+        encrypted_bsn = encryption.encrypt("999993240")
+
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetPeildatum",
+                "burgerservicenummer": encrypted_bsn,
+                "peildatum": "2020-09-24",
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response
+
+        # Assert the scope and unencrypted bsn show up in the logs
+        for r in caplog.records:
+            try:
+                granted = r.granted.contains(SCOPE_ENCRYPT_BSN)
+            except AttributeError:
+                pass
+            else:
+                assert granted.contains(SCOPE_ENCRYPT_BSN)
+                assert r.hc_request.contains("999993240")

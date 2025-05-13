@@ -1,5 +1,6 @@
 import logging
 import time
+from collections.abc import Callable
 from copy import deepcopy
 
 import orjson
@@ -14,13 +15,15 @@ from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from haal_centraal_proxy.bevragingen import authentication, permissions, types
+from haal_centraal_proxy.bevragingen import authentication, encryption, permissions, types
 from haal_centraal_proxy.bevragingen.client import HaalCentraalClient
 from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
 logger = logging.getLogger(__name__)
 audit_log = logging.getLogger("haal_centraal_proxy.audit")
+
+SCOPE_ENCRYPT_BSN = "benk-brp-encrypt-bsn"
 
 
 class BaseProxyView(APIView):
@@ -109,6 +112,28 @@ class BaseProxyView(APIView):
         """
         hc_request = request.data.copy()
 
+        # Decrypt certain values if needed by the user scope
+        try:
+            self.decrypt_request(hc_request)
+        except encryption.DecryptionFailed as err:
+            # Logging happens at the view level, to have full context.
+            self.log_decryption_failed(hc_request, err)
+
+            # Return error response
+            raise ProblemJsonException(
+                title="U bent niet geautoriseerd voor deze operatie.",
+                detail="U bent niet geautoriseerd voor niet versleutelde burgerservicenummers.",
+                code="permissionDenied",  # Same as what Haal Centraal would do.
+                status=status.HTTP_403_FORBIDDEN,
+                invalid_params=[
+                    {
+                        "name": "burgerservicenummer",
+                        "code": "denied",
+                        "reason": "Niet versleuteld.",
+                    }
+                ],
+            ) from err
+
         # Perform validation
         try:
             needed_param_scopes = permissions.validate_parameters(
@@ -189,6 +214,9 @@ class BaseProxyView(APIView):
             final_response,
             needed_scopes=self.needed_scopes | needed_param_scopes,
         )
+
+        # Encrypt certain values if needed by the user scope
+        self.encrypt_response(final_response)
 
         # And return it.
         return HttpResponse(
@@ -275,6 +303,56 @@ class BaseProxyView(APIView):
             },
             extra=extra,
         )
+
+    def log_decryption_failed(
+        self, hc_request: types.BaseQuery, err: encryption.DecryptionFailed
+    ) -> None:
+        """Perform the audit logging for the denied request."""
+        audit_log.info(
+            "Denied access to '%(service)s.%(query_type)s'"
+            " for unencrypted burgerservicenummer with scopes %(scopes)s",
+            {
+                "service": self.service_log_id,
+                "query_type": hc_request["type"],
+                "scopes": list(self.user_scopes),
+            },
+            extra={
+                **self.default_log_fields,
+                "field": "burgerservicenummer",
+                "request_started": self.start_date,
+                "request_processed": now(),
+                "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
+            },
+        )
+
+    def decrypt_request(self, hc_request: types.BaseQuery) -> None:
+        """This method can be overwritten to provide extra request parameter handling per endpoint
+        It may decrypt certain parts of the request for certain scopes in-place.
+        """
+        if SCOPE_ENCRYPT_BSN in self.user_scopes:
+            self._process_bsn(hc_request, encryption.decrypt)
+
+    def encrypt_response(self, hc_response: types.BaseResponse) -> None:
+        """This method can be overwritten to provide extra request parameter handling per endpoint
+        It may encrypt certain parts of the response for certain scopes in-place."""
+        if SCOPE_ENCRYPT_BSN in self.user_scopes:
+            self._process_bsn(hc_response, encryption.encrypt)
+
+    def _process_bsn(self, item: list | dict, process_function: Callable) -> None:
+        if isinstance(item, list):
+            for sub_item in item:
+                self._process_bsn(sub_item, process_function)
+        elif isinstance(item, dict):
+            for key, value in item.items():
+                # Encrypt all burgerservicenummers we encounter
+                if key == "burgerservicenummer":
+                    if isinstance(value, list):
+                        item[key] = [process_function(v) for v in value]
+                        continue
+                    item[key] = process_function(value)
+
+                if isinstance(value, (dict, list)):
+                    self._process_bsn(value, process_function)
 
     def transform_request(self, hc_request: types.BaseQuery) -> None:
         """This method can be overwritten to provide extra request parameter handling per endpoint.
