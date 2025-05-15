@@ -103,6 +103,7 @@ class TestBrpVerblijfplaatshistorieView:
 
         # Create an encrypted BSN to use in the request
         encrypted_bsn = encryption.encrypt("999993240")
+        assert encrypted_bsn.startswith("gAAAAABoJc")
 
         response = api_client.post(
             url,
