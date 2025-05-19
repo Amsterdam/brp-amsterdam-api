@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y curl
 ARG JSON_URL
 ARG DOW
 
-RUN echo ${DOW}
 RUN echo ${JSON_URL}
 
 RUN curl -L ${JSON_URL} -o /app/Data/test-data.json
