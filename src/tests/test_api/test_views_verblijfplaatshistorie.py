@@ -101,9 +101,9 @@ class TestBrpVerblijfplaatshistorieView:
         url = reverse("brp-verblijfplaatshistorie")
         token = build_jwt_token(["benk-brp-verblijfplaatshistorie-api", "benk-brp-encrypt-bsn"])
 
-        # Create an encrypted BSN to use in the request
-        encrypted_bsn = encryption.encrypt("999993240")
-        assert encrypted_bsn.startswith("gAAAAABoJc")
+        # Create an encrypted BSN with the correlation id as salt to use in the request
+        encrypted_bsn = encryption.encrypt("999993240", salt=common_headers["X-Correlation-ID"])
+        assert encrypted_bsn.startswith("gAAAAABo")
 
         response = api_client.post(
             url,
