@@ -347,6 +347,7 @@ HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL = env.str(
     "https://demo-omgeving.haalcentraal.nl/haalcentraal/api/brphistorie/verblijfplaatshistorie",
 )
 
-HAAL_CENTRAAL_BRP_ENCRYPTION_SALTS = env.list(
-    "HAAL_CENTRAAL_BRP_ENCRYPTION_SALTS", default=["insecure"]
+# Muse be a URL-safe base64-encoded 32-byte key
+HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS = env.list(
+    "HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS", default=["4ReHJkftfZUWdxP-ki4-rVOhZkm5eVl4hlW02HjqVNY="]
 )

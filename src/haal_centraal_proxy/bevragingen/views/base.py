@@ -122,14 +122,14 @@ class BaseProxyView(APIView):
             # Return error response
             raise ProblemJsonException(
                 title="U bent niet geautoriseerd voor deze operatie.",
-                detail="U bent niet geautoriseerd voor niet versleutelde burgerservicenummers.",
+                detail=err.detail,
                 code="permissionDenied",  # Same as what Haal Centraal would do.
                 status=status.HTTP_403_FORBIDDEN,
                 invalid_params=[
                     {
                         "name": "burgerservicenummer",
                         "code": "denied",
-                        "reason": "Niet versleuteld.",
+                        "reason": "Geen toegang.",
                     }
                 ],
             ) from err
@@ -339,6 +339,9 @@ class BaseProxyView(APIView):
             self._process_bsn(hc_response, encryption.encrypt)
 
     def _process_bsn(self, item: list | dict, process_function: Callable) -> None:
+        # We use the correlation id to salt the BSN
+        correlation_id = self.request.headers["X-Correlation-ID"]
+
         if isinstance(item, list):
             for sub_item in item:
                 self._process_bsn(sub_item, process_function)
@@ -347,9 +350,9 @@ class BaseProxyView(APIView):
                 # Encrypt all burgerservicenummers we encounter
                 if key == "burgerservicenummer":
                     if isinstance(value, list):
-                        item[key] = [process_function(v) for v in value]
+                        item[key] = [process_function(v, salt=correlation_id) for v in value]
                         continue
-                    item[key] = process_function(value)
+                    item[key] = process_function(value, salt=correlation_id)
 
                 if isinstance(value, (dict, list)):
                     self._process_bsn(value, process_function)

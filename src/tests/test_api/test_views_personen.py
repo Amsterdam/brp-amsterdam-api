@@ -574,7 +574,7 @@ class TestBrpPersonenView:
             assert log_message in log_messages
 
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
-        """Prove that not having access to a set is handled gracefully."""
+        """Prove encryption/decryption of BSNs works."""
         requests_mock.post(
             "/haalcentraal/api/brp/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
@@ -652,6 +652,84 @@ class TestBrpPersonenView:
             ),
         ]:
             assert log_message in log_messages
+
+    def test_encryption_salt_required(self, api_client, requests_mock, caplog, common_headers):
+        """Prove that the correlation id is used as a salt to encrypt/decrypt"""
+        requests_mock.post(
+            "/haalcentraal/api/brp/personen",
+            json=self.RESPONSE_ENCRYPT_BSN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                "benk-brp-encrypt-bsn",
+            ]
+        )
+        response = api_client.post(
+            f"{url}?resultaatFormaat=volledig",
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                # No fields, is autofilled with all options of gegevensset-1.
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
+        response = response.json()
+
+        # Expect BSN to be encrypted
+        burgerservicenummer = response["personen"][0]["burgerservicenummer"]
+        assert burgerservicenummer != "999993367"
+
+        caplog.clear()
+
+        # Test to see if the encrypted bsn can not be used by another request/correlation id
+        requests_mock.reset_mock()
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                "benk-brp-encrypt-bsn",
+            ]
+        )
+        common_headers["X-Correlation-ID"] = "some-correlation-id"
+
+        response = api_client.post(
+            f"{url}?resultaatFormaat=volledig",
+            {
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": [burgerservicenummer],
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 403, response.data
+        assert response.json()["detail"], "Geen toegang tot versleutelde waarde."
+
+        # Expect permission denied and the SCOPE_ENCRYPT_BSN to show up in the logs
+        access_denied_message = (
+            "Denied access to 'personen.RaadpleegMetBurgerservicenummer' "
+            "for unencrypted burgerservicenummer with scopes"
+        )
+
+        log_messages = caplog.messages
+        assert any(
+            m.startswith(access_denied_message) and SCOPE_ENCRYPT_BSN in m for m in log_messages
+        )
 
     def test_decrypt_unencrypted_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove that not having access to a set is handled gracefully."""
