@@ -1,3 +1,4 @@
+burgerservicenummer
 naam.voornamen
 naam.voorletters
 naam.adellijkeTitelPredicaat
