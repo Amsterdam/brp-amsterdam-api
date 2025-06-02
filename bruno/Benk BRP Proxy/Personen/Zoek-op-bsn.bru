@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: http://localhost:8000/bevragingen/v1/personen
+  url: http://localhost:8000/bevragingen/v1/personen?resultaat-formaat=volledig
   body: json
   auth: none
+}
+
+params:query {
+  resultaat-formaat: volledig
 }
 
 headers {
@@ -24,8 +28,12 @@ body:json {
   {
       "type": "RaadpleegMetBurgerservicenummer",
       "burgerservicenummer": [
-          "010082426",
-          "999999667"
+          "999992351"
+        /*
+          "999999667",
+          "999999199",  // invalid date
+          "999999230"  // geldige datum
+          */
       ]
   }
 
