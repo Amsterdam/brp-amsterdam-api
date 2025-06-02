@@ -34,9 +34,9 @@ azure-identity==1.23.0 \
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
-azure-monitor-opentelemetry==1.6.9 \
-    --hash=sha256:2689cb019982d01688584de832e118316e974c3ba02d81f71d8e8e7ca5d1e799 \
-    --hash=sha256:3e3ae4b4f8f048df7b7056510f75dbcf41055cdd433cc9425a5b7f7d1a0163c3
+azure-monitor-opentelemetry==1.6.10 \
+    --hash=sha256:1f8145f665abb1626ac1caf14f75fc9b4fc43b818694798f7a43ea369e265683 \
+    --hash=sha256:8b5953454f72da42f7959a8017e5f9712427b931d1d08be008d32722c4605a0d
     # via -r requirements.in
 azure-monitor-opentelemetry-exporter==1.0.0b36 \
     --hash=sha256:82977b9576a694362ea9c6a9eec6add6e56314da759dbc543d02f50962d4b72d \
@@ -334,9 +334,9 @@ deprecated==1.2.18 \
     # via
     #   opentelemetry-api
     #   opentelemetry-semantic-conventions
-django==5.1.9 \
-    --hash=sha256:2fd1d4a0a66a5ba702699eb692e75b0d828b73cc2f4e1fc4b6a854a918967411 \
-    --hash=sha256:565881bdd0eb67da36442e9ac788bda90275386b549070d70aee86327781a4fc
+django==5.2.1 \
+    --hash=sha256:57fe1f1b59462caed092c80b3dd324fd92161b620d59a9ba9181c34746c97284 \
+    --hash=sha256:a9b680e84f9a0e71da83e399f1e922e1ab37b2173ced046b541c72e1589a5961
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
