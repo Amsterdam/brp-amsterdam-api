@@ -348,6 +348,12 @@ HAAL_CENTRAAL_BRP_VERBLIJFPLAATS_HISTORIE_URL = env.str(
 )
 
 # Muse be a URL-safe base64-encoded 32-byte key
-HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS = env.list(
-    "HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS", default=["4ReHJkftfZUWdxP-ki4-rVOhZkm5eVl4hlW02HjqVNY="]
-)
+if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):
+    HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS = Path(
+        "/mnt/secrets-store/brp-bevragingen-encryption-keys"
+    ).read_text()
+else:
+    HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS = env.list(
+        "HAAL_CENTRAAL_BRP_ENCRYPTION_KEYS",
+        default=["4ReHJkftfZUWdxP-ki4-rVOhZkm5eVl4hlW02HjqVNY="],
+    )
