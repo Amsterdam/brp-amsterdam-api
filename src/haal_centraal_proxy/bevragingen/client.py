@@ -90,14 +90,16 @@ class BrpClient:
             # The requests-oauthlib logic will automatically insert the token data.
             self._session = OAuth2Session(
                 # The BackendApplicationClient gives grant_type=authorization_code
-                client=BackendApplicationClient(client_id=oauth_client_id),
-                scope=oauth_scope,
+                client=BackendApplicationClient(client_id=oauth_client_id, scope=oauth_scope),
                 token=token,
                 token_updater=self._cache_token,  # only called for refresh urls.
             )
 
         if cert_file is not None:
             self._session.cert = (cert_file, key_file)
+
+    def __repr__(self):
+        return f"<{self.__class__.__qualname__}: {self.endpoint_url}>"
 
     def fetch_token(self) -> OAuthToken:
         """Retrieve the access token.
@@ -108,6 +110,7 @@ class BrpClient:
         token = self._session.fetch_token(
             self.oauth_endpoint_url,
             client_secret=self._client_secret,
+            include_client_id=True,  # not using "Authorization: Basic" header but POST params
             resourceServer="ResourceServer01",
             headers={
                 "Accept": "application/json; charset=utf-8",
