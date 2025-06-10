@@ -25,6 +25,7 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/pyth
 
 WORKDIR /app
 COPY . ./
+COPY config/ca/* /usr/local/share/ca-certificates/
 
 # Have some defaults so the container is easier to start
 ENV DJANGO_SETTINGS_MODULE=haal_centraal_proxy.settings \
@@ -32,9 +33,12 @@ ENV DJANGO_SETTINGS_MODULE=haal_centraal_proxy.settings \
     UWSGI_HTTP_SOCKET=:8000 \
     UWSGI_MODULE=haal_centraal_proxy.wsgi \
     UWSGI_CALLABLE=application \
-    UWSGI_MASTER=1
-RUN pip install setuptools  # workaround for missing pkg_resources in opentelemetry
-RUN python manage.py collectstatic --noinput
+    UWSGI_MASTER=1 \
+    REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+RUN pip install --no-cache-dir setuptools  # workaround for missing pkg_resources in opentelemetry
+
+RUN python manage.py collectstatic --noinput \
+ && update-ca-certificates --verbose
 
 EXPOSE 8000
 USER haalcentraalapi
