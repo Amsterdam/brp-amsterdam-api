@@ -13,11 +13,13 @@ from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 
 from haal_centraal_proxy.bevragingen import authentication, encryption, permissions, types
 from haal_centraal_proxy.bevragingen.client import BrpClient
-from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
+from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException, RemoteAPIException
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
 logger = logging.getLogger(__name__)
@@ -26,15 +28,54 @@ audit_log = logging.getLogger("haal_centraal_proxy.audit")
 SCOPE_ENCRYPT_BSN = "benk-brp-encrypt-bsn"
 
 
-class BaseProxyView(APIView):
+class ClientMixin(APIView):
+
+    #: Define which additional scopes are needed
+    client_class = BrpClient
+
+    #: Define the URL for the endpoint
+    endpoint_url: str
+
+    def get_client(self) -> BrpClient:
+        """Provide the API client class. This can be overwritten per view if needed."""
+        return self.client_class(
+            endpoint_url=self.endpoint_url,
+            oauth_endpoint_url=settings.BRP_OAUTH_TOKEN_URL,
+            oauth_client_id=settings.BRP_OAUTH_CLIENT_ID,
+            oauth_client_secret=settings.BRP_OAUTH_CLIENT_SECRET,
+            oauth_scope=settings.BRP_OAUTH_SCOPE,
+            cert_file=settings.BRP_MTLS_CERT_FILE,
+            key_file=settings.BRP_MTLS_KEY_FILE,
+        )
+
+
+class BaseHealthCheckView(ClientMixin, APIView):
+    """View that performs a dummy call to the BRP API for healthchecks."""
+
+    authentication_classes = [authentication.JWTAuthentication]
+    throttle_classes = [AnonRateThrottle, ScopedRateThrottle]
+
+    dummy_request = {"type": "healthcheck"}
+
+    def get(self, request, *args, **kwargs):
+        try:
+            client = self.get_client()
+            hc_response = client.call(self.dummy_request)
+        except RemoteAPIException as e:
+            success = e.detail == "De foutieve parameter(s) zijn: type."
+            return Response({"success": success, "response": e.remote_json})
+        except (APIException, OSError) as e:
+            return Response({"success": False, "exception": str(e)})
+
+        return Response({"success": True, "response": hc_response})
+
+
+class BaseProxyView(ClientMixin, APIView):
     """View that proxies Haal Centraal BRP.
 
     This is a pass-through proxy, but with authorization and extra restrictions added.
     The subclasses implement the variations between Haal Centraal endpoints.
     """
-
-    #: Define which additional scopes are needed
-    client_class = BrpClient
 
     authentication_classes = [authentication.JWTAuthentication]
 
@@ -78,18 +119,6 @@ class BaseProxyView(APIView):
             raise PermissionDenied(
                 f"A required header is missing: {e.args[0]}", code="missingHeaders"
             ) from None
-
-    def get_client(self) -> BrpClient:
-        """Provide the API client class. This can be overwritten per view if needed."""
-        return self.client_class(
-            endpoint_url=self.endpoint_url,
-            oauth_endpoint_url=settings.BRP_OAUTH_TOKEN_URL,
-            oauth_client_id=settings.BRP_OAUTH_CLIENT_ID,
-            oauth_client_secret=settings.BRP_OAUTH_CLIENT_SECRET,
-            oauth_scope=settings.BRP_OAUTH_SCOPE,
-            cert_file=settings.BRP_MTLS_CERT_FILE,
-            key_file=settings.BRP_MTLS_KEY_FILE,
-        )
 
     def get_permissions(self):
         """Collect the DRF permission checks.

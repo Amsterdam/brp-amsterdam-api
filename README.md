@@ -199,6 +199,11 @@ pyenv virtualenv 3.12.4 haal-centraal-proxy
 echo haal-centraal-proxy > .python-version
 ```
 
+## Testing Connectivity
+
+There is a `manage.py testendpoint` command that helps to debug any endpoint issues.
+
+
 ## Test BSN Numbers
 
 The docker mock API uses this [JSON test dataset](https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/src/config/BrpService/test-data.json).
