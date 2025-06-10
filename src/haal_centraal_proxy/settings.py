@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "haal_centraal_proxy",
+    "haal_centraal_proxy.bevragingen",
 ]
 
 MIDDLEWARE = [
@@ -303,6 +304,12 @@ REST_FRAMEWORK = dict(
         "rest_framework.renderers.JSONRenderer",
     ],
     EXCEPTION_HANDLER="haal_centraal_proxy.views.exception_handler",
+    DEFAULT_THROTTLE_RATES={
+        "anon": "10/m",
+        "personen:health": "10/m",
+        "bewoningen:health": "10/m",
+        "verblijfplaatshistorie:health": "10/m",
+    },
     UNAUTHENTICATED_USER=None,  # Avoid importing django.contrib.auth.models
     UNAUTHENTICATED_TOKEN=None,
     URL_FORMAT_OVERRIDE="_format",  # use ?_format=.. instead of ?format=..

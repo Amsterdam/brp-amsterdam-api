@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import orjson
 import requests
 from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
 from more_ds.network.url import URL
 from oauthlib.oauth2 import BackendApplicationClient
 from requests import Timeout
@@ -73,11 +74,11 @@ class BrpClient:
             self._session = requests.Session()
         else:
             if not oauth_endpoint_url:
-                raise ValueError("Missing BRP OAuth endpoint URL")
+                raise ImproperlyConfigured("Missing BRP OAuth endpoint URL")
             if not oauth_client_id:
-                raise ValueError("Missing BRP OAuth client ID")
+                raise ImproperlyConfigured("Missing BRP OAuth client ID")
             if not oauth_client_secret:
-                raise ValueError("Missing BRP OAuth client secret")
+                raise ImproperlyConfigured("Missing BRP OAuth client secret")
 
             # Connecting to official API on the private 'diginetwerk'.
             self._client_secret = oauth_client_secret

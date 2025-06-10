@@ -2,7 +2,15 @@ from django.conf import settings
 
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
-from .base import BaseProxyView
+from .base import BaseHealthCheckView, BaseProxyView
+
+
+class BrpBewoningenHealthView(BaseHealthCheckView):
+    """View to check backend access."""
+
+    permission_classes = []
+    throttle_scope = "bewoningen:health"
+    endpoint_url = settings.BRP_BEWONINGEN_URL
 
 
 class BrpBewoningenView(BaseProxyView):

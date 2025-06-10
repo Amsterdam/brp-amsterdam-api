@@ -9,7 +9,7 @@ from haal_centraal_proxy.bevragingen import fields, types
 from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
-from .base import BaseProxyView, audit_log
+from .base import BaseHealthCheckView, BaseProxyView, audit_log
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +52,13 @@ TOP_LEVEL_ARRAY_FIELDS = [
     "partners",
     "gezag",
 ]
+
+
+class BrpPersonenHealthView(BaseHealthCheckView):
+    """View to check backend access."""
+
+    throttle_scope = "personen:health"
+    endpoint_url = settings.BRP_PERSONEN_URL
 
 
 class BrpPersonenView(BaseProxyView):
