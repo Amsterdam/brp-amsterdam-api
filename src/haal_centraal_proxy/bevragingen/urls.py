@@ -14,15 +14,14 @@ urlpatterns = [
         views.BrpVerblijfplaatshistorieView.as_view(),
         name="brp-verblijfplaatshistorie",
     ),
+]
+
+health_urls = [
     # Healthchecks
-    path("v1/health/personen", views.BrpPersonenHealthView.as_view(), name="brp-personen-health"),
+    path("personen", views.BrpPersonenHealthView.as_view(), name="brp-personen-health"),
+    path("bewoningen", views.BrpBewoningenHealthView.as_view(), name="brp-bewoningen-health"),
     path(
-        "v1/health/bewoningen",
-        views.BrpBewoningenHealthView.as_view(),
-        name="brp-bewoningen-health",
-    ),
-    path(
-        "v1/health/verblijfplaatshistorie",
+        "verblijfplaatshistorie",
         views.BrpVerblijfplaatshistorieHealthView.as_view(),
         name="brp-verblijfplaatshistorie-health",
     ),
