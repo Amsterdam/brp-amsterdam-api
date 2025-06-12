@@ -337,7 +337,9 @@ else:
     BRP_OAUTH_CLIENT_SECRET = env.str("BRP_OAUTH_CLIENT_SECRET", default="")
 
 BRP_OAUTH_CLIENT_ID = env.str("BRP_OAUTH_CLIENT_ID", default=None)
-BRP_OAUTH_SCOPE = env.str("BRP_OAUTH_SCOPE", "00000001002564440000")  # OIN of Gemeente Amsterdam
+
+# Scope is AfnemerID + Amsterdam OIN
+BRP_OAUTH_SCOPE = env.str("BRP_OAUTH_SCOPE", "510193-00000001002564440000")
 
 # mTLS client certificate for production
 BRP_MTLS_KEY_FILE = env.str("BRP_MTLS_KEY_FILE", None)
