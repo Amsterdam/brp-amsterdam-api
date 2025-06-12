@@ -576,7 +576,7 @@ class TestBrpPersonenView:
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove encryption/decryption of BSNs works."""
         requests_mock.post(
-            "/haalcentraal/api/brp/personen",
+            "/lap/api/brp",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )
@@ -656,7 +656,7 @@ class TestBrpPersonenView:
     def test_encryption_salt_required(self, api_client, requests_mock, caplog, common_headers):
         """Prove that the correlation id is used as a salt to encrypt/decrypt"""
         requests_mock.post(
-            "/haalcentraal/api/brp/personen",
+            "/lap/api/brp",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )
