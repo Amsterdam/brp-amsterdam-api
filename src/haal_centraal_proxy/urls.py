@@ -11,7 +11,10 @@ handler404 = views.not_found
 handler500 = views.server_error
 
 urlpatterns = [
+    # Routed by the public ingress:
     path("bevragingen/", include(haal_centraal_proxy.bevragingen.urls)),
+    # outside public ingress:
+    path("health/", include(haal_centraal_proxy.bevragingen.urls.health_urls)),
     path("", views.RootView.as_view()),
 ]
 
