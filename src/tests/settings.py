@@ -50,7 +50,11 @@ STORAGES = {
     },
 }
 
-# Use different default:
-HAAL_CENTRAAL_BRP_URL = env.str(
-    "HAAL_CENTRAAL_BRP_URL", "http://localhost:5010/haalcentraal/api/brp/personen"
+# use different defaults.
+# By using a portnumber, the BrpClient detects that this is a mock API, and will not require OAuth.
+BRP_URL = env.str("BRP_URL", default="http://localhost:5010/lap/api/brp")
+BRP_PERSONEN_URL = env.str("BRP_PERSONEN_URL", default=BRP_URL)
+BRP_BEWONINGEN_URL = env.str("BRP_BEWONINGEN_URL", default=f"{BRP_URL}/bewoning")
+BRP_VERBLIJFPLAATSHISTORIE_URL = env.str(
+    "BRP_VERBLIJFPLAATSHISTORIE_URL", default=f"{BRP_URL}/verblijfplaatshistorie"
 )
