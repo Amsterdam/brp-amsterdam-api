@@ -355,7 +355,7 @@ BRP_URL = env.str(
     "BRP_URL",
     default="https://apigw.npr.idm.diginetwerk.net/lap/api/brp",
 )
-BRP_PERSONEN_URL = env.str("BRP_PERSONEN_URL", default=BRP_URL)
+BRP_PERSONEN_URL = env.str("BRP_PERSONEN_URL", default=f"{BRP_URL}/personen")
 BRP_BEWONINGEN_URL = env.str("BRP_BEWONINGEN_URL", default=f"{BRP_URL}/bewoning")
 BRP_VERBLIJFPLAATSHISTORIE_URL = env.str(
     "BRP_VERBLIJFPLAATSHISTORIE_URL", default=f"{BRP_URL}/verblijfplaatshistorie"
