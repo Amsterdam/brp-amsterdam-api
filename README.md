@@ -141,7 +141,7 @@ The following environment variables are useful for configuring a local developme
 * `BRP_URL` base endpoint for the BRP API's. This also works as default for the endpoints:
   * `BRP_PERSONEN_URL` endpoint for the Haal Centraal BRP Personen API.
   * `BRP_BEWONINGEN_URL` endpoint for the BRP occupancy URL.
-  * `VERBLIJFPLAATSHISTORIE_URL` endpoint for the address history URL.
+  * `BRP_VERBLIJFPLAATSHISTORIE_URL` endpoint for the address history URL.
 * `BRP_MTLS_CERT_FILE` the mTLS client certificate.
 * `BRP_MTLS_KEY_FILE` the mTLS client key file.
 
