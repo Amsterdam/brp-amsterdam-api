@@ -19,7 +19,7 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Start containers
-      run: docker compose -f "docker-compose.yml" up web -d --build
+      run: docker compose up -d --build
 
     - name: Run tests
       run: docker compose exec -T web pytest -v --ds=tests.settings --show-capture=no
