@@ -28,6 +28,14 @@ SEARCH_INCLUDE_DECEASED = {
     "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
 }
 
+SEARCH_ONLY_IN_AMSTERDAM = {
+    "ZoekMetPostcodeEnHuisnummer",
+    "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
+    "ZoekMetNummeraanduidingIdentificatie",
+    "ZoekMetAdresseerbaarObjectIdentificatie",
+    "ZoekMetNaamEnGemeenteVanInschrijving",
+}
+
 SCOPE_NATIONWIDE = "benk-brp-landelijk"
 SCOPE_INCLUDE_DECEASED = "benk-brp-inclusief-overledenen"
 SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-inclusief-geheim"
@@ -171,16 +179,19 @@ class BrpPersonenView(BaseProxyView):
     }
 
     # Special rules for some query types:
-    parameter_ruleset_by_type = {
-        "ZoekMetPostcodeEnHuisnummer": {
-            **parameter_ruleset,
-            # Also allow searching outside Amsterdam for postcode search.
-            "gemeenteVanInschrijving": ParameterPolicy(
-                {GEMEENTE_AMSTERDAM_CODE: ParameterPolicy.allow_value},
-                default_scope={SCOPE_NATIONWIDE, SCOPE_SEARCH_POSTCODE_NATIONWIDE},
-            ),
-        }
+    disallow_nationwide_municipality_code = {
+        **parameter_ruleset,
+        # Disallow searching outside Amsterdam for postcode search.
+        "gemeenteVanInschrijving": ParameterPolicy(
+            {GEMEENTE_AMSTERDAM_CODE: ParameterPolicy.allow_value},
+        ),
     }
+
+    # List comprehension doesn't work here, so we'll use a for loop
+    # see https://docs.python.org/3/reference/executionmodel.html#resolution-of-names
+    parameter_ruleset_by_type = {}
+    for request_type in SEARCH_ONLY_IN_AMSTERDAM:
+        parameter_ruleset_by_type[request_type] = disallow_nationwide_municipality_code
 
     def get_parameter_ruleset(self, hc_request: types.PersonenQuery) -> dict[str, ParameterPolicy]:
         """Allow a different parameter ruleset for some type of requests."""
@@ -232,9 +243,9 @@ class BrpPersonenView(BaseProxyView):
         if "fields" not in hc_request:
             self._add_fields_filter(hc_request)
 
-        if (
+        if "gemeenteVanInschrijving" not in hc_request and (
             SCOPE_NATIONWIDE not in self.user_scopes
-            and "gemeenteVanInschrijving" not in hc_request
+            or hc_request["type"] in SEARCH_ONLY_IN_AMSTERDAM
         ):
             self._add_municipality_filter(hc_request)
 
@@ -289,27 +300,22 @@ class BrpPersonenView(BaseProxyView):
 
     def _add_municipality_filter(self, hc_request: types.PersonenQuery) -> None:
         """Restrict the search to a single municipality."""
-        if (
-            hc_request["type"] == "ZoekMetPostcodeEnHuisnummer"
-            and SCOPE_SEARCH_POSTCODE_NATIONWIDE in self.user_scopes
-        ):
-            # Avoid limiting the request if a nationwide search on postcode is allowed.
-            # The ruleset also allows this situation.
-            logging.debug(
-                "User doesn't have %s scope, "
-                "but still allowing to search nationwide because of %s",
-                SCOPE_NATIONWIDE,
-                SCOPE_SEARCH_POSTCODE_NATIONWIDE,
-            )
-        else:
-            # If the use may only search in Amsterdam, enforce that.
-            # if a different value is set, it will be handled by the permission check later.
+        # If the use may only search in Amsterdam, enforce that.
+        # if a different value is set, it will be handled by the permission check later.
+        if hc_request["type"] not in [
+            "ZoekMetPostcodeEnHuisnummer",
+            "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
+            "ZoekMetNummeraanduidingIdentificatie",
+            "ZoekMetAdresseerbaarObjectIdentificatie",
+            "ZoekMetNaamEnGemeenteVanInschrijving",
+        ]:
+            # Only log this line for types which could be used for nationwide search
             logging.debug(
                 "User doesn't have %s scope, limiting results to gemeenteVanInschrijving=%s",
                 SCOPE_NATIONWIDE,
                 GEMEENTE_AMSTERDAM_CODE,
             )
-            hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
+        hc_request["gemeenteVanInschrijving"] = GEMEENTE_AMSTERDAM_CODE
 
     def _add_deceased_filter(self, hc_request: types.PersonenQuery) -> None:
         """When the user profile may access deceased persons, include that."""

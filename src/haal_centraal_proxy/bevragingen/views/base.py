@@ -201,7 +201,7 @@ class BaseProxyView(ClientMixin, APIView):
             raise ProblemJsonException(
                 title="Een of meerdere veldnamen zijn niet correct.",
                 detail=(
-                    f"Het veld '{err.field_name}' ondersteund niet"
+                    f"Het veld '{err.field_name}' ondersteunt niet"
                     f" de waarde(s): {', '.join(err.invalid_values)}."
                 ),
                 code="paramsValidation",
