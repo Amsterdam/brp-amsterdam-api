@@ -58,7 +58,7 @@ class TestBrpPersonenView:
     def test_postcode_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -111,7 +111,7 @@ class TestBrpPersonenView:
     def test_transform_include_nulls_zipcode(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -173,7 +173,7 @@ class TestBrpPersonenView:
     def test_transform_include_nulls_bsn(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_BSN,
             headers={"content-type": "application/json"},
         )
@@ -449,7 +449,7 @@ class TestBrpPersonenView:
             "geheimhoudingPersoonsgegevens": "1",
         }
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json={
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "personen": [person1, person2],
@@ -507,7 +507,7 @@ class TestBrpPersonenView:
             )
 
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json={
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "personen": [
@@ -576,7 +576,7 @@ class TestBrpPersonenView:
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove encryption/decryption of BSNs works."""
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )
@@ -656,7 +656,7 @@ class TestBrpPersonenView:
     def test_encryption_salt_required(self, api_client, requests_mock, caplog, common_headers):
         """Prove that the correlation id is used as a salt to encrypt/decrypt"""
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )

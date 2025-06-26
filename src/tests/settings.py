@@ -53,8 +53,8 @@ STORAGES = {
 # use different defaults.
 # By using a portnumber, the BrpClient detects that this is a mock API, and will not require OAuth.
 BRP_URL = env.str("BRP_URL", default="http://localhost:5010/lap/api/brp")
-BRP_PERSONEN_URL = env.str("BRP_PERSONEN_URL", default=BRP_URL)
-BRP_BEWONINGEN_URL = env.str("BRP_BEWONINGEN_URL", default=f"{BRP_URL}/bewoning")
+BRP_PERSONEN_URL = env.str("BRP_PERSONEN_URL", default=f"{BRP_URL}/personen")
+BRP_BEWONINGEN_URL = env.str("BRP_BEWONINGEN_URL", default=f"{BRP_URL}/bewoning/bewoningen")
 BRP_VERBLIJFPLAATSHISTORIE_URL = env.str(
     "BRP_VERBLIJFPLAATSHISTORIE_URL", default=f"{BRP_URL}/verblijfplaatshistorie"
 )
