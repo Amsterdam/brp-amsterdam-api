@@ -318,6 +318,108 @@ class TestBrpPersonenView:
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
         }
 
+    def test_transform_enforce_municipality_not_added(self):
+        """Prove that 'gemeenteVanInschrijving' will not be added if present."""
+        view = BrpPersonenView()
+        view.user_scopes = {"benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"}
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "fields": ["naam.aanduidingNaamgebruik"],
+            "gemeenteVanInschrijving": "0384",
+        }
+        view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["aNummer", "burgerservicenummer"]
+
+        assert hc_request == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            # Note that the 'fields' are also updated for logging purposes
+            "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],  # added
+            "gemeenteVanInschrijving": "0384",  # not overwritten
+        }
+
+    @pytest.mark.parametrize(
+        "request_type",
+        [
+            "ZoekMetPostcodeEnHuisnummer",
+            "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
+            "ZoekMetNummeraanduidingIdentificatie",
+            "ZoekMetAdresseerbaarObjectIdentificatie",
+            "ZoekMetNaamEnGemeenteVanInschrijving",
+        ],
+    )
+    def test_transform_enforce_municipality_not_overridden_by_nationwide_scope(self, request_type):
+        """Prove that 'gemeenteVanInschrijving' will not be overridden by nationwide scope
+        for some of the search entries.
+        """
+        view = BrpPersonenView()
+        view.user_scopes = {
+            "benk-brp-landelijk",
+            "benk-brp-zoekvraag-postcode-huisnummer",
+            "benk-brp-gegevensset-1",
+        }
+        hc_request = {
+            "type": request_type,
+            "fields": ["naam.aanduidingNaamgebruik"],
+        }
+        view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["burgerservicenummer"]
+
+        assert hc_request == {
+            "type": request_type,
+            # Note that the 'fields' are also updated for logging purposes
+            "fields": ["naam.aanduidingNaamgebruik", "burgerservicenummer"],  # added
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+        }
+
+    @pytest.mark.parametrize(
+        "request_type, required_scope",
+        [
+            ("ZoekMetPostcodeEnHuisnummer", "benk-brp-zoekvraag-postcode-huisnummer"),
+            (
+                "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
+                "benk-brp-zoekvraag-straatnaam-huisnummer",
+            ),
+            ("ZoekMetNummeraanduidingIdentificatie", "benk-brp-zoekvraag-nummeraanduiding"),
+            ("ZoekMetAdresseerbaarObjectIdentificatie", "benk-brp-zoekvraag-adresseerbaar-object"),
+            ("ZoekMetNaamEnGemeenteVanInschrijving", "benk-brp-zoekvraag-naam-gemeente"),
+        ],
+    )
+    def test_disallow_nationwide_search(
+        self, requests_mock, api_client, common_headers, request_type, required_scope
+    ):
+        """Prove that some search entries are only allowed for search within Amsterdam."""
+        requests_mock.post(
+            "/lap/api/brp/personen",
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                required_scope,
+                "benk-brp-landelijk",
+                "benk-brp-gegevensset-1",
+            ]
+        )
+        response = api_client.post(
+            url,
+            {
+                "type": request_type,
+                "gemeenteVanInschrijving": "0384",  # Search for another municipality
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 400, response.data
+        assert response.data["code"] == "paramsValidation"
+        assert (
+            response.data["detail"]
+            == "Het veld 'gemeenteVanInschrijving' ondersteunt niet de waarde(s): 0384."
+        )
+
     def test_transform_do_not_allow_deceased_for_bsn_search(self):
         """Prove that 'inclusiefOverledenPersonen' is not automatically added for the scope.
         When searched on BSN.
@@ -345,9 +447,8 @@ class TestBrpPersonenView:
         """Prove that 'inclusiefOverledenPersonen' is automatically added for the scope."""
         view = BrpPersonenView()
         view.user_scopes = {
-            "benk-brp-zoekvraag-bsn",
+            "benk-brp-zoekvraag-postcode-huisnummer",
             "benk-brp-gegevensset-1",
-            SCOPE_NATIONWIDE,
             SCOPE_INCLUDE_DECEASED,
         }
         hc_request = {
@@ -360,6 +461,7 @@ class TestBrpPersonenView:
         assert hc_request == {
             "type": "ZoekMetPostcodeEnHuisnummer",
             "fields": ["naam.aanduidingNaamgebruik", "burgerservicenummer"],
+            "gemeenteVanInschrijving": "0363",
             "inclusiefOverledenPersonen": True,
         }
 
