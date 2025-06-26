@@ -10,14 +10,14 @@ class TestHealthCheck:
         "title": "Een of meerdere parameters zijn niet correct.",
         "status": 400,
         "detail": "De foutieve parameter(s) zijn: type.",
-        "instance": "/lap/api/brp",
+        "instance": "/lap/api/brp/personen",
         "code": "paramsValidation",
     }
 
     def test_backend_health_endpoint(self, api_client, requests_mock, caplog, common_headers):
         """Prove that incorrect API-key settings are handled gracefully."""
         requests_mock.post(
-            "/lap/api/brp",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_HEALTHCHECK,
             status_code=400,
             headers={"content-type": "application/json"},

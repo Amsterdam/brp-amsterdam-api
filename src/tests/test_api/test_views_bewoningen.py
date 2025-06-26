@@ -20,7 +20,7 @@ class TestBrpBewoningenView:
     def test_address_id_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/bewoning",
+            "/lap/api/brp/bewoning/bewoningen",
             json=self.RESPONSE_BEWONINGEN,
             headers={"content-type": "application/json"},
         )
