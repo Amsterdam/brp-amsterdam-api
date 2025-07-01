@@ -215,7 +215,11 @@ class BrpPersonenView(BaseProxyView):
             # Separate log message for every person that's being accessed.
             for persoon in hc_response["personen"]:
                 msg_params = {}
-                extra = {}
+                extra = {
+                    "request": request.data,
+                    "hc_request": hc_request,
+                    "hc_response": final_response or hc_response,
+                }
                 msg = ["User %(user)s retrieved using '%(service)s.%(query_type)s':"]
                 for id_field in self.always_insert_id_fields:
                     msg_params[id_field] = persoon.get(id_field, "?")

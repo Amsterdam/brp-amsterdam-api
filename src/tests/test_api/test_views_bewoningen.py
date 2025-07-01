@@ -12,12 +12,18 @@ class TestBrpBewoningenView:
                 "adresseerbaarObjectIdentificatie": "0518010000832200",
                 "periode": {"datumVan": "2020-09-24", "datumTot": "2020-09-25"},
                 "bewoners": [{"burgerservicenummer": "999993240"}],
-                "mogelijkeBewoners": [],
-            }
+                "mogelijkeBewoners": [{"burgerservicenummer": "999993241"}],
+            },
+            {
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "periode": {"datumVan": "2016-03-02", "datumTot": "2020-09-24"},
+                "bewoners": [{"burgerservicenummer": "999991371"}],
+                "mogelijkeBewoners": [{"burgerservicenummer": "999991383"}],
+            },
         ]
     }
 
-    def test_address_id_search(self, api_client, requests_mock, common_headers):
+    def test_address_id_search(self, api_client, requests_mock, common_headers, caplog):
         """Prove that search is possible"""
         requests_mock.post(
             "/lap/api/brp/bewoning/bewoningen",
@@ -39,8 +45,37 @@ class TestBrpBewoningenView:
                 **common_headers,
             },
         )
+
         assert response.status_code == 200, response
         assert response.json() == self.RESPONSE_BEWONINGEN, response.data
+
+        log_messages = caplog.messages
+        for log_message in [
+            (
+                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
+                " burgerservicenummer=999993240"
+            ),
+            (
+                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
+                " burgerservicenummer=999993241"
+            ),
+            (
+                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
+                " burgerservicenummer=999991371"
+            ),
+            (
+                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
+                " burgerservicenummer=999991383"
+            ),
+        ]:
+            assert log_message in log_messages
+
+        # Log messages about retrieved BSN's should contain the full request/response context
+        for record in caplog.records:
+            if "retrieved using" in record.message:
+                assert all(
+                    getattr(record, attr) for attr in ["request", "hc_request", "hc_response"]
+                )
 
     def test_address_id_search_deny(self, api_client, common_headers):
         """Prove that access is checked"""

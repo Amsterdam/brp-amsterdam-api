@@ -675,6 +675,13 @@ class TestBrpPersonenView:
         ]:
             assert log_message in log_messages
 
+        # Log messages about retrieved BSN's should contain the full request/response context
+        for record in caplog.records:
+            if "retrieved using" in record.message:
+                assert all(
+                    getattr(record, attr) for attr in ["request", "hc_request", "hc_response"]
+                )
+
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove encryption/decryption of BSNs works."""
         requests_mock.post(

@@ -52,7 +52,18 @@ class BaseResponse(TypedDict):
 
 
 class PersonenResponse(BaseResponse):
-    """Stub for the Haal Centraal response"""
+    """Stub for the BRP Personen API response"""
 
     type: str
     personen: list[dict]
+
+
+class Bewoning(TypedDict):
+    bewoners: list[dict]
+    mogelijkeBewoners: list[dict]
+
+
+class BewoningenResponse(BaseResponse):
+    """Stub for the BRP Bewoningen API response"""
+
+    bewoningen: list[Bewoning]
