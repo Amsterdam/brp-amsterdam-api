@@ -210,7 +210,7 @@ class BrpClient:
         content_type = response.headers.get("content-type", "")
         remote_json = (
             orjson.loads(response.content)
-            if content_type in ("application/json", "application/problem+json")
+            if any(ct in content_type for ct in ["application/json", "application/problem+json"])
             else None
         )
         detail_message = response.text if not content_type.startswith("text/html") else None
