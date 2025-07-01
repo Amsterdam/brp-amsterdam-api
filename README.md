@@ -81,7 +81,7 @@ All possible parameters are documented in the [Haal Centraal documentation](http
 For the *personen* endpoint, some parameters are automatically filled in based on the token permissions if these are missing in the original request.
 
 * **fields** will be automatically filled in based on the permissions.
-* **gemeenteVanInschrijving** will be limited to Amsterdam unless the user may search nationwide (for *type=ZoekMetPostcodeEnHuisnummer* or scope *benk-brp-zoekvraag-postcode-huisnummer-landelijk*).
+* **gemeenteVanInschrijving** will be limited to Amsterdam (0363) unless the user may search nationwide (for *type=ZoekMetPostcodeEnHuisnummer* or scope *benk-brp-zoekvraag-postcode-huisnummer-landelijk*).
 * **inclusiefOverledenPersonen=true** will be included when the *benk-brp-inclusief-overledenen* scope is present and the *type* supports this parameter.
 
 This behavior can be overwritten by providing the parameter in the original request.

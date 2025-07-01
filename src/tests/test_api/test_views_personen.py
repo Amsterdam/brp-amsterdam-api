@@ -315,7 +315,7 @@ class TestBrpPersonenView:
             "type": "RaadpleegMetBurgerservicenummer",
             # Note that the 'fields' are also updated for logging purposes
             "fields": ["naam.aanduidingNaamgebruik", "aNummer", "burgerservicenummer"],  # added
-            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside Amsterdam)
         }
 
     def test_transform_enforce_municipality_not_added(self):
@@ -368,7 +368,7 @@ class TestBrpPersonenView:
             "type": request_type,
             # Note that the 'fields' are also updated for logging purposes
             "fields": ["naam.aanduidingNaamgebruik", "burgerservicenummer"],  # added
-            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside Amsterdam)
         }
 
     @pytest.mark.parametrize(
@@ -406,7 +406,7 @@ class TestBrpPersonenView:
             url,
             {
                 "type": request_type,
-                "gemeenteVanInschrijving": "0384",  # Search for another municipality
+                "gemeenteVanInschrijving": "0384",  # Search for another municipality (Diemen)
             },
             headers={
                 "Authorization": f"Bearer {token}",
@@ -461,7 +461,7 @@ class TestBrpPersonenView:
         assert hc_request == {
             "type": "ZoekMetPostcodeEnHuisnummer",
             "fields": ["naam.aanduidingNaamgebruik", "burgerservicenummer"],
-            "gemeenteVanInschrijving": "0363",
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside Amsterdam)
             "inclusiefOverledenPersonen": True,
         }
 
@@ -478,7 +478,7 @@ class TestBrpPersonenView:
 
         assert hc_request == {
             "type": "RaadpleegMetBurgerservicenummer",
-            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside Amsterdam)
             "fields": gegevensset_1,  # added (default all allowed fields)
         }
 
@@ -495,7 +495,7 @@ class TestBrpPersonenView:
 
         assert hc_request == {
             "type": "ZoekMetPostcodeEnHuisnummer",
-            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside area)
+            "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside Amsterdam)
             "fields": [
                 # added (very limited set due to constraints of both the fields CSV and scope)
                 "adressering.adresregel1",
