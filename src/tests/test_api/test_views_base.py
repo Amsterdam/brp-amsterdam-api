@@ -109,8 +109,12 @@ class TestBaseProxyView:
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
         }
 
-    def test_error_response(self, api_client, requests_mock, caplog, common_headers):
-        """Prove that Haal Centraal errors are handled gracefully."""
+    @pytest.mark.parametrize(
+        "content_type",
+        ["application/json", "application/problem+json", "application/json;charset=utf-8"],
+    )
+    def test_error_response(self, api_client, requests_mock, caplog, common_headers, content_type):
+        """Prove that Haal Centraal errors are handled gracefully for all known content-types"""
         requests_mock.post(
             "/lap/api/brp/personen",
             json={
@@ -129,7 +133,7 @@ class TestBaseProxyView:
                 "code": "paramsValidation",
             },
             status_code=400,
-            headers={"content-type": "application/json"},
+            headers={"content-type": content_type},
         )
 
         url = reverse("brp-personen")
