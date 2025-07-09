@@ -42,5 +42,3 @@ kinderen.naam.voorletters
 kinderen.naam.voorvoegsel
 kinderen.naam.geslachtsnaam
 kinderen.geboorte.datum
-kinderen.geboorte.plaats
-kinderen.geboorte.land
