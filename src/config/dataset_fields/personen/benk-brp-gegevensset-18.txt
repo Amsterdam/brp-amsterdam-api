@@ -16,7 +16,6 @@ adressering.aanschrijfwijze.aanspreekvorm
 adressering.aanschrijfwijze.naam
 adressering.gebruikInLopendeTekst
 leeftijd
-ouders.burgerservicenummer
 ouders.naam.voornamen
 ouders.naam.voorletters
 ouders.naam.adellijkeTitelPredicaat
@@ -27,7 +26,6 @@ ouders.geboorte.plaats
 ouders.geboorte.land
 ouders.ouderAanduiding
 nationaliteiten
-partners.burgerservicenummer
 partners.naam.voornamen
 partners.naam.voorletters
 partners.naam.adellijkeTitelPredicaat
@@ -42,10 +40,10 @@ overlijden.datum
 gemeenteVanInschrijving
 datumInschrijvingInGemeente
 verblijfplaats.functieAdres
-verblijfplaats.datumVan
+verblijfplaats.datumVan 
 verblijfplaats.verblijfadres.korteStraatnaam
 verblijfplaats.verblijfadres.officieleStraatnaam
-verblijfplaats.verblijfadres.huisnummer
+verblijfplaats.verblijfadres.huisnummer 
 verblijfplaats.verblijfadres.huisletter
 verblijfplaats.verblijfadres.huisnummertoevoeging
 verblijfplaats.verblijfadres.aanduidingBijHuisnummer
@@ -63,7 +61,6 @@ adressering.adresregel1
 adressering.adresregel2
 adressering.adresregel3
 adressering.land
-kinderen.burgerservicenummer
 kinderen.naam.voornamen
 kinderen.naam.voorletters
 kinderen.naam.voorvoegsel
