@@ -40,10 +40,10 @@ overlijden.datum
 gemeenteVanInschrijving
 datumInschrijvingInGemeente
 verblijfplaats.functieAdres
-verblijfplaats.datumVan 
+verblijfplaats.datumVan
 verblijfplaats.verblijfadres.korteStraatnaam
 verblijfplaats.verblijfadres.officieleStraatnaam
-verblijfplaats.verblijfadres.huisnummer 
+verblijfplaats.verblijfadres.huisnummer
 verblijfplaats.verblijfadres.huisletter
 verblijfplaats.verblijfadres.huisnummertoevoeging
 verblijfplaats.verblijfadres.aanduidingBijHuisnummer
