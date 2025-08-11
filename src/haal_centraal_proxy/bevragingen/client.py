@@ -251,9 +251,9 @@ class BrpClient:
             # Unexpected response, call it a "Bad Gateway"
             logger.error(
                 "Proxy call failed, unexpected status code from endpoint: %s %s",
-                response.status,
+                response.status_code,
                 detail_message,
             )
             return BadGateway(
-                detail_message or f"Unexpected HTTP {response.status} from internal endpoint"
+                detail_message or f"Unexpected HTTP {response.status_code} from internal endpoint"
             )
