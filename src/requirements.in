@@ -4,24 +4,24 @@ django-cors-headers == 4.7.0
 django-healthchecks == 1.5.0
 #amsterdam-schema-tools[django] == 6.0.1
 datapunt-authorization-django == 1.6.1
-djangorestframework == 3.16.0
+djangorestframework == 3.16.1
 python-json-logger==3.3.0
 requests == 2.32.4
 requests-oauthlib == 2.0.0
 #sentry-sdk == 2.13.0
 more-ds == 0.0.6
-orjson == 3.10.18
+orjson == 3.11.1
 whitenoise == 6.9.0
 
 # Monitoring
-azure-monitor-opentelemetry == 1.6.10
-azure-identity == 1.23.0
+azure-monitor-opentelemetry == 1.6.13
+azure-identity == 1.24.0
 uwsgitop == 0.12
 uwsgi-readiness-check == 0.2.0
 
 # Testing
-pytest == 8.4.0
+pytest == 8.4.1
 pytest-django == 4.11.1
-pytest-cov == 6.1.1
+pytest-cov == 6.2.1
 python-owasp-zap-v2.4 == 0.1.0
 requests-mock == 1.12.1
