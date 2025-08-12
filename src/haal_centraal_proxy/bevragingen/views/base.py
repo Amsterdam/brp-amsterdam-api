@@ -9,7 +9,9 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.timezone import now
+from django.views.decorators.cache import never_cache
 from rest_framework import status
 from rest_framework.exceptions import APIException, PermissionDenied
 from rest_framework.request import Request
@@ -139,6 +141,7 @@ class BaseProxyView(ClientMixin, APIView):
         """Allow overriding which parameter ruleset to use."""
         return self.parameter_ruleset
 
+    @method_decorator(never_cache)
     def post(self, request: Request, *args, **kwargs):
         """Handle the incoming POST request.
         Basic checks (such as content-type validation) are already done by REST Framework.
