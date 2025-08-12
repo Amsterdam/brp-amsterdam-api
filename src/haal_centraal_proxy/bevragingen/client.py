@@ -254,6 +254,4 @@ class BrpClient:
                 response.status_code,
                 detail_message,
             )
-            return BadGateway(
-                detail_message or f"Unexpected HTTP {response.status_code} from internal endpoint"
-            )
+            return BadGateway(f"Unexpected HTTP {response.status_code} from internal endpoint")
