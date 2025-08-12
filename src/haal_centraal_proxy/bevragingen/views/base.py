@@ -463,7 +463,7 @@ class BaseProxyView(ClientMixin, APIView):
 
                     if not sub_level:
                         # This is a leaf node
-                        # Empty array for no items, None for object, string, etc..
+                        # None for object, string, etc..
                         item[key] = None
                         continue
 
