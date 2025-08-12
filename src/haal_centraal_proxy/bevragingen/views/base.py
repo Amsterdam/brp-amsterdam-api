@@ -1,6 +1,6 @@
 import logging
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from copy import deepcopy
 
 import orjson
@@ -24,6 +24,8 @@ from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
 logger = logging.getLogger(__name__)
 audit_log = logging.getLogger("haal_centraal_proxy.audit")
+
+DictOfDicts = dict[str, dict[str, dict]]
 
 SCOPE_ENCRYPT_BSN = "benk-brp-encrypt-bsn"
 
@@ -408,6 +410,10 @@ class BaseProxyView(ClientMixin, APIView):
             ],
         )
 
+        # Restore sending null values for empty fields
+        if self.request.GET.get("resultaat-formaat", None) == "volledig":
+            self._insert_null_values(hc_request, hc_response)
+
     def _rewrite_links(
         self, data: dict | list, rewrites: list[tuple[str, str]], in_links: bool = False
     ):
@@ -430,3 +436,53 @@ class BaseProxyView(ClientMixin, APIView):
                 # Dict: go level deeper
                 for child in data.values():
                     self._rewrite_links(child, rewrites, in_links)
+
+    def _insert_null_values(
+        self, hc_request: types.BaseQuery, hc_response: types.BaseResponse
+    ) -> None:
+        """This method can be overwritten to insert any null values that the user does have
+        access to per endpoint. This allows the client to distinguish between having 'no value'
+        instead of 'no access'.
+        """
+
+    def _include_nulls(self, request_fields: DictOfDicts, item: list | dict, parent_path=()):
+        """Include null values based on the collection of requested fields"""
+        if isinstance(item, list):
+            for sub_item in item:
+                self._include_nulls(request_fields, sub_item, parent_path=parent_path)
+        elif isinstance(item, dict):
+            for key, sub_level in request_fields.items():
+                try:
+                    sub_item = item[key]
+                except KeyError:
+                    # Element is missing
+                    if not parent_path and key in self.top_level_array_fields:
+                        # Array fields can't be expanded.
+                        item[key] = []
+                        continue
+
+                    if not sub_level:
+                        # This is a leaf node
+                        # None for object, string, etc..
+                        item[key] = None
+                        continue
+
+                    # New item is empty object, will be filled with its keys.
+                    sub_item = item.setdefault(key, {})
+
+                if sub_level:
+                    self._include_nulls(
+                        sub_level,
+                        sub_item,
+                        parent_path=parent_path + (key,),
+                    )
+
+
+def group_dotted_names(dotted_field_names: Iterable[str]) -> DictOfDicts:
+    """Convert a list of dotted names to tree."""
+    result = {}
+    for dotted_name in dotted_field_names:
+        tree_level = result
+        for path_item in dotted_name.split("."):
+            tree_level = tree_level.setdefault(path_item, {})
+    return result

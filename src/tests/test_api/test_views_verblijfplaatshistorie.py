@@ -32,7 +32,24 @@ class TestBrpVerblijfplaatshistorieView:
                     "adresregel1": "Erasmusweg 471",
                     "adresregel2": "2532 CN  'S-GRAVENHAGE",
                 },
-            }
+            },
+            {
+                "type": "Locatie",
+                "verblijfadres": {
+                    "officieleStraatnaam": "Erasmusweg",
+                    "korteStraatnaam": "Erasmusweg",
+                    "huisnummer": 471,
+                    "postcode": "2532CN",
+                    "woonplaats": "'s-Gravenhage",
+                },
+                "functieAdres": {"code": "W", "omschrijving": "woonadres"},
+                "nummeraanduidingIdentificatie": "0518200000832199",
+                "gemeenteVanInschrijving": {"code": "0518", "omschrijving": "'s-Gravenhage"},
+                "adressering": {
+                    "adresregel1": "Erasmusweg 471",
+                    "adresregel2": "2532 CN  'S-GRAVENHAGE",
+                },
+            },
         ]
     }
 
@@ -126,3 +143,103 @@ class TestBrpVerblijfplaatshistorieView:
             else:
                 assert granted.contains(SCOPE_ENCRYPT_BSN)
                 assert r.hc_request.contains("999993240")
+
+    def test_null_values_added_2(self, api_client, requests_mock, common_headers):
+        """Prove that null values can be added"""
+        requests_mock.post(
+            "/lap/api/brp/verblijfplaatshistorie",
+            json=self.RESPONSE_VERBLIJFPLAATS,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-verblijfplaatshistorie")
+        token = build_jwt_token(["benk-brp-verblijfplaatshistorie-api"])
+        response = api_client.post(
+            f"{url}?resultaat-formaat=volledig",
+            {
+                "type": "RaadpleegMetPeildatum",
+                "burgerservicenummer": "999993240",
+                "peildatum": "2020-09-24",
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response
+        assert response.json() == {
+            "geheimhoudingPersoonsgegevens": None,  # included this missing field
+            "opschortingBijhouding": {  # included this missing object
+                "datum": None,  # included this missing field
+            },
+            "verblijfplaatsen": [
+                {
+                    "adresseerbaarObjectIdentificatie": "0518010000832200",
+                    "adressering": {
+                        "adresregel1": "Erasmusweg 471",
+                        "adresregel2": "2532 CN  'S-GRAVENHAGE",
+                        "inOnderzoek": None,  # included this missing field
+                    },
+                    "datumTot": None,  # included this missing field
+                    "datumVan": {
+                        "datum": "1990-04-27",
+                        "langFormaat": "27 april 1990",
+                        "type": "Datum",
+                    },
+                    "functieAdres": {
+                        "code": "W",
+                        "omschrijving": "woonadres",
+                    },
+                    "gemeenteVanInschrijving": {
+                        "code": "0518",
+                        "omschrijving": "'s-Gravenhage",
+                    },
+                    "inOnderzoek": None,  # included this missing field
+                    "nummeraanduidingIdentificatie": "0518200000832199",
+                    "type": "Adres",
+                    "verblijfadres": {
+                        "aanduidingBijHuisnummer": None,  # included this missing field
+                        "huisletter": None,  # included this missing field
+                        "huisnummer": 471,
+                        "huisnummertoevoeging": None,  # included this missing field
+                        "inOnderzoek": None,  # included this missing field
+                        "korteStraatnaam": "Erasmusweg",
+                        "officieleStraatnaam": "Erasmusweg",
+                        "postcode": "2532CN",
+                        "woonplaats": "'s-Gravenhage",
+                    },
+                    "verblijftNietOpAdresVanaf": None,  # included this missing field
+                },
+                {
+                    "adresseerbaarObjectIdentificatie": None,  # included this missing field
+                    "adressering": {
+                        "adresregel1": "Erasmusweg 471",
+                        "adresregel2": "2532 CN  'S-GRAVENHAGE",
+                        "inOnderzoek": None,
+                    },
+                    "datumTot": None,  # included this missing field
+                    "datumVan": None,  # included this missing field
+                    "functieAdres": {
+                        "code": "W",
+                        "omschrijving": "woonadres",
+                    },
+                    "gemeenteVanInschrijving": {
+                        "code": "0518",
+                        "omschrijving": "'s-Gravenhage",
+                    },
+                    "inOnderzoek": None,  # included this missing field
+                    "nummeraanduidingIdentificatie": "0518200000832199",
+                    "type": "Locatie",
+                    "verblijfadres": {
+                        "huisnummer": 471,
+                        "inOnderzoek": None,  # included this missing field
+                        "korteStraatnaam": "Erasmusweg",
+                        "locatiebeschrijving": None,  # included this missing field
+                        "officieleStraatnaam": "Erasmusweg",
+                        "postcode": "2532CN",
+                        "woonplaats": "'s-Gravenhage",
+                    },
+                    "verblijftNietOpAdresVanaf": None,  # included this missing field
+                },
+            ],
+        }

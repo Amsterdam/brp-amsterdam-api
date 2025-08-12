@@ -10,7 +10,6 @@ from haal_centraal_proxy.bevragingen.views.personen import (
     SCOPE_INCLUDE_DECEASED,
     SCOPE_NATIONWIDE,
     BrpPersonenView,
-    _group_dotted_names,
 )
 
 from tests.utils import build_jwt_token
@@ -881,25 +880,3 @@ class TestBrpPersonenView:
         assert any(
             m.startswith(access_denied_message) and SCOPE_ENCRYPT_BSN in m for m in log_messages
         )
-
-
-def test_group_dotted_names():
-    """Test whether the nested ?_expandScope can be parsed to a tree."""
-    result = _group_dotted_names(
-        [
-            "user",
-            "user.group",
-            "user.permissions",
-            "group",
-            "group.permissions",
-        ]
-    )
-    assert result == {
-        "user": {
-            "group": {},
-            "permissions": {},
-        },
-        "group": {
-            "permissions": {},
-        },
-    }

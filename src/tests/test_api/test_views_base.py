@@ -1,5 +1,6 @@
 import pytest
 from django.urls import reverse
+from haal_centraal_proxy.bevragingen.views.base import group_dotted_names
 
 from tests.utils import build_jwt_token
 
@@ -168,3 +169,25 @@ class TestBaseProxyView:
             "title": "Een of meerdere parameters zijn niet correct.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
         }
+
+
+def test_group_dotted_names():
+    """Test whether the nested ?_expandScope can be parsed to a tree."""
+    result = group_dotted_names(
+        [
+            "user",
+            "user.group",
+            "user.permissions",
+            "group",
+            "group.permissions",
+        ]
+    )
+    assert result == {
+        "user": {
+            "group": {},
+            "permissions": {},
+        },
+        "group": {
+            "permissions": {},
+        },
+    }
