@@ -1,5 +1,4 @@
 import logging
-from collections.abc import Iterable
 
 from django.conf import settings
 from rest_framework import status
@@ -9,11 +8,9 @@ from haal_centraal_proxy.bevragingen import fields, types
 from haal_centraal_proxy.bevragingen.exceptions import ProblemJsonException
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
-from .base import BaseHealthCheckView, BaseProxyView, audit_log
+from .base import BaseHealthCheckView, BaseProxyView, audit_log, group_dotted_names
 
 logger = logging.getLogger(__name__)
-
-DictOfDicts = dict[str, dict[str, dict]]
 
 GEMEENTE_AMSTERDAM_CODE = "0363"
 
@@ -50,16 +47,6 @@ FILTERED_MIN = fields.read_config("haal_centraal/personen/fields-filtered-Persoo
 SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
     "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
 )
-
-TOP_LEVEL_ARRAY_FIELDS = [
-    # Hard-coded list here of all array fields (which shouldn't get null-defaults).
-    # This is based on the output of the get-openapi.py script.
-    "ouders",
-    "kinderen",
-    "nationaliteiten",
-    "partners",
-    "gezag",
-]
 
 
 class BrpPersonenHealthView(BaseHealthCheckView):
@@ -99,6 +86,15 @@ class BrpPersonenView(BaseProxyView):
     }
 
     always_insert_id_fields = ("aNummer", "burgerservicenummer")
+    top_level_array_fields = [
+        # Hard-coded list here of all array fields (which shouldn't get null-defaults).
+        # This is based on the output of the get-openapi.py script.
+        "ouders",
+        "kinderen",
+        "nationaliteiten",
+        "partners",
+        "gezag",
+    ]
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
@@ -361,10 +357,6 @@ class BrpPersonenView(BaseProxyView):
         if self.inserted_id_fields:
             self._hide_inserted_identifiers(hc_request, hc_response)
 
-        # Restore sending null values for empty fields
-        if self.request.GET.get("resultaat-formaat", None) == "volledig":
-            self._insert_null_values(hc_request["fields"], hc_response)
-
     def _hide_confidential_persons(self, hc_response: types.PersonenResponse) -> None:
         """
         If the user may not see persons with confidential data,
@@ -410,52 +402,11 @@ class BrpPersonenView(BaseProxyView):
         for id_field in self.inserted_id_fields:
             hc_request["fields"].remove(id_field)
 
-    def _insert_null_values(self, fields: list[str], hc_response: types.PersonenResponse) -> None:
+    def _insert_null_values(
+        self, hc_request: types.PersonenQuery, hc_response: types.PersonenResponse
+    ) -> None:
         """Insert any null values that the user does have access to.
         This allows the client to distinguish between having 'no value' instead of 'no access'.
         """
-        request_fields = _group_dotted_names(fields)
-        _include_nulls(request_fields, hc_response["personen"])
-
-
-def _include_nulls(request_fields: DictOfDicts, item: list | dict, parent_path=()):
-    """Include null values based on the collection of requested fields"""
-    if isinstance(item, list):
-        for sub_item in item:
-            _include_nulls(request_fields, sub_item, parent_path=parent_path)
-    elif isinstance(item, dict):
-        for key, sub_level in request_fields.items():
-            try:
-                sub_item = item[key]
-            except KeyError:
-                # Element is missing
-                if not parent_path and key in TOP_LEVEL_ARRAY_FIELDS:
-                    # Array fields can't be expanded.
-                    item[key] = []
-                    continue
-
-                if not sub_level:
-                    # This is a leaf node
-                    # Empty array for no items, None for object, string, etc..
-                    item[key] = None
-                    continue
-
-                # New item is empty object, will be filled with its keys.
-                sub_item = item.setdefault(key, {})
-
-            if sub_level:
-                _include_nulls(
-                    sub_level,
-                    sub_item,
-                    parent_path=parent_path + (key,),
-                )
-
-
-def _group_dotted_names(dotted_field_names: Iterable[str]) -> DictOfDicts:
-    """Convert a list of dotted names to tree."""
-    result = {}
-    for dotted_name in dotted_field_names:
-        tree_level = result
-        for path_item in dotted_name.split("."):
-            tree_level = tree_level.setdefault(path_item, {})
-    return result
+        request_fields = group_dotted_names(hc_request["fields"])
+        self._include_nulls(request_fields, hc_response["personen"])

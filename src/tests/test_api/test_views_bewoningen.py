@@ -18,7 +18,7 @@ class TestBrpBewoningenView:
                 "adresseerbaarObjectIdentificatie": "0518010000832200",
                 "periode": {"datumVan": "2016-03-02", "datumTot": "2020-09-24"},
                 "bewoners": [{"burgerservicenummer": "999991371"}],
-                "mogelijkeBewoners": [{"burgerservicenummer": "999991383"}],
+                "mogelijkeBewoners": [],
             },
         ]
     }
@@ -63,10 +63,6 @@ class TestBrpBewoningenView:
                 "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
                 " burgerservicenummer=999991371"
             ),
-            (
-                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
-                " burgerservicenummer=999991383"
-            ),
         ]:
             assert log_message in log_messages
 
@@ -102,4 +98,88 @@ class TestBrpBewoningenView:
             "status": 403,
             "title": "You do not have permission to perform this action.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
+        }
+
+    def test_null_values_added(self, api_client, requests_mock, common_headers):
+        """Prove that null values can be added"""
+        requests_mock.post(
+            "/lap/api/brp/bewoning/bewoningen",
+            json=self.RESPONSE_BEWONINGEN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-bewoningen")
+        token = build_jwt_token(["benk-brp-bewoning-api"])
+        response = api_client.post(
+            f"{url}?resultaat-formaat=volledig",
+            {
+                "type": "BewoningMetPeildatum",
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "peildatum": "2020-09-24",
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response
+        assert response.json() == {
+            "bewoningen": [
+                {
+                    "adresseerbaarObjectIdentificatie": "0518010000832200",
+                    "bewoners": [
+                        {
+                            "burgerservicenummer": "999993240",
+                            "geboorte": {  # included this missing object
+                                "datum": None,  # included this missing field
+                            },
+                            "geheimhoudingPersoonsgegevens": None,  # included this missing field
+                            "inOnderzoek": None,  # included this missing field
+                            "naam": {  # included this missing object
+                                "volledigeNaam": None,  # included this missing field
+                            },
+                        },
+                    ],
+                    "indicatieVeelBewoners": None,  # included this missing field
+                    "mogelijkeBewoners": [
+                        {
+                            "burgerservicenummer": "999993241",
+                            "geboorte": {  # included this missing object
+                                "datum": None,  # included this missing field
+                            },
+                            "geheimhoudingPersoonsgegevens": None,  # included this missing field
+                            "inOnderzoek": None,  # included this missing field
+                            "naam": {  # included this missing object
+                                "volledigeNaam": None,  # included this missing field
+                            },
+                        },
+                    ],
+                    "periode": {
+                        "datumTot": "2020-09-25",
+                        "datumVan": "2020-09-24",
+                    },
+                },
+                {
+                    "adresseerbaarObjectIdentificatie": "0518010000832200",
+                    "bewoners": [
+                        {
+                            "burgerservicenummer": "999991371",
+                            "geboorte": {  # included this missing object
+                                "datum": None,  # included this missing field
+                            },
+                            "geheimhoudingPersoonsgegevens": None,  # included this missing field
+                            "inOnderzoek": None,
+                            "naam": {  # included this missing object
+                                "volledigeNaam": None,  # included this missing field
+                            },
+                        },
+                    ],
+                    "indicatieVeelBewoners": None,  # included this missing field
+                    "mogelijkeBewoners": [],
+                    "periode": {
+                        "datumTot": "2020-09-24",
+                        "datumVan": "2016-03-02",
+                    },
+                },
+            ],
         }

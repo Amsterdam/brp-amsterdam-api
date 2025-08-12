@@ -48,10 +48,10 @@ class PersonenQuery(BasePersonenQuery):
 
 
 class BaseResponse(TypedDict):
-    type: str
+    pass
 
 
-class PersonenResponse(BaseResponse):
+class PersonenResponse(TypedDict):
     """Stub for the BRP Personen API response"""
 
     type: str
@@ -59,11 +59,20 @@ class PersonenResponse(BaseResponse):
 
 
 class Bewoning(TypedDict):
+    adresseerbaarObjectIdentificatie: str
+    periode: dict[str, str]
     bewoners: list[dict]
     mogelijkeBewoners: list[dict]
+    indicatieVeelBewoners: bool
 
 
-class BewoningenResponse(BaseResponse):
+class BewoningenResponse(TypedDict):
     """Stub for the BRP Bewoningen API response"""
+
+    bewoningen: list[Bewoning]
+
+
+class VerblijfsplaatshistorieResponse(TypedDict):
+    """Stub for the BRP Verblijfsplaatshistorie API response"""
 
     bewoningen: list[Bewoning]

@@ -1,10 +1,12 @@
 from django.conf import settings
 from rest_framework.exceptions import APIException
 
-from haal_centraal_proxy.bevragingen import types
+from haal_centraal_proxy.bevragingen import fields, types
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 
-from .base import BaseHealthCheckView, BaseProxyView, audit_log
+from .base import BaseHealthCheckView, BaseProxyView, audit_log, group_dotted_names
+
+ALL_FIELD_NAMES = fields.read_config("haal_centraal/bewoningen/fields.csv")
 
 
 class BrpBewoningenHealthView(BaseHealthCheckView):
@@ -40,6 +42,12 @@ class BrpBewoningenView(BaseProxyView):
         "datumTot": ParameterPolicy.allow_all,  # for BewoningMetPeriode
         "datumVan": ParameterPolicy.allow_all,  # for BewoningMetPeriode
     }
+
+    top_level_array_fields = [
+        # Hard-coded list here of all array fields (which shouldn't get null-defaults).
+        # This is based on the output of the get-openapi.py script.
+        "bewoningen",
+    ]
 
     def log_access_granted(
         self,
@@ -87,3 +95,12 @@ class BrpBewoningenView(BaseProxyView):
                         **extra,
                     },
                 )
+
+    def _insert_null_values(
+        self, hc_request: types.BaseQuery, hc_response: types.BaseResponse
+    ) -> None:
+        """Insert any null values that the user does have access to.
+        This allows the client to distinguish between having 'no value' instead of 'no access'.
+        """
+        request_fields = group_dotted_names(ALL_FIELD_NAMES)
+        self._include_nulls(request_fields, hc_response)
