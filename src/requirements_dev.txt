@@ -386,6 +386,7 @@ django==5.1.11 \
     #   -r /home/jasper/code/haal-centraal-proxy/src/requirements.in
     #   datapunt-authorization-django
     #   django-cors-headers
+    #   django-csp
     #   django-debug-toolbar
     #   django-extensions
     #   django-healthchecks
@@ -393,6 +394,10 @@ django==5.1.11 \
 django-cors-headers==4.7.0 \
     --hash=sha256:6fdf31bf9c6d6448ba09ef57157db2268d515d94fc5c89a0a1028e1fc03ee52b \
     --hash=sha256:f1c125dcd58479fe7a67fe2499c16ee38b81b397463cf025f0e2c42937421070
+    # via -r /home/jasper/code/haal-centraal-proxy/src/requirements.in
+django-csp==4.0 \
+    --hash=sha256:b27010bb702eb20a3dad329178df2b61a2b82d338b70fbdc13c3a3bd28712833 \
+    --hash=sha256:d5a0a05463a6b75a4f1fc1828c58c89af8db9364d09fc6e12f122b4d7f3d00dc
     # via -r /home/jasper/code/haal-centraal-proxy/src/requirements.in
 django-debug-toolbar==6.0.0 \
     --hash=sha256:0cf2cac5c307b77d6e143c914e5c6592df53ffe34642d93929e5ef095ae56841 \
@@ -681,6 +686,7 @@ packaging==25.0 \
     # via
     #   black
     #   build
+    #   django-csp
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-flask
     #   pytest
