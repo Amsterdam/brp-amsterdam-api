@@ -2,6 +2,7 @@ from pathlib import Path
 
 import environ
 from corsheaders.defaults import default_headers
+from csp.constants import NONE
 from pythonjsonlogger import jsonlogger
 
 env = environ.Env()
@@ -35,6 +36,7 @@ TIME_ZONE = "Europe/Amsterdam"
 INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
+    "csp",
     "rest_framework",
     "haal_centraal_proxy",
     "haal_centraal_proxy.bevragingen",
@@ -45,6 +47,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "csp.middleware.CSPMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -288,6 +291,13 @@ CORS_ALLOWED_ORIGIN_REGEXES = env.list(
 CORS_ALLOW_HEADERS = list(default_headers) + env.list(
     "CORS_ALLOW_HEADERS", default=["x-user", "x-correlation-id", "x-task-description"]
 )
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": [NONE],
+        "frame-ancestors": [NONE],
+    },
+}
 
 HEALTH_CHECKS = {
     "app": lambda request: True,
