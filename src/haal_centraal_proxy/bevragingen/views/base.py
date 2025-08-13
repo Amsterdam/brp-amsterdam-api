@@ -107,6 +107,7 @@ class BaseProxyView(ClientMixin, APIView):
         # Token is validated, extract token scopes that are set by the middleware
         self.user_scopes = set(request.get_token_scopes)
         self.user_id = request.get_token_claims.get("email", request.get_token_subject)
+        self.appid = request.get_token_claims.get("appid")
 
         try:
             # request.data is only available in initial(), not in setup()
@@ -119,6 +120,8 @@ class BaseProxyView(ClientMixin, APIView):
                 "X-Task-Description": self.request.headers["X-Task-Description"],
                 "granted": sorted(self.user_scopes),
             }
+            if self.appid:
+                self.default_log_fields["appid"] = self.appid
         except KeyError as e:
             raise PermissionDenied(
                 f"A required header is missing: {e.args[0]}", code="missingHeaders"
