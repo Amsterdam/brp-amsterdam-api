@@ -34,9 +34,9 @@ azure-identity==1.24.0 \
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
-azure-monitor-opentelemetry==1.6.13 \
-    --hash=sha256:59b1b01e64318d78f0d2909c8fa9b3008dbf88e7ea6e491d2042afa5bbe94971 \
-    --hash=sha256:c6a5b0b73b5639054675aec2a8f215cdb6b7d1e5cb21d93188bbdd55673eca30
+azure-monitor-opentelemetry==1.7.0 \
+    --hash=sha256:937c60e9706f75c77b221979a273a27e811cc6529d6887099f53916719c66dd3 \
+    --hash=sha256:eba75e793a95d50f6e5bc35dd2781744e2c1a5cc801b530b688f649423f2ee00
     # via -r requirements.in
 azure-monitor-opentelemetry-exporter==1.0.0b41 \
     --hash=sha256:b363e6f89c0dee16d02782a310a60d626e4c081ef49d533ff5225a40cbab12cc \
