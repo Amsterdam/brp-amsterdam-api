@@ -26,7 +26,6 @@ SEARCH_INCLUDE_DECEASED = {
 }
 
 SEARCH_ONLY_IN_AMSTERDAM = {
-    "ZoekMetPostcodeEnHuisnummer",
     "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
     "ZoekMetNummeraanduidingIdentificatie",
     "ZoekMetAdresseerbaarObjectIdentificatie",
@@ -36,6 +35,7 @@ SEARCH_ONLY_IN_AMSTERDAM = {
 SCOPE_NATIONWIDE = "benk-brp-landelijk"
 SCOPE_INCLUDE_DECEASED = "benk-brp-inclusief-overledenen"
 SCOPE_ALLOW_CONFIDENTIAL_PERSONS = "benk-brp-inclusief-geheim"
+SCOPE_SEARCH_POSTCODE = "benk-brp-zoekvraag-postcode-huisnummer"
 SCOPE_SEARCH_POSTCODE_NATIONWIDE = "benk-brp-zoekvraag-postcode-huisnummer-landelijk"
 
 # Which fields are allowed per type
@@ -116,7 +116,7 @@ class BrpPersonenView(BaseProxyView):
                     "benk-brp-zoekvraag-nummeraanduiding",
                 },
                 "ZoekMetPostcodeEnHuisnummer": {
-                    "benk-brp-zoekvraag-postcode-huisnummer",
+                    SCOPE_SEARCH_POSTCODE,
                     SCOPE_SEARCH_POSTCODE_NATIONWIDE,
                 },
                 "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving": {
@@ -135,7 +135,7 @@ class BrpPersonenView(BaseProxyView):
                 # Declare all known fields which are supported with a deny-permission (None).
                 # This avoids generating a '400 Bad Request' for unknown fieldnames
                 # instead of '403 Permission Denied' responses.
-                {field_name: None for field_name in sorted(ALL_FIELD_NAMES)}
+                dict.fromkeys(sorted(ALL_FIELD_NAMES))
                 # And override those with the configurations for each known role / "gegevensset".
                 | SCOPES_FOR_FIELDS
             ),
@@ -188,6 +188,15 @@ class BrpPersonenView(BaseProxyView):
     parameter_ruleset_by_type = {}
     for request_type in SEARCH_ONLY_IN_AMSTERDAM:
         parameter_ruleset_by_type[request_type] = disallow_nationwide_municipality_code
+
+    parameter_ruleset_by_type["ZoekMetPostcodeEnHuisnummer"] = {
+        **parameter_ruleset,
+        # Also allow searching outside Amsterdam for postcode search if both scopes are present
+        "gemeenteVanInschrijving": ParameterPolicy(
+            {GEMEENTE_AMSTERDAM_CODE: ParameterPolicy.allow_value},
+            default_scope={SCOPE_SEARCH_POSTCODE_NATIONWIDE},
+        ),
+    }
 
     def get_parameter_ruleset(self, hc_request: types.PersonenQuery) -> dict[str, ParameterPolicy]:
         """Allow a different parameter ruleset for some type of requests."""
@@ -246,6 +255,10 @@ class BrpPersonenView(BaseProxyView):
         if "gemeenteVanInschrijving" not in hc_request and (
             SCOPE_NATIONWIDE not in self.user_scopes
             or hc_request["type"] in SEARCH_ONLY_IN_AMSTERDAM
+            or (
+                SCOPE_SEARCH_POSTCODE in self.user_scopes
+                and hc_request["type"] == "ZoekMetPostcodeEnHuisnummer"
+            )
         ):
             self._add_municipality_filter(hc_request)
 
