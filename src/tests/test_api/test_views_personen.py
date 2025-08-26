@@ -373,7 +373,6 @@ class TestBrpPersonenView:
     @pytest.mark.parametrize(
         "request_type, required_scope",
         [
-            ("ZoekMetPostcodeEnHuisnummer", "benk-brp-zoekvraag-postcode-huisnummer"),
             (
                 "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
                 "benk-brp-zoekvraag-straatnaam-huisnummer",
@@ -383,7 +382,7 @@ class TestBrpPersonenView:
             ("ZoekMetNaamEnGemeenteVanInschrijving", "benk-brp-zoekvraag-naam-gemeente"),
         ],
     )
-    def test_disallow_nationwide_search(
+    def test_disallow_other_municipalities(
         self, requests_mock, api_client, common_headers, request_type, required_scope
     ):
         """Prove that some search entries are only allowed for search within Amsterdam."""
@@ -418,6 +417,74 @@ class TestBrpPersonenView:
             response.data["detail"]
             == "Het veld 'gemeenteVanInschrijving' ondersteunt niet de waarde(s): 0384."
         )
+
+    def test_disallow_nationwide_search_for_postcode(
+        self, requests_mock, api_client, common_headers
+    ):
+        """Prove that searching for postcode without SCOPE_SEARCH_POSTCODE_NATIONWIDE
+        is not allowed."""
+        requests_mock.post(
+            "/lap/api/brp/personen",
+            json=self.RESPONSE_POSTCODE_HUISNUMMER,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer",
+                "benk-brp-landelijk",
+                "benk-brp-gegevensset-1",
+            ]
+        )
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "gemeenteVanInschrijving": "0384",  # Search for another municipality (Diemen)
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 403, response.data
+        assert response.data["code"] == "permissionDenied"
+        assert (
+            response.data["detail"]
+            == "U bent niet geautoriseerd voor gemeenteVanInschrijving = 0384."
+        )
+
+    def test_allow_nationwide_search_for_postcode(self, requests_mock, api_client, common_headers):
+        """Prove that it is possible to search for nationwide postcodes with the correct scopes."""
+        requests_mock.post(
+            "/lap/api/brp/personen",
+            json=self.RESPONSE_POSTCODE_HUISNUMMER,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-postcode-huisnummer-landelijk",
+                "benk-brp-landelijk",
+                "benk-brp-gegevensset-1",
+            ]
+        )
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "gemeenteVanInschrijving": "0384",  # Search for another municipality (Diemen)
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
 
     def test_transform_do_not_allow_deceased_for_bsn_search(self):
         """Prove that 'inclusiefOverledenPersonen' is not automatically added for the scope.
