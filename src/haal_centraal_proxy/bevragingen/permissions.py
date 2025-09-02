@@ -246,6 +246,7 @@ class IsUserScope(BasePermission):
         # This calls into 'authorization_django middleware',
         # and logs when the access wasn't granted.
         missing = sorted(self.needed_scopes - user_scopes)
+        appid = request.get_token_claims.get("appid") if request.get_token_claims else None
         audit_log.info(
             "Denied overall access to '%(path)s', missing %(missing)s",
             {"path": request.path, "missing": ",".join(missing)},
@@ -257,6 +258,7 @@ class IsUserScope(BasePermission):
                 "granted": sorted(user_scopes),
                 "needed": sorted(self.needed_scopes),
                 "missing": missing,
+                "appid": appid,
             },
         )
 
