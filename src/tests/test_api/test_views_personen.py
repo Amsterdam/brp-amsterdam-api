@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import pytest
 from django.urls import reverse
+
 from haal_centraal_proxy.bevragingen.fields import read_dataset_fields_files
 from haal_centraal_proxy.bevragingen.permissions import ParameterPolicy
 from haal_centraal_proxy.bevragingen.views.base import SCOPE_ENCRYPT_BSN
@@ -11,7 +12,6 @@ from haal_centraal_proxy.bevragingen.views.personen import (
     SCOPE_NATIONWIDE,
     BrpPersonenView,
 )
-
 from tests.utils import build_jwt_token
 
 

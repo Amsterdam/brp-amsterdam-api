@@ -1,7 +1,7 @@
 from django.urls import reverse
+
 from haal_centraal_proxy.bevragingen import encryption
 from haal_centraal_proxy.bevragingen.views.base import SCOPE_ENCRYPT_BSN
-
 from tests.utils import build_jwt_token
 
 
