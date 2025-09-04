@@ -85,3 +85,4 @@ verblijfstitel.aanduiding
 verblijfstitel.datumEinde
 verblijfstitel.datumIngang
 indicatieCurateleRegister
+gezag
