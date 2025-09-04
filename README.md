@@ -15,7 +15,7 @@ This service does this based on policy files (tbd, but likely in "Amsterdam Sche
 
 Requirements:
 
-* Python >= 3.12
+* Python >= 3.13
 * Recommended: Docker/Docker Compose (or pyenv for local installs)
 
 ## Using Docker Compose
@@ -194,8 +194,8 @@ In a similar way, *pyenv* helps to install the exact Python version,
 and will automatically activate the virtualenv when a `.python-version` file is found:
 
 ```shell
-pyenv install 3.12.4
-pyenv virtualenv 3.12.4 haal-centraal-proxy
+pyenv install 3.13
+pyenv virtualenv 3.13 haal-centraal-proxy
 echo haal-centraal-proxy > .python-version
 ```
 
