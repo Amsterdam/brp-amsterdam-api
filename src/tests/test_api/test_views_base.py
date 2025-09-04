@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
-from haal_centraal_proxy.bevragingen.views.base import group_dotted_names
 
+from haal_centraal_proxy.bevragingen.views.base import group_dotted_names
 from tests.utils import build_jwt_token
 
 

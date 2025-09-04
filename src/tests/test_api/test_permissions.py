@@ -1,4 +1,5 @@
 import pytest
+
 from haal_centraal_proxy.bevragingen.permissions import (
     AccessDenied,
     InvalidParameters,
