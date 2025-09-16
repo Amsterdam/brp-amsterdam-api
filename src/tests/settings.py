@@ -1,4 +1,4 @@
-from haal_centraal_proxy.settings import *  # noqa: F403, F405
+from brp_amsterdam_api.settings import *  # noqa: F403, F405
 
 # The reason the settings are defined here, is to make them independent
 # of the regular project sources. Otherwise, the project needs to have

@@ -1,0 +1,17 @@
+datumVan
+datumTot
+functieAdres
+functieAdres.code
+functieAdres.omschrijving
+verblijfadres
+verblijfadres.locatiebeschrijving
+verblijfadres.inOnderzoek
+gemeenteVanInschrijving
+gemeenteVanInschrijving.code
+gemeenteVanInschrijving.omschrijving
+verblijftNietOpAdresVanaf
+inOnderzoek
+adressering
+adressering.adresregel1
+adressering.adresregel2
+adressering.inOnderzoek

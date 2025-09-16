@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 
-from haal_centraal_proxy.bevragingen.views.base import group_dotted_names
+from brp_amsterdam_api.bevragingen.views.base import group_dotted_names
 from tests.utils import build_jwt_token
 
 
@@ -115,7 +115,7 @@ class TestBaseProxyView:
         ["application/json", "application/problem+json", "application/json;charset=utf-8"],
     )
     def test_error_response(self, api_client, requests_mock, caplog, common_headers, content_type):
-        """Prove that Haal Centraal errors are handled gracefully for all known content-types"""
+        """Prove that RvIG BRP API errors are handled gracefully for all known content-types"""
         requests_mock.post(
             "/lap/api/brp/personen",
             json={

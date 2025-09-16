@@ -1,6 +1,6 @@
 import pytest
 
-from haal_centraal_proxy.bevragingen.permissions import (
+from brp_amsterdam_api.bevragingen.permissions import (
     AccessDenied,
     InvalidParameters,
     InvalidValues,

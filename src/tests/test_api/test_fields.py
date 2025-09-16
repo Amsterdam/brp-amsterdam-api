@@ -1,7 +1,7 @@
 import pytest
 
-from haal_centraal_proxy.bevragingen import fields
-from haal_centraal_proxy.bevragingen.fields import compact_fields_values, read_dataset_fields_files
+from brp_amsterdam_api.bevragingen import fields
+from brp_amsterdam_api.bevragingen.fields import compact_fields_values, read_dataset_fields_files
 
 
 class TestReadConfiguration:

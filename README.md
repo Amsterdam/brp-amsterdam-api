@@ -1,15 +1,15 @@
-# Haal Centraal API
+# BRP Amsterdam API
 
-This is a proxy service to connect to the Haal Centraal API.
+This is a proxy service to connect to the RvIG BRP API.
 It filters requests and enforces token-based authorization.
 
 # Reason
 
-Haal Centraal offers national services for accessing government data.
+Rijksdienst voor Identiteitsgegevens (RvIG) offers national services for accessing government data.
 These services are designed to support broad access, and don't offer much refined authorization policies.
 Such feature has to be implemented by each municipality that implements the API.
 
-This service does this based on policy files (tbd, but likely in "Amsterdam Schema").
+This service does this based on policy files.
 
 # Installation
 
@@ -54,7 +54,7 @@ export DJANGO_DEBUG=true
 
 ## Example Requests
 
-Example request (directly to the Haal Centraal Mock API):
+Example request (directly to the BRP Personen Mock API):
 
     curl -X POST http://localhost:5010/haalcentraal/api/brp/personen -H 'Content-Type: application/json' -d '{"type": "ZoekMetPostcodeEnHuisnummer", "postcode": "1074VE", "huisnummer": 1, "fields": ["naam"]}'
 
@@ -73,7 +73,7 @@ Same for search by BSN:
 The *type* field is required for all request types.
 The *fields* parameter is not required in the proxy, as it will be generated based on your token scopes.
 
-All possible parameters are documented in the [Haal Centraal documentation](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/).
+All possible parameters are documented in the [RvIG BRP documentation](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/).
 
 
 ## Applied Request Transformations
@@ -93,7 +93,7 @@ but specifying *true* requires the token scope to be there.
 
 The *personen* endpoint will transform the responses:
 
-By default, Haal Centraal [hides empty/null/false values](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#geennullfalse-waarde-leeg-object-waarde-en-standaard-waarde).
+By default, BRP API [hides empty/null/false values](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/v2/features-overzicht#geennullfalse-waarde-leeg-object-waarde-en-standaard-waarde).
 This can be overwritten by adding ``?resultaat-formaat=volledig`` to the URL,
 so explicit `null` values or empty arrays are included.
 As such, clients can detect whether a field was actually empty, or omitted due to permissions.
@@ -139,7 +139,7 @@ The following environment variables are useful for configuring a local developme
 
 * `BRP_OAUTH_TOKEN_URL` should be the endpoint for requesting OAuth tokens.
 * `BRP_URL` base endpoint for the BRP API's. This also works as default for the endpoints:
-  * `BRP_PERSONEN_URL` endpoint for the Haal Centraal BRP Personen API.
+  * `BRP_PERSONEN_URL` endpoint for the RvIG BRP Personen API.
   * `BRP_BEWONINGEN_URL` endpoint for the BRP occupancy URL.
   * `BRP_VERBLIJFPLAATSHISTORIE_URL` endpoint for the address history URL.
 * `BRP_MTLS_CERT_FILE` the mTLS client certificate.
@@ -167,7 +167,7 @@ The values for these can be found in the [Aansluitinstructies via Diginetwerk vo
 * `CORS_ALLOW_HEADERS` allows additional headers in the request.
 * `CORS_ALLOWED_ORIGINS` allows a list of origin URLs to use.
 * `CORS_ALLOWED_ORIGIN_REGEXES` supports a list of regex patterns fow allowed origins.
-* `HAAL_CENTRAAL_BRP_ENCRYPTION_SALTS` a list of salts used to encrypt data. The first item will be used to encrypt
+* `BRP_ENCRYPTION_SALTS` a list of salts used to encrypt data. The first item will be used to encrypt
    new values, the other values can be used for rotation.
 
 # Developer Notes
@@ -195,8 +195,8 @@ and will automatically activate the virtualenv when a `.python-version` file is 
 
 ```shell
 pyenv install 3.13
-pyenv virtualenv 3.13 haal-centraal-proxy
-echo haal-centraal-proxy > .python-version
+pyenv virtualenv 3.13 brp-amsterdam-api
+echo brp-amsterdam-api > .python-version
 ```
 
 ## Testing Connectivity
@@ -226,7 +226,7 @@ We've found these to be useful:
 | inOnderzoek                | 999990378 |
 | Nationaliteit onbekend     | 999993367 |
 
-The acceptance environment (proefomgeving) of Haal Centraal uses a different [GABA-V test dataset](https://www.rvig.nl/media/288)
+The acceptance environment (proefomgeving) of RvIG uses a different [GABA-V test dataset](https://www.rvig.nl/media/288)
 to simulate the production environment in the best possible way.
 
 Also note that this proxy can limit the results.
