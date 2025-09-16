@@ -3,7 +3,7 @@ services:
     # from https://github.com/BRP-API/Haal-Centraal-BRP-bevragen/blob/master/docker-compose-mock.yml
     container_name: personen-mock
     build:
-      dockerfile: ./src/haal_centraal_mock/Dockerfile
+      dockerfile: src/brp_personen_mock/Dockerfile
       args:
         - JSON_URL=https://raw.githubusercontent.com/BRP-API/personen-informatie-service/refs/heads/main/src/config/BrpService/test-data.json
     environment:
@@ -26,7 +26,7 @@ services:
     depends_on:
       - personen-mock
     environment:
-      UWSGI_STATIC_MAP: "/haal_centraal_proxy/static=/static"
+      UWSGI_STATIC_MAP: "/brp_amsterdam_api/static=/static"
       SECRET_KEY: insecure
       #DATABASE_URL: "${DATABASE_URL:-postgresql://postgres:insecure@database/dataservices}"
       CORS_ALLOW_ALL_ORIGINS: "${CORS_ALLOW_ALL_ORIGINS:-true}"

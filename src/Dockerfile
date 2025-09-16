@@ -14,7 +14,7 @@ RUN python -m pip install --no-cache-dir --no-deps -r $PIP_REQUIREMENTS
 
 # Start runtime image,
 FROM python:3.13-slim-bullseye
-RUN useradd -U -r haalcentraalapi
+RUN useradd -U -r brpamsterdamapi
 RUN apt update && apt install --no-install-recommends -y \
     curl \
     netcat-openbsd
@@ -28,10 +28,10 @@ COPY . ./
 COPY config/ca/* /usr/local/share/ca-certificates/
 
 # Have some defaults so the container is easier to start
-ENV DJANGO_SETTINGS_MODULE=haal_centraal_proxy.settings \
+ENV DJANGO_SETTINGS_MODULE=brp_amsterdam_api.settings \
     DJANGO_DEBUG=false \
     UWSGI_HTTP_SOCKET=:8000 \
-    UWSGI_MODULE=haal_centraal_proxy.wsgi \
+    UWSGI_MODULE=brp_amsterdam_api.wsgi \
     UWSGI_CALLABLE=application \
     UWSGI_MASTER=1 \
     REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
@@ -41,5 +41,5 @@ RUN python manage.py collectstatic --noinput \
  && update-ca-certificates --verbose
 
 EXPOSE 8000
-USER haalcentraalapi
+USER brpamsterdamapi
 CMD ["uwsgi"]
