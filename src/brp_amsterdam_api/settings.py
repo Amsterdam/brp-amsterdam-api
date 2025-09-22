@@ -289,7 +289,8 @@ CORS_ALLOWED_ORIGIN_REGEXES = env.list(
     ),
 )
 CORS_ALLOW_HEADERS = list(default_headers) + env.list(
-    "CORS_ALLOW_HEADERS", default=["x-user", "x-correlation-id", "x-task-description"]
+    "CORS_ALLOW_HEADERS",
+    default=["x-user", "x-correlation-id", "x-task-description", "accept-gezag-version"],
 )
 
 CONTENT_SECURITY_POLICY = {
