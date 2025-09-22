@@ -745,7 +745,7 @@ class TestBrpPersonenView:
         for record in caplog.records:
             if "retrieved using" in record.message:
                 assert all(
-                    getattr(record, attr) for attr in ["request", "hc_request", "hc_response"]
+                    getattr(record, attr) for attr in ["request", "hcRequest", "hcResponse"]
                 )
 
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):

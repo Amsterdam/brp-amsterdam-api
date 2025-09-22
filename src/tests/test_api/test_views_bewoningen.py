@@ -70,7 +70,7 @@ class TestBrpBewoningenView:
         for record in caplog.records:
             if "retrieved using" in record.message:
                 assert all(
-                    getattr(record, attr) for attr in ["request", "hc_request", "hc_response"]
+                    getattr(record, attr) for attr in ["request", "hcRequest", "hcResponse"]
                 )
 
     def test_address_id_search_deny(self, api_client, common_headers):
