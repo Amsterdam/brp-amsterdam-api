@@ -72,10 +72,10 @@ class BrpBewoningenView(BaseProxyView):
                 msg_params = {}
                 extra = {
                     "request": request.data,
-                    "hc_request": hc_request,
-                    "hc_response": final_response or hc_response,
+                    "hcRequest": hc_request,
+                    "hcResponse": final_response or hc_response,
                 }
-                msg = ["User %(user)s retrieved using '%(service)s.%(query_type)s':"]
+                msg = ["User %(upn)s retrieved using '%(service)s.%(queryType)s':"]
                 msg_params["burgerservicenummer"] = persoon.get("burgerservicenummer", "?")
                 extra["burgerservicenummer"] = persoon.get("burgerservicenummer", None)
                 msg.append("burgerservicenummer=%(burgerservicenummer)s")
@@ -85,8 +85,8 @@ class BrpBewoningenView(BaseProxyView):
                     " ".join(msg),
                     {
                         "service": self.service_log_id,
-                        "query_type": hc_request["type"],
-                        "user": self.user_id,
+                        "queryType": hc_request["type"],
+                        "upn": self.upn,
                         **msg_params,
                     },
                     # Extra JSON fields for log querying

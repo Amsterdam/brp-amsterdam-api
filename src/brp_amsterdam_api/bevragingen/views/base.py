@@ -106,18 +106,18 @@ class BaseProxyView(ClientMixin, APIView):
 
         # Token is validated, extract token scopes that are set by the middleware
         self.user_scopes = set(request.get_token_scopes)
-        self.user_id = request.get_token_claims.get("email", request.get_token_subject)
+        self.upn = request.get_token_claims.get("email", request.get_token_subject)
         self.appid = request.get_token_claims.get("appid")
 
         try:
             # request.data is only available in initial(), not in setup()
             self.default_log_fields = {
                 "service": self.service_log_id,
-                "query_type": request.data.get("type", None),
-                "user": self.user_id,
-                "X-User": self.request.headers["X-User"],
-                "X-Correlation-ID": self.request.headers["X-Correlation-ID"],
-                "X-Task-Description": self.request.headers["X-Task-Description"],
+                "queryType": request.data.get("type", None),
+                "upn": self.upn,
+                "user": self.request.headers["X-User"],
+                "correlationId": self.request.headers["X-Correlation-ID"],
+                "taskDescription": self.request.headers["X-Task-Description"],
                 "granted": sorted(self.user_scopes),
             }
             if self.appid:
@@ -272,11 +272,11 @@ class BaseProxyView(ClientMixin, APIView):
         """Perform the audit logging for the denied request."""
         missing = sorted(err.needed_scopes - self.user_scopes)
         audit_log.info(
-            "Denied access to '%(service)s.%(query_type)s'"
+            "Denied access to '%(service)s.%(queryType)s'"
             " for %(field)s=%(values)s, missing %(missing)s",
             {
                 "service": self.service_log_id,
-                "query_type": hc_request["type"],
+                "queryType": hc_request["type"],
                 "field": err.field_name,
                 "values": ",".join(err.denied_values),
                 "missing": ",".join(missing),
@@ -287,9 +287,9 @@ class BaseProxyView(ClientMixin, APIView):
                 "values": err.denied_values,
                 "needed": sorted(err.needed_scopes),
                 "missing": missing,
-                "request_started": self.start_date,
-                "request_processed": now(),
-                "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
+                "requestStarted": self.start_date,
+                "requestProcessed": now(),
+                "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
             },
         )
 
@@ -311,35 +311,31 @@ class BaseProxyView(ClientMixin, APIView):
             **self.default_log_fields,
             "needed": sorted(needed_scopes),
             "request": request.data,
-            "hc_request": hc_request,
-            "hc_response": final_response or hc_response,
-            "request_started": self.start_date,
-            "request_processed": now(),
-            "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
+            "hcRequest": hc_request,
+            "hcResponse": final_response or hc_response,
+            "requestStarted": self.start_date,
+            "requestProcessed": now(),
+            "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
         }
 
         if exception is None:
             msg = (
-                "Access granted for '%(service)s.%(query_type)s' to '%(user)s'"
+                "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
                 " (full request/response in detail)"
             )
         else:
             msg = (
-                "Access granted for '%(service)s.%(query_type)s' to '%(user)s'"
+                "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
                 ", but error returned (full request/response in detail)"
             )
             extra["exception"] = str(exception)
 
-        # user.AuthenticatedId is already added globally.
-        # TODO:
-        # - afnemerindicatie (client certificaat)
-        # - session ID van afnemende applicatie.
         audit_log.info(
             msg,
             {
                 "service": self.service_log_id,
-                "query_type": hc_request["type"],
-                "user": self.user_id,
+                "queryType": hc_request["type"],
+                "upn": self.upn,
             },
             extra=extra,
         )
@@ -349,19 +345,19 @@ class BaseProxyView(ClientMixin, APIView):
     ) -> None:
         """Perform the audit logging for the denied request."""
         audit_log.info(
-            "Denied access to '%(service)s.%(query_type)s'"
+            "Denied access to '%(service)s.%(queryType)s'"
             " for unencrypted burgerservicenummer with scopes %(scopes)s",
             {
                 "service": self.service_log_id,
-                "query_type": hc_request["type"],
+                "queryType": hc_request["type"],
                 "scopes": list(self.user_scopes),
             },
             extra={
                 **self.default_log_fields,
                 "field": "burgerservicenummer",
-                "request_started": self.start_date,
-                "request_processed": now(),
-                "processing_time": (time.perf_counter_ns() - self.start_time) * 1e-9,
+                "requestStarted": self.start_date,
+                "requestProcessed": now(),
+                "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
             },
         )
 

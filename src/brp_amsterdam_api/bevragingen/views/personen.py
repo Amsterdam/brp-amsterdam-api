@@ -222,10 +222,10 @@ class BrpPersonenView(BaseProxyView):
                 msg_params = {}
                 extra = {
                     "request": request.data,
-                    "hc_request": hc_request,
-                    "hc_response": final_response or hc_response,
+                    "hcRequest": hc_request,
+                    "hcResponse": final_response or hc_response,
                 }
-                msg = ["User %(user)s retrieved using '%(service)s.%(query_type)s':"]
+                msg = ["User %(upn)s retrieved using '%(service)s.%(queryType)s':"]
                 for id_field in self.always_insert_id_fields:
                     msg_params[id_field] = persoon.get(id_field, "?")
                     extra[id_field] = persoon.get(id_field, None)
@@ -236,8 +236,8 @@ class BrpPersonenView(BaseProxyView):
                     " ".join(msg),
                     {
                         "service": self.service_log_id,
-                        "query_type": hc_request["type"],
-                        "user": self.user_id,
+                        "queryType": hc_request["type"],
+                        "upn": self.upn,
                         **msg_params,
                     },
                     # Extra JSON fields for log querying
