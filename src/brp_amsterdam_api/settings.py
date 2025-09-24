@@ -360,11 +360,11 @@ BRP_MTLS_CERT_FILE = env.str("BRP_MTLS_CERT_FILE", None)
 # Proefomgeving URLs (NPR: Niet Productie):
 BRP_OAUTH_TOKEN_URL = env.str(
     "BRP_OAUTH_TOKEN_URL",
-    default="https://auth.npr.idm.diginetwerk.net/nidp/oauth/nam/token",
+    default="",
 )
 BRP_URL = env.str(
     "BRP_URL",
-    default="https://apigw.npr.idm.diginetwerk.net/lap/api/brp",
+    default="",
 )
 BRP_PERSONEN_URL = env.str("BRP_PERSONEN_URL", default=f"{BRP_URL}/personen")
 BRP_BEWONINGEN_URL = env.str("BRP_BEWONINGEN_URL", default=f"{BRP_URL}/bewoning/bewoningen")
