@@ -10,6 +10,7 @@ from brp_amsterdam_api.bevragingen.loghandler import (
     BRPAuditLogHandler,
 )
 from brp_amsterdam_api.bevragingen.views.base import audit_log
+from brp_amsterdam_api.settings import CustomJsonFormatter
 from tests.utils import build_jwt_token
 
 
@@ -43,9 +44,11 @@ class TestAuditLogHandler:
         settings.AZURE_DATA_COLLECTION_ENDPOINT = "mock-endpoint"
         settings.AZURE_DATA_COLLECTION_RULE_ID = "mock-rule-id"
         settings.AZURE_DATA_COLLECTION_STREAM_NAME = "mock-stream-name"
+        settings.MANAGED_IDENTITY_CLIENT_ID = "mock-client-id"
 
         handler = BRPAuditLogHandler()
         handler.setLevel(logging.DEBUG)
+        handler.setFormatter(CustomJsonFormatter("%(asctime)s $(levelname)s %(name)s %(message)s"))
         audit_log.addHandler(handler)
 
         yield
