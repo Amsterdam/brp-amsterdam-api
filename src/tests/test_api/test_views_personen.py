@@ -742,6 +742,7 @@ class TestBrpPersonenView:
             assert log_message in log_messages
 
         # Log messages about retrieved BSN's should contain the full request/response context
+        assert any("retrieved using" in record.message for record in caplog.records)
         for record in caplog.records:
             if "retrieved using" in record.message:
                 assert all(
