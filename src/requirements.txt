@@ -357,9 +357,9 @@ datapunt-authorization-django==1.6.2 \
     --hash=sha256:19f3ec1b942dce49ea92894866a6ccd5653f578899a0383bc466c5db8052f77a \
     --hash=sha256:c3e2a256f105230e1a5a5b142f72894120e91e5fbb79d6f7a6465c86ccb21723
     # via -r requirements.in
-django==5.2.6 \
-    --hash=sha256:60549579b1174a304b77e24a93d8d9fafe6b6c03ac16311f3e25918ea5a20058 \
-    --hash=sha256:da5e00372763193d73cecbf71084a3848458cecf4cee36b9a1e8d318d114a87b
+django==5.2.7 \
+    --hash=sha256:59a13a6515f787dec9d97a0438cd2efac78c8aca1c80025244b0fe507fe0754b \
+    --hash=sha256:e0f6f12e2551b1716a95a63a1366ca91bbcd7be059862c1b18f989b1da356cdd
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
