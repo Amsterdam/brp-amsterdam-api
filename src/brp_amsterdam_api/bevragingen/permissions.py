@@ -252,9 +252,9 @@ class IsUserScope(BasePermission):
             {"path": request.path, "missing": ",".join(missing)},
             extra={
                 "path": request.path,
-                "X-User": request.headers.get("X-User", None),
-                "X-Correlation-ID": request.headers.get("X-Correlation-ID", None),
-                "X-Task-Description": request.headers.get("X-Task-Description", None),
+                "user": request.headers.get("X-User", None),
+                "correlationId": request.headers.get("X-Correlation-ID", None),
+                "taskDescription": request.headers.get("X-Task-Description", None),
                 "granted": sorted(user_scopes),
                 "needed": sorted(self.needed_scopes),
                 "missing": missing,
