@@ -14,9 +14,11 @@ adressering.aanschrijfwijze.aanspreekvorm
 adressering.aanschrijfwijze.naam
 adressering.gebruikInLopendeTekst
 leeftijd
+partners.burgerservicenummer
 partners.naam.voorletters
 partners.naam.voorvoegsel
 partners.naam.geslachtsnaam
+partners.geboorte.datum
 partners.aangaanHuwelijkPartnerschap.datum
 partners.ontbindingHuwelijkPartnerschap.datum
 overlijden.datum
