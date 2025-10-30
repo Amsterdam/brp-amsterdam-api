@@ -6,6 +6,8 @@ naam.adellijkeTitelPredicaat
 naam.voorvoegsel
 naam.geslachtsnaam
 geboorte.datum
+geboorte.plaats
+geboorte.land
 geslacht
 naam.aanduidingNaamgebruik
 naam.volledigeNaam

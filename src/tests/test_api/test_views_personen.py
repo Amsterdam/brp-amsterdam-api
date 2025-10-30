@@ -229,6 +229,8 @@ class TestBrpPersonenView:
                     "datumInschrijvingInGemeente": None,
                     "geboorte": {  # included this missing object
                         "datum": None,  # included this missing field
+                        "land": None,
+                        "plaats": None,
                     },
                     "immigratie": {  # included this missing object
                         "datumVestigingInNederland": None,  # included this missing field
