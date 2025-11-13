@@ -41,7 +41,7 @@ class ParameterPolicy:
 
     #: A specific scope for each value. Multiple values acts as OR.
     #: The user needs to have one of the listed scopes.
-    scopes_for_values: dict[str | None, set[str] | None] = field(default_factory=dict)
+    scopes_for_values: dict[str | bool | None, set[str] | None] = field(default_factory=dict)
 
     #: A default scope in case the value is missing in the :attr:`scopes_for_values`.
     default_scope: set[str] | None = None
@@ -86,7 +86,7 @@ class ParameterPolicy:
         return [
             (re.compile(re.escape(key).replace(r"\*", ".+")), roles)
             for key, roles in self.scopes_for_values.items()
-            if key.endswith("*")
+            if isinstance(key, str) and key.endswith("*")
         ]
 
     def validate_values(
