@@ -1,3 +1,4 @@
+import json
 from copy import deepcopy
 
 import pytest
@@ -532,6 +533,87 @@ class TestBrpPersonenView:
             "gemeenteVanInschrijving": "0363",  # added (missing scope to seek outside Amsterdam)
             "inclusiefOverledenPersonen": True,
         }
+
+    def test_inclusief_overleden_personen_accepts_booleans(
+        self, requests_mock, api_client, common_headers
+    ):
+        """Prove that 'inclusiefOverledenPersonen' accepts boolean values from JSON."""
+        requests_mock.post(
+            "/lap/api/brp/personen",
+            json=self.RESPONSE_POSTCODE_HUISNUMMER,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                SCOPE_INCLUDE_DECEASED,
+            ]
+        )
+        json_data = json.loads(
+            '{"type": "RaadpleegMetBurgerservicenummer","inclusiefOverledenPersonen": false}'
+        )
+        response = api_client.post(
+            url,
+            data=json_data,
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
+
+        json_data = json.loads(
+            '{"type": "RaadpleegMetBurgerservicenummer","inclusiefOverledenPersonen": true}'
+        )
+        response = api_client.post(
+            url,
+            data=json_data,
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
+
+    def test_inclusief_overleden_personen_disallows_strings(
+        self, requests_mock, api_client, common_headers
+    ):
+        """Prove that 'inclusiefOverledenPersonen' does not accept string values."""
+        requests_mock.post(
+            "/lap/api/brp/personen",
+            json=self.RESPONSE_POSTCODE_HUISNUMMER,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-zoekvraag-bsn",
+                "benk-brp-gegevensset-1",
+                SCOPE_INCLUDE_DECEASED,
+            ]
+        )
+        json_data = json.loads(
+            '{"type": "RaadpleegMetBurgerservicenummer","inclusiefOverledenPersonen": "false"}'
+        )
+        response = api_client.post(
+            url,
+            data=json_data,
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 400, response.data
+        assert (
+            response.data["detail"]
+            == "Het veld 'inclusiefOverledenPersonen' ondersteunt niet de waarde(s): false."
+        )
 
     def test_transform_add_fields(self, gegevensset_1):
         """Prove that 'fields' and 'gemeente-filter is added."""

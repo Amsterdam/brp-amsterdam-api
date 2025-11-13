@@ -161,8 +161,8 @@ class BrpPersonenView(BaseProxyView):
         "burgerservicenummer": ParameterPolicy.for_all_values({"benk-brp-zoekvraag-bsn"}),
         "inclusiefOverledenPersonen": ParameterPolicy(
             scopes_for_values={
-                "true": {SCOPE_INCLUDE_DECEASED},
-                "false": ParameterPolicy.allow_value,
+                True: {SCOPE_INCLUDE_DECEASED},
+                False: ParameterPolicy.allow_value,
             }
         ),
         "gemeenteVanInschrijving": ParameterPolicy(
