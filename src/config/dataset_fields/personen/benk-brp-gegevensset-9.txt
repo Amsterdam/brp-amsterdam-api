@@ -32,6 +32,7 @@ partners.naam.geslachtsnaam
 partners.geboorte.datum
 partners.aangaanHuwelijkPartnerschap.datum
 partners.ontbindingHuwelijkPartnerschap.datum
+partners.soortVerbintenis
 overlijden.datum
 gemeenteVanInschrijving
 datumInschrijvingInGemeente
