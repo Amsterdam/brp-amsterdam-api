@@ -6,7 +6,7 @@ django-healthchecks == 1.5.0
 #amsterdam-schema-tools[django] == 6.0.1
 datapunt-authorization-django == 1.6.2
 djangorestframework == 3.16.1
-python-json-logger==3.3.0
+python-json-logger==4.0.0
 requests == 2.32.5
 requests-oauthlib == 2.0.0
 #sentry-sdk == 2.13.0
