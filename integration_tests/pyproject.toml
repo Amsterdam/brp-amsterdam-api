@@ -1,0 +1,10 @@
+[project]
+name = "brp-amsterdam-integration-tests"
+version = "0.1.0"
+description = "Integration tests to validate deployment and integration with the RvIG Backend of the BRP Amsterdam API"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "click>=8.3.1",
+    "locust>=2.43.1",
+]
