@@ -116,6 +116,7 @@ class BrpClient:
                 "Accept": "application/json; charset=utf-8",
                 "User-Agent": USER_AGENT,
             },
+            timeout=5,
         )
         self._cache_token(token)
         return token
