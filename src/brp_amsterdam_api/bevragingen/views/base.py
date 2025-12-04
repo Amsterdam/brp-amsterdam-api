@@ -62,14 +62,17 @@ class BaseHealthCheckView(ClientMixin, APIView):
     dummy_request = {"type": "healthcheck"}
 
     def get(self, request, *args, **kwargs):
+        client = self.get_client()
         try:
-            client = self.get_client()
             hc_response = client.call(self.dummy_request)
         except RemoteAPIException as e:
             success = e.detail == "De foutieve parameter(s) zijn: type."
             return Response({"success": success, "response": e.remote_json})
         except (APIException, OSError) as e:
-            return Response({"success": False, "exception": str(e)})
+            logger.error(
+                "Proxy call to %s failed, error when connecting to server: %s", client.host, e
+            )
+            return Response({"success": False, "exception": f"Proxy call to {client.host} failed"})
 
         return Response({"success": True, "response": hc_response})
 
