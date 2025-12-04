@@ -1,7 +1,6 @@
 """Client for RvIG BRP API."""
 
 import logging
-import time
 from typing import TypedDict
 from urllib.parse import urlparse
 
@@ -17,7 +16,14 @@ from requests_oauthlib import OAuth2Session
 from rest_framework import status
 from rest_framework.exceptions import APIException, NotFound
 
-from .exceptions import BadGateway, GatewayTimeout, RemoteAPIException, ServiceUnavailable
+from brp_amsterdam_api.bevragingen.exceptions import (
+    BadGateway,
+    GatewayTimeout,
+    RemoteAPIException,
+    ServiceUnavailable,
+)
+
+from .base import BaseBrpClient
 
 logger = logging.getLogger(__name__)
 
@@ -31,14 +37,12 @@ class OAuthToken(TypedDict):
     scope: str
 
 
-class BrpClient:
+class RvIGBrpClient(BaseBrpClient):
     """RvIG BRP API client.
 
     When a reference to the client is kept globally,
     its HTTP connection pool can be reused between threads.
     """
-
-    endpoint_url: URL
 
     def __init__(
         self,
@@ -99,26 +103,33 @@ class BrpClient:
         if cert_file is not None:
             self._session.cert = (cert_file, key_file)
 
-    def __repr__(self):
-        return f"<{self.__class__.__qualname__}: {self.endpoint_url}>"
-
     def fetch_token(self) -> OAuthToken:
         """Retrieve the access token.
         This is a server-side OAuth call, which doesn't redirect the user.
         It but immediately returns the token.
         """
         # The retrieved token is also stored in self._session.token.
-        token = self._session.fetch_token(
-            self.oauth_endpoint_url,
-            client_secret=self._client_secret,
-            include_client_id=True,  # not using "Authorization: Basic" header but POST params
-            resourceServer="ResourceServer01",
-            headers={
-                "Accept": "application/json; charset=utf-8",
-                "User-Agent": USER_AGENT,
-            },
-            timeout=5,
-        )
+        host = self.oauth_endpoint_url
+        try:
+            token = self._session.fetch_token(
+                self.oauth_endpoint_url,
+                client_secret=self._client_secret,
+                include_client_id=True,  # not using "Authorization: Basic" header but POST params
+                resourceServer="ResourceServer01",
+                headers={
+                    "Accept": "application/json; charset=utf-8",
+                    "User-Agent": USER_AGENT,
+                },
+                timeout=5,
+            )
+        except (TimeoutError, Timeout) as e:
+            # Socket timeout
+            logger.error("Proxy call to %s failed, timeout from remote server: %s", host, e)
+            raise GatewayTimeout() from e
+        except OSError as e:
+            # Socket connect / SSL error.
+            logger.error("Proxy call to %s failed, error when connecting to server: %s", host, e)
+            raise ServiceUnavailable(str(e)) from e
         self._cache_token(token)
         return token
 
@@ -129,81 +140,11 @@ class BrpClient:
         logger.debug("Caching OAuth access token for %d seconds", timeout)
         cache.set("rvig-token", token, timeout=timeout)
 
-    def call(self, hc_request: dict | None = None) -> requests.Response:
-        """Make an HTTP GET call. kwargs are passed to pool.request."""
-        logger.debug("calling %s", self.endpoint_url)
-        t0 = time.perf_counter_ns()
-        host = None
-        try:
-            # Request the token if needed
-            if self._client_secret is not None and not self._session.token:
-                logger.debug("No OAuth token stored yet, retrieving new OAuth token")
-                host = self.oauth_endpoint_url
-                self.fetch_token()
-
-            # Using urllib directly instead of requests for performance
-            host = self._host
-            response: requests.Response = self._session.request(
-                "POST",
-                self.endpoint_url,
-                json=hc_request,
-                timeout=60,
-                headers={
-                    # "Authorization": "Bearer <oauthtoken>" is inserted by requests-oauthlib
-                    "Accept": "application/json; charset=utf-8",
-                    "Content-Type": "application/json; charset=utf-8",
-                    "User-Agent": USER_AGENT,
-                },
-            )
-        except InvalidClientError as e:
-            # OAuth client credentials are invalid.
-            logger.error("Proxy call to %s failed, invalid OAuth client credentials: %s", host, e)
-            raise ServiceUnavailable() from e
-        except (TimeoutError, Timeout) as e:
-            # Socket timeout
-            logger.error("Proxy call to %s failed, timeout from remote server: %s", host, e)
-            raise GatewayTimeout() from e
-        except (OSError, ConnectionError) as e:
-            # Socket connect / SSL error.
-            logger.error("Proxy call to %s failed, error when connecting to server: %s", host, e)
-            raise ServiceUnavailable() from e
-
-        # Log response and timing results
-        level = logging.ERROR if response.status_code >= 400 else logging.INFO
-        logger.log(
-            level,
-            "Proxy call to %s, status %s: %s (%s), took: %.3fs",
-            self.endpoint_url,
-            response.status_code,
-            response.reason,
-            response.headers.get("content-type"),
-            (time.perf_counter_ns() - t0) * 1e-9,
-        )
-
-        if 200 <= response.status_code < 300:
-            return response
-
-        # We got an error.
-        if logger.isEnabledFor(logging.DEBUG):
-            content_type = response.headers.get("content-type", "")
-            if content_type and "json" in content_type and response.content.startswith(b'{"'):
-                # For application/json and application/problem+json,
-                logger.debug(
-                    "  Decoded JSON response body",
-                    extra={
-                        "hc_request": hc_request,
-                        "hc_response": orjson.loads(response.content),
-                    },
-                )
-            else:
-                logger.debug("  Response body: %s", response.text)
-
-        # Raise exception in nicer format, but chain with the original one
-        # so the "response" object is still accessible via __cause__.response.
-        try:
-            response.raise_for_status()
-        except requests.HTTPError as e:
-            raise self._get_http_error(response) from e
+    def _prepare_request(self):
+        # Request the token if needed
+        if self._client_secret is not None and not self._session.token:
+            logger.debug("No OAuth token stored yet, retrieving new OAuth token")
+            self.fetch_token()
 
     @property
     def host(self) -> str:
