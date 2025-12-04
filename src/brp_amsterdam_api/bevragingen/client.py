@@ -161,7 +161,7 @@ class BrpClient:
         except OSError as e:
             # Socket connect / SSL error.
             logger.error("Proxy call to %s failed, error when connecting to server: %s", host, e)
-            raise ServiceUnavailable(str(e)) from e
+            raise ServiceUnavailable() from e
 
         # Log response and timing results
         level = logging.ERROR if response.status_code >= 400 else logging.INFO
@@ -199,6 +199,10 @@ class BrpClient:
             response.raise_for_status()
         except requests.HTTPError as e:
             raise self._get_http_error(response) from e
+
+    @property
+    def host(self) -> str:
+        return self._host
 
     def _get_http_error(self, response: requests.Response) -> APIException:
         # Translate the remote HTTP error to the proper response.
