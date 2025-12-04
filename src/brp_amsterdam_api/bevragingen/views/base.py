@@ -20,7 +20,7 @@ from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 
 from brp_amsterdam_api.bevragingen import authentication, encryption, permissions, types
-from brp_amsterdam_api.bevragingen.client import BrpClient
+from brp_amsterdam_api.bevragingen.clients import RvIGBrpClient
 from brp_amsterdam_api.bevragingen.exceptions import ProblemJsonException, RemoteAPIException
 from brp_amsterdam_api.bevragingen.permissions import ParameterPolicy
 
@@ -35,12 +35,12 @@ SCOPE_ENCRYPT_BSN = "benk-brp-encrypt-bsn"
 class ClientMixin(APIView):
 
     #: Define which additional scopes are needed
-    client_class = BrpClient
+    client_class = RvIGBrpClient
 
     #: Define the URL for the endpoint
     endpoint_url: str
 
-    def get_client(self) -> BrpClient:
+    def get_client(self) -> RvIGBrpClient:
         """Provide the API client class. This can be overwritten per view if needed."""
         return self.client_class(
             endpoint_url=self.endpoint_url,

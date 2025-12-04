@@ -7,7 +7,7 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.urllib import URLLibInstrumentor
 from opentelemetry.instrumentation.urllib3 import URLLib3Instrumentor
 
-from brp_amsterdam_api.bevragingen.client import BrpClient
+from brp_amsterdam_api.bevragingen.clients import RvIGBrpClient
 from brp_amsterdam_api.bevragingen.exceptions import RemoteAPIException
 
 ENDPOINTS = {
@@ -36,7 +36,7 @@ class Command(BaseCommand):
         URLLib3Instrumentor().uninstrument()
 
         endpoint_type = options["endpoint"]
-        client = BrpClient(
+        client = RvIGBrpClient(
             endpoint_url=ENDPOINTS[endpoint_type],
             oauth_endpoint_url=settings.BRP_OAUTH_TOKEN_URL,
             oauth_client_id=settings.BRP_OAUTH_CLIENT_ID,
