@@ -369,6 +369,15 @@ BRP_VERBLIJFPLAATSHISTORIE_URL = env.str(
     "BRP_VERBLIJFPLAATSHISTORIE_URL", default=f"{BRP_URL}/verblijfplaatshistorie"
 )
 
+# Partnerhistorie is requested from BRP-V ad hoc service endpoint
+BRP_V_ADHOC_SERVICE_URL = env.str(
+    "BRP_V_ADHOC_SERVICE_URL",
+    default="",
+)
+BRP_PARTNERHISTORIE_URL = env.str(
+    "BRP_PARTNERHISTORIE_URL", default=f"{BRP_V_ADHOC_SERVICE_URL}/partnerhistorie"
+)
+
 # Muse be a URL-safe base64-encoded 32-byte key
 if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):
     BRP_ENCRYPTION_KEYS = (
