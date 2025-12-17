@@ -13,3 +13,7 @@ verblijfplaats.verblijfadres.woonplaats
 verblijfplaats.adresseerbaarObjectIdentificatie
 verblijfplaats.nummeraanduidingIdentificatie
 verblijfplaats.verblijfadres.locatiebeschrijving
+verblijfplaats.verblijfadres.land
+verblijfplaats.verblijfadres.regel1
+verblijfplaats.verblijfadres.regel2
+verblijfplaats.verblijfadres.regel3
