@@ -93,7 +93,7 @@
             "datum": "19191219"
         },
         "opschortingBijhouding": {
-            "datum": "20250303",
+            "datum": "20250909",
             "reden": {
                 "code": "O",
                 "omschrijving": "overlijden"
@@ -108,7 +108,7 @@
                 "code": "0518",
                 "omschrijving": "'s-Gravenhage"
             },
-            "datum": "20250303"
+            "datum": "20250909"
         },
         "verblijfplaats": {
             "functieAdres": {
@@ -22365,7 +22365,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Xena",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -24354,7 +24354,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Wilma",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -24467,7 +24467,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Vladimir",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -24580,7 +24580,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Udina",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -24802,7 +24802,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Targa",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -25083,7 +25083,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Sonja",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -25404,7 +25404,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Ronald",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -25902,7 +25902,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Quinty",
-            "geslachtsnaam": "Precise"
+            "geslachtsnaam": "Preciezer"
         },
         "nationaliteiten": [
             {
@@ -26330,6 +26330,24 @@
                 "omschrijving": "Oran"
             },
             "datum": "19510000"
+        },
+        "opschortingBijhouding": {
+            "datum": "20250303",
+            "reden": {
+                "code": "O",
+                "omschrijving": "overlijden"
+            }
+        },
+        "overlijden": {
+            "land": {
+                "code": "6030",
+                "omschrijving": "Nederland"
+            },
+            "plaats": {
+                "code": "0518",
+                "omschrijving": "'s-Gravenhage"
+            },
+            "datum": "20250303"
         },
         "verblijfplaats": {
             "adresseerbaarObjectIdentificatie": "0363010000640049",
@@ -35767,23 +35785,23 @@
             "datum": "19690921"
         },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010000990737",
-            "nummeraanduidingIdentificatie": "0363200000466090",
+            "adresseerbaarObjectIdentificatie": "0363010000805805",
+            "nummeraanduidingIdentificatie": "0363200000264601",
             "functieAdres": {
                 "code": "W",
                 "omschrijving": "woonadres"
             },
             "woonplaats": "Amsterdam",
-            "straat": "Vitternkade",
-            "huisnummer": 101,
-            "huisnummertoevoeging": "II",
-            "postcode": "1060PK",
-            "datumIngangGeldigheid": "20150121",
-            "datumAanvangAdreshouding": "20070312",
-            "naamOpenbareRuimte": "Vitternkade"
+            "straat": "Schakelstraat",
+            "huisnummer": 14,
+            "huisnummertoevoeging": "H",
+            "postcode": "1014AW",
+            "datumIngangGeldigheid": "20051114",
+            "datumAanvangAdreshouding": "20051114",
+            "naamOpenbareRuimte": "Schakelstraat"
         },
         "immigratie": {
-            "datumVestigingInNederland": "20070312",
+            "datumVestigingInNederland": "20051114",
             "landVanwaarIngeschreven": {
                 "code": "6011",
                 "omschrijving": "IJsland"
@@ -35793,7 +35811,7 @@
             "code": "0363",
             "omschrijving": "Amsterdam"
         },
-        "datumInschrijvingInGemeente": "20070312",
+        "datumInschrijvingInGemeente": "20051114",
         "verblijfstitel": {
             "aanduiding": {
                 "code": "25",
@@ -35892,19 +35910,20 @@
             "datum": "19690516"
         },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010000695979",
-            "nummeraanduidingIdentificatie": "0363200000157730",
+            "adresseerbaarObjectIdentificatie": "0363010000805805",
+            "nummeraanduidingIdentificatie": "0363200000264601",
             "functieAdres": {
-                "code": "W",
-                "omschrijving": "woonadres"
+                "code": "B",
+                "omschrijving": "briefadres"
             },
             "woonplaats": "Amsterdam",
-            "straat": "Jozef Israëlskade",
-            "huisnummer": 469,
-            "postcode": "1074SW",
-            "datumIngangGeldigheid": "20180403",
-            "datumAanvangAdreshouding": "19960510",
-            "naamOpenbareRuimte": "Jozef Israëlskade"
+            "straat": "Schakelstraat",
+            "huisnummer": 14,
+            "huisnummertoevoeging": "H",
+            "postcode": "1014AW",
+            "datumIngangGeldigheid": "20251111",
+            "datumAanvangAdreshouding": "20251111",
+            "naamOpenbareRuimte": "Schakelstraat"
         },
         "immigratie": {
             "datumVestigingInNederland": "19790416",
@@ -52901,19 +52920,19 @@
             "datum": "19740819"
         },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010000881321",
-            "nummeraanduidingIdentificatie": "0363200000339346",
+            "adresseerbaarObjectIdentificatie": "0457010000008575",
+            "nummeraanduidingIdentificatie": "0457200000205522",
             "functieAdres": {
                 "code": "W",
                 "omschrijving": "woonadres"
             },
-            "woonplaats": "Amsterdam",
-            "straat": "Zuidermolenweg",
-            "huisnummer": 7,
-            "postcode": "1069CE",
-            "datumIngangGeldigheid": "20111101",
-            "datumAanvangAdreshouding": "20061230",
-            "naamOpenbareRuimte": "Zuidermolenweg"
+            "woonplaats": "Weesp",
+            "straat": "Nieuwstraat",
+            "huisnummer": 70,
+            "huisletter": "a",
+            "postcode": "1381BD",
+            "datumAanvangAdreshouding": "20251120",
+            "naamOpenbareRuimte": "Nieuwstraat"
         },
         "gemeenteVanInschrijving": {
             "code": "0363",
@@ -54062,7 +54081,7 @@
             "plaats": {
                 "omschrijving": "Avignan Ísafjörðus Kőröstétlen"
             },
-            "datum": "19331213"
+            "datum": "19231213"
         },
         "opschortingBijhouding": {
             "datum": "20120920",
@@ -65227,7 +65246,6 @@
             "inOnderzoek": {
                 "aanduidingGegevensInOnderzoek": "080000",
                 "datumIngangOnderzoek": "20250404"
-            }
         },
         "gemeenteVanInschrijving": {
             "code": "0363",
@@ -65262,7 +65280,8 @@
         ],
         "partners": [],
         "gezag": []
-    },
+    }
+  },
     {
         "aNummer": "9275974237",
         "burgerservicenummer": "999990536",
@@ -89094,19 +89113,18 @@
             "datum": "20190901"
         },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010001021677",
-            "nummeraanduidingIdentificatie": "0363200000506627",
+            "adresseerbaarObjectIdentificatie": "0363010000881321",
+            "nummeraanduidingIdentificatie": "0363200000339346",
             "functieAdres": {
                 "code": "W",
                 "omschrijving": "woonadres"
             },
             "woonplaats": "Amsterdam",
-            "straat": "Boorstraat",
-            "huisnummer": 2,
-            "postcode": "1021JZ",
-            "datumIngangGeldigheid": "20190901",
-            "datumAanvangAdreshouding": "20190901",
-            "naamOpenbareRuimte": "Boorstraat"
+            "straat": "Zuidermolenweg",
+            "huisnummer": 7,
+            "postcode": "1069CE",
+            "datumAanvangAdreshouding": "20251230",
+            "naamOpenbareRuimte": "Zuidermolenweg"
         },
         "gemeenteVanInschrijving": {
             "code": "0363",
@@ -89235,19 +89253,18 @@
             "datum": "19821201"
         },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010001021677",
-            "nummeraanduidingIdentificatie": "0363200000506627",
+            "adresseerbaarObjectIdentificatie": "0363010000881321",
+            "nummeraanduidingIdentificatie": "0363200000339346",
             "functieAdres": {
                 "code": "W",
                 "omschrijving": "woonadres"
             },
             "woonplaats": "Amsterdam",
-            "straat": "Boorstraat",
-            "huisnummer": 2,
-            "postcode": "1021JZ",
-            "datumIngangGeldigheid": "20180526",
-            "datumAanvangAdreshouding": "20180526",
-            "naamOpenbareRuimte": "Boorstraat"
+            "straat": "Zuidermolenweg",
+            "huisnummer": 7,
+            "postcode": "1069CE",
+            "datumAanvangAdreshouding": "20251230",
+            "naamOpenbareRuimte": "Zuidermolenweg"
         },
         "immigratie": {
             "datumVestigingInNederland": "20180526",
@@ -89398,38 +89415,19 @@
             },
             "datum": "19780930"
         },
-        "opschortingBijhouding": {
-            "datum": "20250303",
-            "reden": {
-                "code": "O",
-                "omschrijving": "overlijden"
-            }
-        },
-        "overlijden": {
-            "land": {
-                "code": "6030",
-                "omschrijving": "Nederland"
-            },
-            "plaats": {
-                "code": "0518",
-                "omschrijving": "'s-Gravenhage"
-            },
-            "datum": "20250303"
-        },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010001021677",
-            "nummeraanduidingIdentificatie": "0363200000506627",
+            "adresseerbaarObjectIdentificatie": "0363010000881321",
+            "nummeraanduidingIdentificatie": "0363200000339346",
             "functieAdres": {
                 "code": "W",
                 "omschrijving": "woonadres"
             },
             "woonplaats": "Amsterdam",
-            "straat": "Boorstraat",
-            "huisnummer": 2,
-            "postcode": "1021JZ",
-            "datumIngangGeldigheid": "20170125",
-            "datumAanvangAdreshouding": "20170125",
-            "naamOpenbareRuimte": "Boorstraat"
+            "straat": "Zuidermolenweg",
+            "huisnummer": 7,
+            "postcode": "1069CE",
+            "datumAanvangAdreshouding": "20251230",
+            "naamOpenbareRuimte": "Zuidermolenweg"
         },
         "immigratie": {
             "datumVestigingInNederland": "20170125",
@@ -92039,7 +92037,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Piet Junior",
-            "geslachtsnaam": "Streeveld"
+            "geslachtsnaam": "Streeveld Extra"
         },
         "nationaliteiten": [
             {
@@ -92172,7 +92170,7 @@
                 "omschrijving": "eigen geslachtsnaam"
             },
             "voornamen": "Piet",
-            "geslachtsnaam": "Streeveld"
+            "geslachtsnaam": "Streeveld Extra"
         },
         "nationaliteiten": [
             {
@@ -100368,6 +100366,9 @@
                         "code": "0363",
                         "omschrijving": "Amsterdam"
                     }
+                },
+                "ontbindingHuwelijkPartnerschap": {
+                    "datum": "20250815"
                 }
             }
         ],
@@ -151113,7 +151114,6 @@
         "aNummer": "1053531528",
         "burgerservicenummer": "999992715",
         "datumEersteInschrijvingGBA": "19940501",
-        "geheimhoudingPersoonsgegevens": 7,
         "geslacht": {
             "code": "M",
             "omschrijving": "man"
@@ -151752,25 +151752,24 @@
             "datum": "19390315"
         },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010001043391",
-            "nummeraanduidingIdentificatie": "0363200000011942",
+            "adresseerbaarObjectIdentificatie": "0518010000617227",
+            "nummeraanduidingIdentificatie": "0518200000617226",
             "functieAdres": {
                 "code": "W",
                 "omschrijving": "woonadres"
             },
-            "woonplaats": "Amsterdam",
-            "straat": "Doblijn",
-            "huisnummer": 26,
-            "postcode": "1046BN",
-            "datumIngangGeldigheid": "20240301",
-            "datumAanvangAdreshouding": "20240301",
-            "naamOpenbareRuimte": "Doblijn"
+            "woonplaats": "'s-Gravenhage",
+            "straat": "Leyweg",
+            "huisnummer": 1485,
+            "postcode": "2548AE",
+            "datumAanvangAdreshouding": "20251201",
+            "naamOpenbareRuimte": "Leyweg"
         },
         "gemeenteVanInschrijving": {
-            "code": "0363",
-            "omschrijving": "Amsterdam"
+            "code": "0518",
+            "omschrijving": "'s-Gravenhage"
         },
-        "datumInschrijvingInGemeente": "20240301",
+        "datumInschrijvingInGemeente": "20251201",
         "kinderen": [
             {
                 "burgerservicenummer": "999994724",
@@ -152190,20 +152189,20 @@
             },
             "datum": "19950901"
         },
+       "opschortingBijhouding": {
+            "datum": "20251004",
+            "reden": {
+                "code": "E",
+                "omschrijving": "emigratie"
+            }
+        },
         "verblijfplaats": {
-            "adresseerbaarObjectIdentificatie": "0363010000938048",
-            "nummeraanduidingIdentificatie": "0363200000424915",
-            "functieAdres": {
-                "code": "W",
-                "omschrijving": "woonadres"
+            "land": {
+                "code": "0000",
+                "omschrijving": "Onbekend"
             },
-            "woonplaats": "Amsterdam",
-            "straat": "E Cady Stantonpln",
-            "huisnummer": 1,
-            "postcode": "1102BL",
-            "datumIngangGeldigheid": "20151001",
-            "datumAanvangAdreshouding": "20151001",
-            "naamOpenbareRuimte": "Elizabeth Cady Stantonplein"
+            "datumIngangGeldigheid": "20251004",
+            "datumAanvangAdresBuitenland": "20251004"
         },
         "immigratie": {
             "datumVestigingInNederland": "20151001",
@@ -152213,10 +152212,10 @@
             }
         },
         "gemeenteVanInschrijving": {
-            "code": "0363",
-            "omschrijving": "Amsterdam"
+            "code": "1999",
+            "omschrijving": "Registratie Niet Ingezetenen (RNI)"
         },
-        "datumInschrijvingInGemeente": "20151001",
+        "datumInschrijvingInGemeente": "20251004",
         "verblijfstitel": {
             "aanduiding": {
                 "code": "25",
