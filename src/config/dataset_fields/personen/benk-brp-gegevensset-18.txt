@@ -35,7 +35,10 @@ partners.geboorte.datum
 partners.geboorte.plaats
 partners.geboorte.land
 partners.aangaanHuwelijkPartnerschap.datum
+partners.aangaanHuwelijkPartnerschap.plaats
+partners.aangaanHuwelijkPartnerschap.land
 partners.ontbindingHuwelijkPartnerschap.datum
+partners.soortVerbintenis
 overlijden.datum
 gemeenteVanInschrijving
 datumInschrijvingInGemeente
