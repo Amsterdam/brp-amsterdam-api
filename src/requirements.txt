@@ -353,13 +353,13 @@ cryptography==45.0.6 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==1.6.2 \
-    --hash=sha256:19f3ec1b942dce49ea92894866a6ccd5653f578899a0383bc466c5db8052f77a \
-    --hash=sha256:c3e2a256f105230e1a5a5b142f72894120e91e5fbb79d6f7a6465c86ccb21723
+datapunt-authorization-django==1.7.0 \
+    --hash=sha256:3791618204ca1b89938eabfe7c3f41f5a1ae72ea8709c3eaf734ff1e9e9bc355 \
+    --hash=sha256:70f3bffb4c8925862c0d599f290889644ed4e8124f185a979fa111afa267b13e
     # via -r requirements.in
-django==5.2.9 \
-    --hash=sha256:16b5ccfc5e8c27e6c0561af551d2ea32852d7352c67d452ae3e76b4f6b2ca495 \
-    --hash=sha256:3a4ea88a70370557ab1930b332fd2887a9f48654261cdffda663fef5976bb00a
+django==5.2.10 \
+    --hash=sha256:74df100784c288c50a2b5cad59631d71214f40f72051d5af3fdf220c20bdbbbe \
+    --hash=sha256:cf85067a64250c95d5f9067b056c5eaa80591929f7e16fbcd997746e40d6c45c
     # via
     #   -r requirements.in
     #   datapunt-authorization-django
