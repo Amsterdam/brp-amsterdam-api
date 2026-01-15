@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import orjson
 import requests
+from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from more_ds.network.url import URL
@@ -68,7 +69,7 @@ class BrpClient:
         self.oauth_endpoint_url = oauth_endpoint_url
         self._host = urlparse(endpoint_url).netloc
 
-        if urlparse(endpoint_url).port and not oauth_client_secret:
+        if settings.BACKEND_API == "mock":
             # Connecting to the mock endpoint
             self._client_secret = None
             self._session = requests.Session()
