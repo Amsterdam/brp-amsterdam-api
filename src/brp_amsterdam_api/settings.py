@@ -330,6 +330,7 @@ DATAPUNT_AUTHZ = {
 }
 
 # -- Local app settings
+BACKEND_API = env.str("BACKEND_API", "mock")
 
 # These OAuth settings are for authenticating the backend with the BRP OAuth endpoint.
 # Not to be confused with the settings for validating the client token (OAUTH_JWKS_URL above).
