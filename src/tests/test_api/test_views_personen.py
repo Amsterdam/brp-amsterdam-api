@@ -1094,7 +1094,7 @@ class TestBrpPersonenView:
     def test_decrypt_unencrypted_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove that not having access to a set is handled gracefully."""
         requests_mock.post(
-            "/haalcentraal/api/brp/personen",
+            "/lap/api/brp/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )
