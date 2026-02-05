@@ -19,7 +19,7 @@ from tests.utils import build_jwt_token
 @pytest.fixture
 def gegevensset_1():
     return sorted(
-        read_dataset_fields_files("dataset_fields/personen/benk-brp-gegevensset-1.txt").keys()
+        read_dataset_fields_files("dataset_fields/npr/personen/benk-brp-gegevensset-1.txt").keys()
     )
 
 
