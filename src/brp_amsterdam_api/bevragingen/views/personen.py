@@ -43,9 +43,10 @@ ALL_FIELD_NAMES = fields.read_config("rvig_brp_api/personen/fields-Persoon.csv")
 FILTERED = fields.read_config("rvig_brp_api/personen/fields-filtered-Persoon.csv")
 FILTERED_MIN = fields.read_config("rvig_brp_api/personen/fields-filtered-PersoonBeperkt.csv")
 
-# Which fields are allowed for each scope
+# Which fields are allowed for each scope, specified for prod or non-prod
+env_dir = "prd" if settings.ENVIRONMENT == "prd" else "npr"
 SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
-    "dataset_fields/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
+    f"dataset_fields/{env_dir}/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
 )
 
 
