@@ -370,13 +370,18 @@ BRP_VERBLIJFPLAATSHISTORIE_URL = env.str(
 )
 
 # Partnerhistorie is requested from BRP-V ad hoc service endpoint
-BRP_V_ADHOC_SERVICE_URL = env.str(
-    "BRP_V_ADHOC_SERVICE_URL",
+BRP_V_ADHOC_URL = env.str(
+    "BRP_V_ADHOC_URL",
     default="",
 )
 BRP_PARTNERHISTORIE_URL = env.str(
-    "BRP_PARTNERHISTORIE_URL", default=f"{BRP_V_ADHOC_SERVICE_URL}/partnerhistorie"
+    "BRP_PARTNERHISTORIE_URL", default=f"{BRP_V_ADHOC_URL}/partnerhistorie"
 )
+if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):
+    BRP_V_ADHOC_PASSWORD = Path("/mnt/secrets-store/brp-v-adhoc-password").read_text()
+else:
+    BRP_V_ADHOC_PASSWORD = env.str("BRP_V_ADHOC_PASSWORD", default="")
+BRP_V_ADHOC_USER = env.str("BRP_V_ADHOC_USER", default=None)
 
 # Muse be a URL-safe base64-encoded 32-byte key
 if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):

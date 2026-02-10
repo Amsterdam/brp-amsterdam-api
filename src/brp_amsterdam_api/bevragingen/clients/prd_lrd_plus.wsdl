@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:tns="http://lrdplus.presentation.gbav.gba.nl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http"
+                  xmlns:ns1="http://www.bprbzk.nl/GBA/LRDPlus/version1.1" name="LrdPlusSoapBindingImplService"
+                  targetNamespace="http://lrdplus.presentation.gbav.gba.nl/">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.bprbzk.nl/GBA/LRDPlus/version1.1"
+                   xmlns:ns1="http://www.bprbzk.nl/GBA/LO3/version1.1" elementFormDefault="qualified"
+                   targetNamespace="http://www.bprbzk.nl/GBA/LRDPlus/version1.1" version="1.0">
+
+            <xs:import namespace="http://www.bprbzk.nl/GBA/LO3/version1.1"/>
+
+            <xs:element name="changePassword">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="in0" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="changePasswordResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="changePasswordReturn" type="tns:Resultaat"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="vraag">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="in0" type="tns:Vraag"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="vraagResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="vraagReturn" type="tns:Antwoord"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:complexType name="Resultaat">
+                <xs:sequence>
+                    <xs:element name="code" type="xs:int"/>
+                    <xs:element name="letter" nillable="true" type="xs:string"/>
+                    <xs:element name="omschrijving" nillable="true" type="xs:string"/>
+                    <xs:element name="referentie" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Vraag">
+                <xs:sequence>
+                    <xs:element name="indicatieAdresvraag" nillable="true" type="xs:byte"/>
+                    <xs:element name="indicatieZoekenInHistorie" nillable="true" type="xs:byte"/>
+                    <xs:element name="masker" nillable="true" type="tns:ArrayOf_xsd_int"/>
+                    <xs:element name="parameters" nillable="true" type="tns:ArrayOfZoekparameter"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="ArrayOf_xsd_int">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="ArrayOfZoekparameter">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true"
+                                type="tns:Zoekparameter"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Zoekparameter">
+                <xs:sequence>
+                    <xs:element name="rubrieknummer" type="xs:int"/>
+                    <xs:element name="zoekwaarde" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Antwoord">
+                <xs:sequence>
+                    <xs:element name="persoonslijsten" nillable="true" type="ns1:ArrayOf_PL"/>
+                    <xs:element name="resultaat" nillable="true" type="tns:Resultaat"/>
+                </xs:sequence>
+            </xs:complexType>
+
+        </xs:schema>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.bprbzk.nl/GBA/LO3/version1.1"
+                   targetNamespace="http://www.bprbzk.nl/GBA/LO3/version1.1" version="1.0">
+
+            <xs:complexType name="ArrayOf_PL">
+                <xs:sequence>
+                    <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="item" nillable="true"
+                                type="tns:PL"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="PL">
+                <xs:sequence>
+                    <xs:element form="qualified" name="categoriestapels" nillable="true"
+                                type="tns:ArrayOf_Categoriestapel"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="ArrayOf_Categoriestapel">
+                <xs:sequence>
+                    <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="item" nillable="true"
+                                type="tns:Categoriestapel"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Categoriestapel">
+                <xs:sequence>
+                    <xs:element form="qualified" name="categorievoorkomens" nillable="true"
+                                type="tns:ArrayOf_Categorievoorkomen"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="ArrayOf_Categorievoorkomen">
+                <xs:sequence>
+                    <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="item" nillable="true"
+                                type="tns:Categorievoorkomen"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Categorievoorkomen">
+                <xs:sequence>
+                    <xs:element form="qualified" name="categorienummer" type="xs:byte"/>
+                    <xs:element form="qualified" name="elementen" nillable="true" type="tns:ArrayOf_Element"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="ArrayOf_Element">
+                <xs:sequence>
+                    <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="item" nillable="true"
+                                type="tns:Element"/>
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:complexType name="Element">
+                <xs:sequence>
+                    <xs:element form="qualified" name="nummer" type="xs:short"/>
+                    <xs:element form="qualified" name="waarde" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="changePassword">
+        <wsdl:part element="ns1:changePassword" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="vraag">
+        <wsdl:part element="ns1:vraag" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="vraagResponse">
+        <wsdl:part element="ns1:vraagResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="changePasswordResponse">
+        <wsdl:part element="ns1:changePasswordResponse" name="parameters">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="LrdPlus">
+        <wsdl:operation name="changePassword">
+            <wsdl:input message="ns1:changePassword" name="changePassword">
+            </wsdl:input>
+            <wsdl:output message="ns1:changePasswordResponse" name="changePasswordResponse">
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="vraag">
+            <wsdl:input message="ns1:vraag" name="vraag">
+            </wsdl:input>
+            <wsdl:output message="ns1:vraagResponse" name="vraagResponse">
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="LrdPlusSoapBinding" type="ns1:LrdPlus">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="changePassword">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="changePassword">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="changePasswordResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="vraag">
+            <soap:operation soapAction="" style="document"/>
+            <wsdl:input name="vraag">
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="vraagResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="LrdPlusService">
+        <wsdl:port binding="tns:LrdPlusSoapBinding" name="LrdPlusSoapBindingPort">
+            <soap:address location="https://gbav.idm.diginetwerk.net/gba-v/online/lo3services/adhoc"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

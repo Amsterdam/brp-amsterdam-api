@@ -15,12 +15,23 @@ class BrpVAdhocServiceClient(BaseBrpClient):
     since this (currently) isn't part of the RvIG BRP APIs.
     """
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        endpoint_url,
+        *,
+        user: str | None = None,
+        password: str | None = None,
+        cert_file=None,
+        key_file=None,
+    ):
+        super().__init__(endpoint_url, cert_file=cert_file, key_file=key_file)
 
-        transport = Transport(session=self._session)
+        # Add basic auth to the session
+        self._session.auth = (user, password)
 
+        # Import the WSDL locally to bypass http import in the online file
         wsdl = f"{settings.SRC_DIR}/brp_amsterdam_api/bevragingen/clients/lrd_plus.wsdl"
+        transport = Transport(session=self._session)
         self.client = Client(wsdl=wsdl, transport=transport)
         self.factory = self.client.type_factory("ns0")
 
