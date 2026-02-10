@@ -1,5 +1,6 @@
 import requests
-import settings
+
+from integration_tests import settings
 
 
 def get_token() -> str:
