@@ -37,6 +37,8 @@ class BrpPartnerhistorieView(BaseProxyView):
         """Provide the API client class. This can be overwritten per view if needed."""
         return self.client_class(
             endpoint_url=self.endpoint_url,
+            user=settings.BRP_V_ADHOC_USER,
+            password=settings.BRP_V_ADHOC_PASSWORD,
             cert_file=settings.BRP_MTLS_CERT_FILE,
             key_file=settings.BRP_MTLS_KEY_FILE,
         )
