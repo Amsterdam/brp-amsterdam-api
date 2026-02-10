@@ -12,33 +12,38 @@ Requirements:
 
 ## BRP Amsterdam API
 
-Make sure you have a local development environment of the BRP Amsterdam API running. The easiest option is using
-Docker Compose:
+The easiest way to run these integration tests is by using Docker Compose. This will also start the BRP Amsterdam API
+and the BRP Personen Mock.
+
+To be able to run the tests you will need a valid token to be able to make the requests. The easiest way is to set up
+direnv with an `.envrc` file or export a token from the command line:
+
 ```shell
-cd ..
-docker compose up -d
+export TOKEN="$(docker compose run web python get-token.py benk-brp-personen-api benk-brp-gegevensset-1 benk-brp-zoekvraag-bsn benk-brp-zoekvraag-geslachtsnaam-geboortedatum benk-brp-zoekvraag-naam-gemeente benk-brp-zoekvraag-adresseerbaar-object benk-brp-zoekvraag-nummeraanduiding benk-brp-zoekvraag-postcode-huisnummer benk-brp-zoekvraag-straatnaam-huisnummer benk-brp-bewoning-api benk-brp-verblijfplaatshistorie-api)"
 ```
 
-And return to the integration_tests directory.
+After having a valid token in your environment you'll be able to start the tests using:
 
-## Using Docker Compose
-
-Run docker compose:
 ```shell
-docker compose up
+docker compose run tests
+```
+
+The BRP Personen Mock only has the `personen` endpoint available, so running the tests against the `bewoningen` and
+`verblijfplaatshistorie` will result in a failed test. To see the test run succesfully you can run the tests for the
+`personen` endpoint only:
+
+```shell
+docker compose run tests -e personen
 ```
 
 ## Using Local Python
 
-Create a virtualenv:
+Make sure you have the BRP Amsterdam API and BRP Personen Mock running
 
 ```shell
-python3 -m venv venv
-source venv/bin/activate
+docker compose up -d -f ../docker-compose.yml
 ```
 
-Install all packages in it:
 ```shell
-pip install -U wheel pip
-cd src/
-make install  # installs src/requirements_dev.txt
+uv sync
+```
