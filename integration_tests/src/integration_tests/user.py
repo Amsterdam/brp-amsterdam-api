@@ -1,8 +1,13 @@
 import uuid
 
-import settings
 from locust import HttpUser
-from tasks import Bewoningen, Personen, Verblijfsplaatshistorie
+
+from integration_tests import settings
+from integration_tests.tasks import (
+    Bewoningen,
+    Personen,
+    Verblijfsplaatshistorie,
+)
 
 
 class BRPUser(HttpUser):

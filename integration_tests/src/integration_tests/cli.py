@@ -1,7 +1,8 @@
 import logging
 
 import click
-from testrunner import run_tests
+
+from integration_tests.testrunner import run_tests
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
@@ -23,9 +24,6 @@ ENDPOINTS = [
     help="Endpoints to test",
 )
 @click.option("-l", "--load-test", type=bool, default=False, help="Perform a load test")
-def setup_tests(endpoints: list, load_test: bool):
+def cli(endpoints: list, load_test: bool):
+    print("TESTING ENDPOINTS: ", endpoints)
     run_tests(endpoints)
-
-
-if __name__ == "__main__":
-    setup_tests()
