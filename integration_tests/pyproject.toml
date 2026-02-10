@@ -1,5 +1,5 @@
 [project]
-name = "brp-amsterdam-integration-tests"
+name = "integration-tests"
 version = "0.1.0"
 description = "Integration tests to validate deployment and integration with the RvIG Backend of the BRP Amsterdam API"
 readme = "README.md"
@@ -9,9 +9,15 @@ dependencies = [
     "locust>=2.43.1",
 ]
 
+[project.scripts]
+brp-test = "integration_tests.cli:cli"
+
 [build-system]
 requires = ["uv_build>=0.9.25,<0.10.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
 module-root = "src"
+
+[tool.ruff.lint.isort]
+known-first-party = ["integration_tests"]
