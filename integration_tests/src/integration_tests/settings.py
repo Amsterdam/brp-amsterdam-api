@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from exceptions import ImproperlyConfigured
+from integration_tests.exceptions import ImproperlyConfigured
 
 CLOUD_ENV = os.environ.get("CLOUD_ENV", "default").lower()
 BRP_URL = os.environ.get("BRP_URL", "http://localhost:8095")
