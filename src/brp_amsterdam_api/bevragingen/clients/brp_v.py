@@ -5,6 +5,7 @@ from rest_framework.exceptions import APIException
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from zeep import Client, Transport
+from zeep.plugins import HistoryPlugin
 
 from .base import BaseBrpClient
 
@@ -31,8 +32,12 @@ class BrpVAdhocServiceClient(BaseBrpClient):
 
         # Import the WSDL locally to bypass http import in the online file
         wsdl = f"{settings.SRC_DIR}/brp_amsterdam_api/bevragingen/clients/lrd_plus.wsdl"
+
+        # For debugging purposes
+        self.history = HistoryPlugin()
+
         transport = Transport(session=self._session)
-        self.client = Client(wsdl=wsdl, transport=transport)
+        self.client = Client(wsdl=wsdl, transport=transport, plugins=[self.history])
         self.factory = self.client.type_factory("ns0")
 
     def call(self, hc_request: dict | None = None) -> requests.Response | APIException:
