@@ -58,3 +58,6 @@ BRP_BEWONINGEN_URL = env.str("BRP_BEWONINGEN_URL", default=f"{BRP_URL}/bewoning/
 BRP_VERBLIJFPLAATSHISTORIE_URL = env.str(
     "BRP_VERBLIJFPLAATSHISTORIE_URL", default=f"{BRP_URL}/verblijfplaatshistorie"
 )
+
+BRP_V_ADHOC_USER = "adhoc"
+BRP_V_ADHOC_PASSWORD = "pass"
