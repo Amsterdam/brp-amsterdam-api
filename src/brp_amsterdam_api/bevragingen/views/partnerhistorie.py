@@ -1,10 +1,14 @@
 from django.conf import settings
 from rest_framework.request import Request
 
-from brp_amsterdam_api.bevragingen.clients.brp_v import BrpVAdhocServiceClient
+from brp_amsterdam_api.bevragingen import types
+from brp_amsterdam_api.bevragingen.clients.brp_v import (
+    BRP_CATEGORY_MAPPING,
+    BrpVAdhocServiceClient,
+)
 from brp_amsterdam_api.bevragingen.permissions import ParameterPolicy
 
-from .base import BaseProxyView
+from .base import BaseProxyView, group_dotted_names
 
 
 class BrpPartnerhistorieView(BaseProxyView):
@@ -48,3 +52,13 @@ class BrpPartnerhistorieView(BaseProxyView):
         super().initial(request, *args, **kwargs)
 
         self.client = self.get_client()
+
+    def _insert_null_values(
+        self, hc_request: types.PartnerhistorieQuery, hc_response: types.PartnerhistorieResponse
+    ) -> None:
+        """Insert any null values that the user does have access to.
+        This allows the client to distinguish between having 'no value' instead of 'no access'.
+        """
+        print("HALLLO")
+        request_fields = group_dotted_names(BRP_CATEGORY_MAPPING.keys())
+        self._include_nulls(request_fields, hc_response["partnerhistorie"])
