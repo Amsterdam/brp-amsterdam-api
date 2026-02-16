@@ -9,12 +9,22 @@ from zeep import Client, Transport
 from zeep.plugins import HistoryPlugin
 
 from .base import BaseBrpClient
-from .utils import derive_initials
+from .utils import derive_date, derive_description, derive_initials
 
 BRP_CATEGORY_MAPPING = {
     "burgerservicenummer": "05.01.20",
-    "geslacht": "05.04.10",
-    "soortVerbintenis": "05.15.10",
+    "geslacht.code": "05.04.10",
+    "geslacht.omschrijving": {
+        "source": "geslacht.code",
+        "function": derive_description,
+        "args": "GENDER_CODE_TABLE",
+    },
+    "soortVerbintenis.code": "05.15.10",
+    "soortVerbintenis.omschrijving": {
+        "source": "soortVerbintenis.code",
+        "function": derive_description,
+        "args": "ENGAGEMENT_TYPE_TABLE",
+    },
     "naam.voornamen": "05.02.10",
     "naam.adellijkeTitelPredicaat": "05.02.20",
     "naam.voorvoegsel": "05.02.30",
@@ -24,15 +34,50 @@ BRP_CATEGORY_MAPPING = {
         "function": derive_initials,
     },
     "geboorte.datum": "05.03.10",
-    "geboorte.land": "05.03.20",
-    "geboorte.plaats": "05.03.30",
+    "geboorte.plaats.code": "05.03.20",
+    "geboorte.plaats.omschrijving": {
+        "source": "geboorte.plaats.code",
+        "function": derive_description,
+        "args": "CITY_CODE_TABLE",
+    },
+    "geboorte.land.code": "05.03.30",
+    "geboorte.land.omschrijving": {
+        "source": "geboorte.land.code",
+        "function": derive_description,
+        "args": "COUNTRY_CODE_TABLE",
+    },
     "aangaanHuwelijkParnerschap.datum": "05.06.10",
-    "aangaanHuwelijkParnerschap.land": "05.06.20",
-    "aangaanHuwelijkParnerschap.plaats": "05.06.30",
+    "aangaanHuwelijkParnerschap.plaats.code": "05.06.20",
+    "aangaanHuwelijkParnerschap.plaats.omschrijving": {
+        "source": "aangaanHuwelijkParnerschap.plaats.code",
+        "function": derive_description,
+        "args": "CITY_CODE_TABLE",
+    },
+    "aangaanHuwelijkParnerschap.land.code": "05.06.30",
+    "aangaanHuwelijkParnerschap.land.omschrijving": {
+        "source": "aangaanHuwelijkParnerschap.land.code",
+        "function": derive_description,
+        "args": "COUNTRY_CODE_TABLE",
+    },
     "ontbindingHuwelijkParnerschap.datum": "05.07.10",
-    "ontbindingHuwelijkParnerschap.land": "05.07.20",
-    "ontbindingHuwelijkParnerschap.plaats": "05.07.30",
-    "ontbindingHuwelijkParnerschap.reden": "05.07.40",
+    "ontbindingHuwelijkParnerschap.plaats.code": "05.07.20",
+    "ontbindingHuwelijkParnerschap.plaats.omschrijving": {
+        "source": "ontbindingHuwelijkParnerschap.plaats.code",
+        "function": derive_description,
+        "args": "CITY_CODE_TABLE",
+    },
+    "ontbindingHuwelijkParnerschap.land.code": "05.07.30",
+    "ontbindingHuwelijkParnerschap.land.omschrijving": {
+        "source": "ontbindingHuwelijkParnerschap.land.code",
+        "function": derive_description,
+        "args": "COUNTRY_CODE_TABLE",
+    },
+    "ontbindingHuwelijkParnerschap.reden.code": "05.07.40",
+    "ontbindingHuwelijkParnerschap.reden.omschrijving": {
+        "source": "ontbindingHuwelijkParnerschap.reden.code",
+        "function": derive_description,
+        "args": "REASON_DISSOLUTION_TABLE",
+    },
 }
 
 ADDITIONAL_FIELDS_FOR_DERIVATION = {
@@ -40,8 +85,6 @@ ADDITIONAL_FIELDS_FOR_DERIVATION = {
     "extra.datumIngangOnderzoek": "05.83.20",
     "extra.datumEindeOnderzoek": "05.83.30",
 }
-
-CATEGORY_FIELD_MAPPING = {}
 
 
 class BrpVAdhocServiceClient(BaseBrpClient):
@@ -121,6 +164,8 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         for p in partner_history:
             _derive_values(p)
 
+            _derive_date_fields(p)
+
             # Add the fields which are under investigation
             _derive_under_investigation(p)
 
@@ -134,8 +179,18 @@ def _derive_values(data: dict):
     derived_fields = _get_derived_fields_mapping()
     for field, mapping in derived_fields.items():
         if source_value := _get_dotted_field_value(data, mapping["source"]):
-            derived_value = mapping["function"](source_value)
+            args = [source_value]
+            if "args" in mapping:
+                args += mapping["args"] if isinstance(mapping["args"], list) else [mapping["args"]]
+            derived_value = mapping["function"](*args)
             _set_dotted_field_value(data, field, derived_value)
+
+
+def _derive_date_fields(data: dict):
+    date_fields = [field for field in BRP_CATEGORY_MAPPING if ".datum" in field]
+    for field in date_fields:
+        if current_value := _get_dotted_field_value(data, field):
+            _set_dotted_field_value(data, field, derive_date(current_value))
 
 
 def _derive_under_investigation(data: dict):
@@ -157,9 +212,13 @@ def _derive_under_investigation(data: dict):
         )
         fields = _get_fields_by_category(int(category), int(group), int(element))
 
+        # Remove code/omschrijving from field names
+        fields = {field.replace(".code", "").replace("omschrijving", "") for field in fields}
+
         for field in fields:
             if field.startswith("extra"):
                 continue
+
             *base, leaf = field.split(".")
             if base:
                 under_investigation_field_name = ".".join([*base, "inOnderzoek", leaf])
@@ -233,7 +292,6 @@ def _group_dotted_result(dotted_result) -> dict:
         *keys, leaf = dotted_name.split(".")
         for k in keys:
             tree_level = tree_level.setdefault(k, {})
-        print(leaf)
         tree_level[leaf] = value
     return result
 

@@ -1,0 +1,391 @@
+code;omschrijving
+0000;Onbekend
+5001;Canada
+5002;Frankrijk
+5003;Zwitserland
+5004;Rhodesië
+5005;Malawi
+5006;Cuba
+5007;Suriname
+5008;Tunesië
+5009;Oostenrijk
+5010;België
+5011;Botswana
+5012;Iran
+5013;Nieuw-Zeeland
+5014;Zuid-Afrika
+5015;Denemarken
+5016;Noord-Jemen
+5017;Hongarije
+5018;Saoedi-Arabië
+5019;Liberia
+5020;Ethiopië
+5021;Chili
+5022;Marokko
+5023;Togo
+5024;Ghana
+5025;Laos
+5026;Angola
+5027;Filipijnen
+5028;Zambia
+5029;Mali
+5030;Ivoorkust
+5031;Burma
+5032;Monaco
+5033;Colombia
+5034;Albanië
+5035;Kameroen
+5036;Zuid-Vietnam
+5037;Singapore
+5038;Paraguay
+5039;Zweden
+5040;Cyprus
+5041;Australisch Nieuw-Guinea
+5042;Brunei
+5043;Irak
+5044;Mauritius
+5045;Vaticaanstad
+5046;Kashmir
+5047;Myanmar
+5048;Jemen
+5049;Slovenië
+5050;Zaïre
+5051;Kroatië
+5052;Taiwan
+5053;Rusland
+5054;Armenië
+5055;Ascension
+5056;Azoren
+5057;Bahrein
+5058;Bhutan
+5059;Britse Antillen
+5060;Comoren
+5061;Falklandeilanden
+5062;Frans-Guyana
+5063;Frans-Somaliland
+5064;Gilbert- en Ellice-eilanden
+5065;Groenland
+5066;Guadeloupe
+5067;Kaapverdische Eilanden
+5068;Macau
+5069;Martinique
+5070;Mozambique
+5071;Pitcairneilanden
+5072;Guinee-Bissau
+5073;Réunion
+5074;Saint Pierre en Miquelon
+5075;Seychellen en Amiranten
+5076;Tonga
+5077;Wallis en Futuna
+5078;Zuidwest-Afrika
+5079;Frans-Indië
+5080;Johnston
+5081;Kedah
+5082;Kelantan
+5083;Malakka
+5084;Mayotte
+5085;Negri Sembilan
+5086;Pahang
+5087;Perak
+5088;Perlis
+5089;Portugees-Indië
+5090;Selangor
+5091;Sikkim
+5092;Saint Vincent en de Grenadines
+5093;Spitsbergen
+5094;Trengganu
+5095;Aruba
+5096;Burkina Faso
+5097;Azerbeidzjan
+5098;Belarus
+5099;Kazachstan
+5100;Macedonië
+5101;Timor Leste
+5102;Servië en Montenegro
+5103;Servië
+5104;Montenegro
+5105;Kosovo
+5106;Bonaire
+5107;Curaçao
+5108;Saba
+5109;Sint Eustatius
+5110;Sint Maarten
+5111;Zuid-Soedan
+5112;Gazastrook en Westelijke Jordaanoever, met inbegrip van Oost-Jeruzalem
+5113;Republiek Noord-Macedonië
+6000;Moldavië
+6001;Burundi
+6002;Finland
+6003;Griekenland
+6004;Guatemala
+6005;Nigeria
+6006;Libië
+6007;Ierland
+6008;Brazilië
+6009;Rwanda
+6010;Venezuela
+6011;IJsland
+6012;Liechtenstein
+6013;Somalië
+6014;Verenigde Staten van Amerika
+6015;Bolivia
+6016;Australië
+6017;Jamaica
+6018;Luxemburg
+6019;Tsjaad
+6020;Mauritanië
+6021;Kirgizië
+6022;China
+6023;Afghanistan
+6024;Indonesië
+6025;Guyana
+6026;Noord-Vietnam
+6027;Noorwegen
+6028;San Marino
+6029;Duitsland
+6030;Nederland
+6031;Cambodja
+6032;Fiji
+6033;Bahama's
+6034;Israël
+6035;Nepal
+6036;Zuid-Korea
+6037;Spanje
+6038;Oekraïne
+6039;Verenigd Koninkrijk
+6040;Niger
+6041;Haïti
+6042;Jordanië
+6043;Turkije
+6044;Trinidad en Tobago
+6045;Joegoslavië
+6046;Opper-Volta
+6047;Algerije
+6048;Gabon
+6049;Noord-Korea
+6050;Oezbekistan
+6051;Sierra Leone
+6052;Brits-Honduras
+6053;Canarische Eilanden
+6054;Frans-Polynesië
+6055;Gibraltar
+6056;Portugees-Timor
+6057;Tadzjikistan
+6058;Britse Salomonseilanden
+6059;São Tomé en Principe
+6060;Sint-Helena
+6061;Tristan Da Cunha
+6062;West-Samoa
+6063;Turkmenistan
+6064;Georgië
+6065;Bosnië-Herzegovina
+6066;Tsjechië
+6067;Slowakije
+6068;Federale Republiek Joegoslavië
+6069;Democratische Republiek Congo
+7001;Uganda
+7002;Kenya
+7003;Malta
+7004;Barbados
+7005;Andorra
+7006;Mexico
+7007;Costa Rica
+7008;Gambia
+7009;Syrië
+7011;Nederlandse Antillen
+7012;Zuid-Jemen
+7014;Egypte
+7015;Argentinië
+7016;Lesotho
+7017;Honduras
+7018;Nicaragua
+7020;Pakistan
+7021;Senegal
+7023;Dahomey
+7024;Bulgarije
+7026;Maleisië
+7027;Dominicaanse Republiek
+7028;Polen
+7029;Rusland (oud)
+7030;Britse Maagdeneilanden
+7031;Tanzania
+7032;El Salvador
+7033;Sri Lanka
+7034;Soedan
+7035;Japan
+7036;Hongkong
+7037;Panama
+7038;Uruguay
+7039;Ecuador
+7040;Guinee
+7041;Maldiven
+7042;Thailand
+7043;Libanon
+7044;Italië
+7045;Koeweit
+7046;India
+7047;Roemenië
+7048;Tsjecho-Slowakije
+7049;Peru
+7050;Portugal
+7051;Oman
+7052;Mongolië
+7053;Samoa
+7054;Verenigde Arabische Emiraten
+7055;Tibet
+7057;Nauru
+7058;Nederlands Nieuw-Guinea
+7059;Tanganyika
+7060;Palestina
+7062;Brits West-Indië
+7063;Portugees-Afrika
+7064;Letland
+7065;Estland
+7066;Litouwen
+7067;Brits-Afrika
+7068;Belgisch-Congo
+7070;Brits-Indië
+7071;Noord-Rhodesië
+7072;Zuid-Rhodesië
+7073;Saarland
+7074;Frans Indochina
+7075;Brits West-Borneo
+7076;Goudkust
+7077;Ras al-Khaimah
+7079;Frans-Congo
+7080;Siam
+7082;Brits Oost-Afrika
+7083;Brits Noord-Borneo
+7084;Bangladesh
+7085;Duitse Democratische Republiek
+7087;Madeira-eilanden
+7088;Amerikaanse Maagdeneilanden
+7089;Australische Salomonseilanden
+7091;Spaanse Sahara
+7092;Caymaneilanden
+7093;Caicoseilanden
+7094;Turkseilanden
+7095;Brits Antarctisch Territorium
+7096;Brits Indische Oceaanterritorium
+7097;Cookeilanden
+7098;Tokelau
+7099;Nieuw-Caledonië
+8000;Hawaii-eilanden
+8001;Guam
+8002;Amerikaans-Samoa
+8003;Midway
+8004;Riukiu-eilanden
+8005;Wake
+8006;Pacific-eilanden
+8008;Grenada
+8009;Marianen
+8010;Cabinda
+8011;Canton en Enderbury
+8012;Christmaseiland
+8013;Cocoseilanden
+8014;Faeröer
+8015;Montserrat
+8016;Norfolk
+8017;Belize
+8018;Tasmanië
+8019;Turks- en Caicoseilanden
+8020;Puerto Rico
+8021;Papoea-Nieuw-Guinea
+8022;Salomonseilanden
+8023;Benin
+8024;Vietnam
+8025;Kaapverdië
+8026;Seychellen
+8027;Kiribati
+8028;Tuvalu
+8029;Saint Lucia
+8030;Dominica
+8031;Zimbabwe
+8032;Dubai
+8033;Nieuwe Hebriden
+8034;Kanaaleilanden
+8035;Man
+8036;Anguilla
+8037;Saint Kitts en Nevis
+8038;Antigua
+8039;Saint Vincent
+8040;Gilberteilanden
+8041;Panamakanaalzone
+8042;Saint Kitts, Nevis en Anguilla
+8043;Belau
+8044;Palau
+8045;Antigua en Barbuda
+9000;Newfoundland
+9001;Nyasaland
+9003;Eritrea
+9005;Ifni
+9006;Brits-Kameroen
+9007;Keizer Wilhelmsland
+9008;Congo
+9009;Congo-Kinshasa
+9010;Madagaskar
+9013;Congo-Brazzaville
+9014;Leewardeilanden
+9015;Windwardeilanden
+9016;Frans Territorium voor Afars en Issa's
+9017;Phoenixeilanden
+9020;Portugees-Guinee
+9022;Duits Zuidwest-Afrika
+9023;Namibië
+9027;Brits-Somaliland
+9028;Italiaans-Somaliland
+9030;Nederlands-Indië
+9031;Brits-Guyana
+9036;Swaziland
+9037;Qatar
+9038;Eswatini
+9041;Aden
+9042;Zuid-Arabische Federatie
+9043;Equatoriaal-Guinea
+9044;Spaans-Guinee
+9047;Verenigde Arabische Republiek
+9048;Bermuda
+9049;Sovjet-Unie
+9050;Duits Oost-Afrika
+9051;Zanzibar
+9052;Ceylon
+9053;Muscat en Oman
+9054;Trucial Oman
+9055;Indochina
+9056;Marshalleilanden
+9057;Sarawak
+9058;Brits-Borneo
+9060;Sabah
+9061;Abu Dhabi
+9062;Ajman
+9063;Basutoland
+9064;Bechuanaland
+9065;Fujairah
+9066;Frans-Kameroen
+9067;Johore
+9068;Korea
+9069;Labuan
+9070;Umm Al-Qaiwain
+9071;Oostenrijk-Hongarije
+9072;Portugees Oost-Afrika
+9073;Portugees West-Afrika
+9074;Sharjah
+9075;Straits Settlements
+9076;Abessinië
+9077;Frans West-Afrika
+9078;Frans Equatoriaal-Afrika
+9081;Urundi
+9082;Ruanda-Urundi
+9084;Goa
+9085;Dantzig
+9086;Centraal-Afrikaanse Republiek
+9087;Djibouti
+9088;Transjordanië
+9089;Bondsrepubliek Duitsland
+9090;Vanuatu
+9091;Niue
+9092;Spaans Noord-Afrika
+9093;Westelijke Sahara
+9094;Micronesia
+9095;Svalbardeilanden
+9999;Internationaal gebied
