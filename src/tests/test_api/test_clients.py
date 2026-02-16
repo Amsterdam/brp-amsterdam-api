@@ -1,6 +1,7 @@
 import pytest
 
 from brp_amsterdam_api.bevragingen.clients.brp_v import (
+    _derive_date_fields,
     _derive_under_investigation,
     _derive_values,
     _get_fields_by_category,
@@ -9,10 +10,42 @@ from brp_amsterdam_api.bevragingen.clients.brp_v import (
 
 class TestBrpVAdhocServiceClient:
 
-    def test_derive_values(self):
+    def test_derive_initials(self):
         data = {"naam": {"voornamen": "Jan-Willem Hendrikus"}}
         _derive_values(data)
         assert data["naam"]["voorletters"] == "J.H."
+
+    def test_derive_city(self):
+        data = {"geboorte": {"plaats": {"code": "0363"}}}
+        _derive_values(data)
+        assert data["geboorte"]["plaats"]["omschrijving"] == "Amsterdam"
+
+    def test_derive_country(self):
+        data = {"geboorte": {"land": {"code": "6030"}}}
+        _derive_values(data)
+        assert data["geboorte"]["land"]["omschrijving"] == "Nederland"
+
+    def test_derive_engagement_type(self):
+        data = {"soortVerbintenis": {"code": "P"}}
+        _derive_values(data)
+        assert data["soortVerbintenis"]["omschrijving"] == "geregistreerd partnerschap"
+
+    def test_derive_reason_dissolution(self):
+        data = {"ontbindingHuwelijkParnerschap": {"reden": {"code": "S"}}}
+        _derive_values(data)
+        assert (
+            data["ontbindingHuwelijkParnerschap"]["reden"]["omschrijving"]
+            == "echtsch of huw.ontb na sch van tfl en bed/eindigen partnersch door ovk of ontb"
+        )
+
+    def test_derive_dates(self):
+        data = {"geboorte": {"datum": "19700420"}}
+        _derive_date_fields(data)
+        assert data["geboorte"]["datum"] == {
+            "datum": "1970-04-20",
+            "type": "Datum",
+            "langFormaat": "20 april 1970",
+        }
 
     @pytest.mark.parametrize(
         "value, expected",
@@ -21,7 +54,7 @@ class TestBrpVAdhocServiceClient:
                 "050620",
                 {
                     "extra": {"inOnderzoek": "050620"},
-                    "aangaanHuwelijkParnerschap": {"inOnderzoek": {"land": True}},
+                    "aangaanHuwelijkParnerschap": {"inOnderzoek": {"plaats": True}},
                 },
             ),
         ],

@@ -1,0 +1,1480 @@
+code;omschrijving
+0000;Onbekend
+0001;Adorp
+0002;Aduard
+0003;Appingedam
+0004;Baflo
+0005;Bedum
+0006;Beerta
+0007;Bellingwedde
+0008;Bierum
+0009;Ten Boer
+0010;Delfzijl
+0011;Eenrum
+0012;Ezinge
+0013;Finsterwolde
+0014;Groningen
+0015;Grootegast
+0016;Grijpskerk
+0017;Haren
+0018;Hoogezand-Sappemeer
+0019;Hefshuizen
+0020;Kantens
+0021;Kloosterburen
+0022;Leek
+0023;Leens
+0024;Loppersum
+0025;Marum
+0026;Meeden
+0027;Middelstum
+0028;Midwolda
+0029;Muntendam
+0030;Nieuwe Pekela
+0031;Nieuweschans
+0032;Nieuwolda
+0033;Oosterbroek
+0034;Almere
+0035;Oldehove
+0036;Oldekerk
+0037;Stadskanaal
+0038;Oude Pekela
+0039;Scheemda
+0040;Slochteren
+0041;Stedum
+0042;Termunten
+0043;Uithuizen
+0044;Uithuizermeeden
+0045;Ulrum
+0046;Usquert
+0047;Veendam
+0048;Vlagtwedde
+0049;Warffum
+0050;Zeewolde
+0051;Skarsterlân
+0052;Winschoten
+0053;Winsum
+0054;'t Zandt
+0055;Boarnsterhim
+0056;Zuidhorn
+0057;Boornsterhem
+0058;Dongeradeel
+0059;Achtkarspelen
+0060;Ameland
+0061;Baarderadeel
+0062;Barradeel
+0063;het Bildt
+0064;Bolsward
+0065;Dantumadeel
+0066;Dokkum
+0067;Doniawerstal
+0068;Ferwerderadeel
+0069;Franeker
+0070;Franekeradeel
+0071;Gaasterland
+0072;Harlingen
+0073;Haskerland
+0074;Heerenveen
+0075;Hemelumer Oldeferd
+0076;Hennaarderadeel
+0077;Hindeloopen
+0078;Idaarderadeel
+0079;Kollumerland en Nieuwkruisland
+0080;Leeuwarden
+0081;Leeuwarderadeel
+0082;Lemsterland
+0083;Menaldumadeel
+0084;Oostdongeradeel
+0085;Ooststellingwerf
+0086;Opsterland
+0087;Rauwerderhem
+0088;Schiermonnikoog
+0089;Sloten (F)
+0090;Smallingerland
+0091;Sneek
+0092;Stavoren
+0093;Terschelling
+0094;Tietjerksteradeel
+0095;Utingeradeel
+0096;Vlieland
+0097;Westdongeradeel
+0098;Weststellingwerf
+0099;Wonseradeel
+0100;Workum
+0101;Wymbritseradeel
+0102;IJlst
+0103;Littenseradeel
+0104;Nijefurd
+0105;Anloo
+0106;Assen
+0107;Beilen
+0108;Borger
+0109;Coevorden
+0110;Dalen
+0111;Diever
+0112;Dwingeloo
+0113;Eelde
+0114;Emmen
+0115;Gasselte
+0116;Gieten
+0117;Havelte
+0118;Hoogeveen
+0119;Meppel
+0120;Norg
+0121;Nijeveen
+0122;Odoorn
+0123;Oosterhesselen
+0124;Peize
+0125;Roden
+0126;Rolde
+0127;Ruinen
+0128;Ruinerwold
+0129;Schoonebeek
+0130;Sleen
+0131;Smilde
+0132;Vledder
+0133;Vries
+0134;Westerbork
+0135;de Wijk
+0136;Zuidlaren
+0137;Zuidwolde
+0138;Zweeloo
+0139;Scharsterland
+0140;Littenseradiel
+0141;Almelo
+0142;Ambt Delden
+0143;Avereest
+0144;Bathmen
+0145;Blankenham
+0146;Blokzijl
+0147;Borne
+0148;Dalfsen
+0149;Denekamp
+0150;Deventer
+0151;Diepenheim
+0152;Diepenveen
+0153;Enschede
+0154;Genemuiden
+0155;Giethoorn
+0156;Goor
+0157;Gramsbergen
+0158;Haaksbergen
+0159;Den Ham
+0160;Hardenberg
+0161;Hasselt
+0162;Heino
+0163;Hellendoorn
+0164;Hengelo (O)
+0165;Holten
+0166;Kampen
+0167;Kuinre
+0168;Losser
+0169;Markelo
+0170;Nieuwleusen
+0171;Noordoostpolder
+0172;Oldemarkt
+0173;Oldenzaal
+0174;Olst
+0175;Ommen
+0176;Ootmarsum
+0177;Raalte
+0178;Rijssen
+0179;Stad Delden
+0180;Staphorst
+0181;Steenwijk
+0182;Steenwijkerwold
+0183;Tubbergen
+0184;Urk
+0185;Vollenhove
+0186;Vriezenveen
+0187;Wanneperveen
+0188;Weerselo
+0189;Wierden
+0190;Wijhe
+0191;IJsselmuiden
+0192;Zwartsluis
+0193;Zwolle
+0194;Brederwiede
+0195;IJsselham
+0196;Rijnwaarden
+0197;Aalten
+0198;Ammerzoden
+0199;Angerlo
+0200;Apeldoorn
+0201;Appeltern
+0202;Arnhem
+0203;Barneveld
+0204;Batenburg
+0205;Beesd
+0206;Bemmel
+0207;Bergh
+0208;Bergharen
+0209;Beuningen
+0210;Beusichem
+0211;Borculo
+0212;Brakel
+0213;Brummen
+0214;Buren
+0215;Buurmalsen
+0216;Culemborg
+0217;Deil
+0218;Didam
+0219;Dinxperlo
+0220;Dodewaard
+0221;Doesburg
+0222;Doetinchem
+0223;Doornspijk
+0224;Dreumel
+0225;Druten
+0226;Duiven
+0227;Echteld
+0228;Ede
+0229;Eibergen
+0230;Elburg
+0231;Elst
+0232;Epe
+0233;Ermelo
+0234;Est en Opijnen
+0235;Ewijk
+0236;Geldermalsen
+0237;Gendringen
+0238;Gendt
+0239;Gorssel
+0240;Groenlo
+0241;Groesbeek
+0242;Haaften
+0243;Harderwijk
+0244;Hattem
+0245;Hedel
+0246;Heerde
+0247;Heerewaarden
+0248;Hengelo (Gld)
+0249;Herwen en Aerdt
+0250;Herwijnen
+0251;Heteren
+0252;Heumen
+0253;Hoevelaken
+0254;Horssen
+0255;Huissen
+0256;Hummelo en Keppel
+0257;Kerkwijk
+0258;Kesteren
+0259;Laren (Gld)
+0260;Lichtenvoorde
+0261;Lienden
+0262;Lochem
+0263;Maasdriel
+0264;Maurik
+0265;Millingen aan de Rijn
+0266;Neede
+0267;Nijkerk
+0268;Nijmegen
+0269;Oldebroek
+0270;Ophemert
+0271;Overasselt
+0272;Pannerden
+0273;Putten
+0274;Renkum
+0275;Rheden
+0276;Rossum
+0277;Rozendaal
+0278;Ruurlo
+0279;Scherpenzeel
+0280;Steenderen
+0281;Tiel
+0282;Ubbergen
+0283;Valburg
+0284;Varik
+0285;Voorst
+0286;Vorden
+0287;Vuren
+0288;Waardenburg
+0289;Wageningen
+0290;Wamel
+0291;Warnsveld
+0292;Wehl
+0293;Westervoort
+0294;Winterswijk
+0295;Wisch
+0296;Wijchen
+0297;Zaltbommel
+0298;Zelhem
+0299;Zevenaar
+0300;Zoelen
+0301;Zutphen
+0302;Nunspeet
+0303;Dronten
+0304;Neerijnen
+0305;Abcoude
+0306;Amerongen
+0307;Amersfoort
+0308;Baarn
+0309;Benschop
+0310;De Bilt
+0311;Breukelen
+0312;Bunnik
+0313;Bunschoten
+0314;Cothen
+0315;Doorn
+0316;Driebergen-Rijsenburg
+0317;Eemnes
+0318;Harmelen
+0319;Hoenkoop
+0320;Hoogland
+0321;Houten
+0322;Jutphaas
+0323;Kamerik
+0324;Kockengen
+0325;Langbroek
+0326;Leersum
+0327;Leusden
+0328;Linschoten
+0329;Loenen
+0330;Loosdrecht
+0331;Lopik
+0332;Maarn
+0333;Maarssen
+0334;Maartensdijk
+0335;Montfoort
+0336;Mijdrecht
+0337;Nigtevecht
+0338;Polsbroek
+0339;Renswoude
+0340;Rhenen
+0341;Snelrewaard
+0342;Soest
+0343;Stoutenburg
+0344;Utrecht
+0345;Veenendaal
+0346;Vinkeveen en Waverveen
+0347;Vleuten-De Meern
+0348;Vreeswijk
+0349;Willeskop
+0350;Wilnis
+0351;Woudenberg
+0352;Wijk bij Duurstede
+0353;IJsselstein
+0354;Zegveld
+0355;Zeist
+0356;Nieuwegein
+0357;Egmond
+0358;Aalsmeer
+0359;Abbekerk
+0360;Akersloot
+0361;Alkmaar
+0362;Amstelveen
+0363;Amsterdam
+0364;Andijk
+0365;Graft-De Rijp
+0366;Anna Paulowna
+0367;Assendelft
+0368;Avenhorn
+0369;Barsingerhorn
+0370;Beemster
+0371;Beets
+0372;Bennebroek
+0373;Bergen (NH)
+0374;Berkhout
+0375;Beverwijk
+0376;Blaricum
+0377;Bloemendaal
+0378;Blokker
+0379;Bovenkarspel
+0380;Broek in Waterland
+0381;Bussum
+0382;Callantsoog
+0383;Castricum
+0384;Diemen
+0385;Edam-Volendam
+0386;Egmond aan Zee
+0387;Egmond-Binnen
+0388;Enkhuizen
+0389;Graft
+0390;'s-Graveland
+0391;Grootebroek
+0392;Haarlem
+0393;Haarlemmerliede en Spaarnwoude
+0394;Haarlemmermeer
+0395;Harenkarspel
+0396;Heemskerk
+0397;Heemstede
+0398;Heerhugowaard
+0399;Heiloo
+0400;Den Helder
+0401;Hensbroek
+0402;Hilversum
+0403;Hoogkarspel
+0404;Hoogwoud
+0405;Hoorn
+0406;Huizen
+0407;Ilpendam
+0408;Jisp
+0409;Katwoude
+0410;Koedijk
+0411;Koog aan de Zaan
+0412;Niedorp
+0413;Krommenie
+0414;Kwadijk
+0415;Landsmeer
+0416;Langedijk
+0417;Laren
+0418;Limmen
+0419;Marken
+0420;Medemblik
+0421;Middelie
+0422;Midwoud
+0423;Monnickendam
+0424;Muiden
+0425;Naarden
+0426;Nederhorst den Berg
+0427;Nibbixwoud
+0428;Nieuwe Niedorp
+0429;Obdam
+0430;Oosthuizen
+0431;Oostzaan
+0432;Opmeer
+0433;Opperdoes
+0434;Oterleek
+0435;Oudendijk
+0436;Oude Niedorp
+0437;Ouder-Amstel
+0438;Oudorp
+0439;Purmerend
+0440;De Rijp
+0441;Schagen
+0442;Schellinkhout
+0443;Schermerhorn
+0444;Schoorl
+0445;Sint Maarten
+0446;Sint Pancras
+0447;Sijbekarspel
+0448;Texel
+0449;Twisk
+0450;Uitgeest
+0451;Uithoorn
+0452;Ursem
+0453;Velsen
+0454;Venhuizen
+0455;Warder
+0456;Warmenhuizen
+0457;Weesp
+0458;Schermer
+0459;Wervershoof
+0460;Westwoud
+0461;Westzaan
+0462;Wieringen
+0463;Wieringermeer
+0464;Wieringerwaard
+0465;Winkel
+0466;Wognum
+0467;Wormer
+0468;Wormerveer
+0469;Wijdenes
+0470;Wijdewormer
+0471;Zaandam
+0472;Zaandijk
+0473;Zandvoort
+0474;Zuid- en Noord-Schermer
+0475;Zwaag
+0476;Zijpe
+0477;Albrandswaard (oud)
+0478;Zeevang
+0479;Zaanstad
+0480;Ter Aar
+0481;Abbenbroek
+0482;Alblasserdam
+0483;Alkemade
+0484;Alphen aan den Rijn
+0485;Ameide
+0486;Ammerstol
+0487;Arkel
+0488;Asperen
+0489;Barendrecht
+0490;Benthuizen
+0491;Bergambacht
+0492;Bergschenhoek
+0493;Berkel en Rodenrijs
+0494;Berkenwoude
+0495;Bleiswijk
+0496;Bleskensgraaf en Hofwegen
+0497;Bodegraven
+0498;Drechterland
+0499;Boskoop
+0500;Brandwijk
+0501;Brielle
+0502;Capelle aan den IJssel
+0503;Delft
+0504;Dirksland
+0505;Dordrecht
+0506;Driebruggen
+0507;Dubbeldam
+0508;Everdingen
+0509;Geervliet
+0510;Giessenburg
+0511;Goedereede
+0512;Gorinchem
+0513;Gouda
+0514;Gouderak
+0515;Goudriaan
+0516;Goudswaard
+0517;'s-Gravendeel
+0518;'s-Gravenhage
+0519;'s-Gravenzande
+0520;Groot-Ammers
+0521;Haastrecht
+0522;Hagestein
+0523;Hardinxveld-Giessendam
+0524;Hazerswoude
+0525;Heenvliet
+0526;Heerjansdam
+0527;Hei- en Boeicop
+0528;Heinenoord
+0529;Noorder-Koggenland
+0530;Hellevoetsluis
+0531;Hendrik-Ido-Ambacht
+0532;Stede Broec
+0533;Heukelum
+0534;Hillegom
+0535;Hoogblokland
+0536;Hoornaar
+0537;Katwijk
+0538;Kedichem
+0539;Klaaswaal
+0540;Koudekerk aan den Rijn
+0541;Krimpen aan de Lek
+0542;Krimpen aan den IJssel
+0543;Langerak
+0544;Leerbroek
+0545;Leerdam
+0546;Leiden
+0547;Leiderdorp
+0548;Leidschendam
+0549;Leimuiden
+0550;Lekkerkerk
+0551;Lexmond
+0552;De Lier
+0553;Lisse
+0554;Maasdam
+0555;Maasland
+0556;Maassluis
+0557;Meerkerk
+0558;Wester-Koggenland
+0559;Middelharnis
+0560;Moerkapelle
+0561;Molenaarsgraaf
+0562;Monster
+0563;Moordrecht
+0564;Mijnsheerenland
+0565;Naaldwijk
+0566;Nieuw-Beijerland
+0567;Nieuwerkerk aan den IJssel
+0568;Bernisse
+0569;Nieuwkoop
+0570;Nieuwland
+0571;Nieuw-Lekkerland
+0572;Nieuwpoort
+0573;Nieuwveen
+0574;Noordeloos
+0575;Noordwijk
+0576;Noordwijkerhout
+0577;Nootdorp
+0578;Numansdorp
+0579;Oegstgeest
+0580;Oostflakkee
+0581;Oostvoorne
+0582;Ottoland
+0583;Oud-Alblas
+0584;Oud-Beijerland
+0585;Binnenmaas
+0586;Oudenhoorn
+0587;Ouderkerk aan den IJssel
+0588;Korendijk
+0589;Oudewater
+0590;Papendrecht
+0591;Piershil
+0592;Poortugaal
+0593;Puttershoek
+0594;Pijnacker
+0595;Reeuwijk
+0596;Rhoon
+0597;Ridderkerk
+0598;Rockanje
+0599;Rotterdam
+0600;Rozenburg
+0601;Rijnsaterwoude
+0602;Rijnsburg
+0603;Rijswijk
+0604;Sassenheim
+0605;Schelluinen
+0606;Schiedam
+0607;Schipluiden
+0608;Schoonhoven
+0609;Schoonrewoerd
+0610;Sliedrecht
+0611;Cromstrijen
+0612;Spijkenisse
+0613;Albrandswaard
+0614;Westvoorne
+0615;Stolwijk
+0616;Streefkerk
+0617;Strijen
+0618;Tienhoven (ZH)
+0619;Valkenburg (ZH)
+0620;Vianen
+0621;Vierpolders
+0622;Vlaardingen
+0623;Vlist
+0624;Voorburg
+0625;Voorhout
+0626;Voorschoten
+0627;Waddinxveen
+0628;Warmond
+0629;Wassenaar
+0630;Wateringen
+0631;Westmaas
+0632;Woerden
+0633;Woubrugge
+0634;Wijngaarden
+0635;Zevenhoven
+0636;Zevenhuizen
+0637;Zoetermeer
+0638;Zoeterwoude
+0639;Zuid-Beijerland
+0640;Zuidland
+0641;Zwartewaal
+0642;Zwijndrecht
+0643;Nederlek
+0644;Ouderkerk
+0645;Jacobswoude
+0646;Rijneveld
+0647;Moerhuizen
+0648;Aardenburg
+0649;Arnemuiden
+0650;Axel
+0651;Baarland
+0652;Biervliet
+0653;Gaasterlân-Sleat
+0654;Borsele
+0655;Breskens
+0656;Brouwershaven
+0657;Bruinisse
+0658;Cadzand
+0659;Clinge
+0660;Domburg
+0661;Driewegen
+0662;Duiveland
+0663;Ellewoutsdijk
+0664;Goes
+0665;Graauw en Langendam
+0666;'s-Gravenpolder
+0667;Groede
+0668;West Maas en Waal
+0669;'s Heer Abtskerke
+0670;'s-Heer Arendskerke
+0671;'s-Heerenhoek
+0672;Heinkenszand
+0673;Hoedekenskerke
+0674;Hoek
+0675;Hontenisse
+0676;Hoofdplaat
+0677;Hulst
+0678;Kapelle
+0679;Kattendijke
+0680;Kloetinge
+0681;Koewacht
+0682;Kortgene
+0683;Wymbritseradiel
+0684;Krabbendijke
+0685;Kruiningen
+0686;Mariekerke
+0687;Middelburg
+0688;Middenschouwen
+0689;Giessenlanden
+0690;Nieuwvliet
+0691;Nisse
+0692;Oostburg
+0693;Graafstroom
+0694;Liesveld
+0695;Oudelande
+0696;Oud-Vossemeer
+0697;Overslag
+0698;Ovezande
+0699;Philippine
+0700;Poortvliet
+0701;Retranchement
+0702;Rilland-Bath
+0703;Reimerswaal
+0704;Sas van Gent
+0705;Scherpenisse
+0706;Schoondijke
+0707;Zederik
+0708;Sint-Annaland
+0709;St. Jansteen
+0710;Wûnseradiel
+0711;Sint-Maartensdijk
+0712;Sint Philipsland
+0713;Sluis (oud)
+0714;Stavenisse
+0715;Terneuzen
+0716;Tholen
+0717;Veere
+0718;Vlissingen
+0719;Vogelwaarde
+0720;Valkenisse
+0721;Waarde
+0722;Waterlandkerkje
+0723;Wemeldinge
+0724;Westdorpe
+0725;Westerschouwen
+0726;Westkapelle
+0727;Wissenkerke
+0728;Wolphaartsdijk
+0729;Yerseke
+0730;IJzendijke
+0731;Zaamslag
+0732;Zierikzee
+0733;Lingewaal
+0734;Zuiddorpe
+0735;Zuidzande
+0736;De Ronde Venen
+0737;Tytsjerksteradiel
+0738;Aalburg
+0739;Aarle-Rixtel
+0740;Almkerk
+0741;Alphen en Riel
+0742;Andel
+0743;Asten
+0744;Baarle-Nassau
+0745;Bakel en Milheeze
+0746;Beek en Donk
+0747;Beers
+0748;Bergen op Zoom
+0749;Bergeyk
+0750;Berghem
+0751;Berkel-Enschot
+0752;Berlicum
+0753;Best
+0754;Bladel en Netersel
+0755;Boekel
+0756;Boxmeer
+0757;Boxtel
+0758;Breda
+0759;Budel
+0760;Chaam
+0761;Cuijk en Sint Agatha
+0762;Deurne
+0763;Diessen
+0764;Dinteloord en Prinsenland
+0765;Pekela
+0766;Dongen
+0767;Drunen
+0768;Den Dungen
+0769;Dussen
+0770;Eersel
+0771;Eethen
+0772;Eindhoven
+0773;Empel en Meerwijk
+0774;Engelen
+0775;Erp
+0776;Esch
+0777;Etten-Leur
+0778;Fijnaart en Heijningen
+0779;Geertruidenberg
+0780;Geffen
+0781;Geldrop
+0782;Gemert
+0783;Giessen
+0784;Gilze en Rijen
+0785;Goirle
+0786;Grave
+0787;'s Gravenmoer
+0788;Haaren
+0789;Halsteren
+0790;Haps
+0791;Heesch
+0792;Heeswijk-Dinther
+0793;Heeze
+0794;Helmond
+0795;Helvoirt
+0796;'s-Hertogenbosch
+0797;Heusden
+0798;Hilvarenbeek
+0799;Hoeven
+0800;Hoogeloon, Hapert en Casteren
+0801;Hooge en Lage Mierde
+0802;Hooge en Lage Zwaluwe
+0803;Huijbergen
+0804;Klundert
+0805;Leende
+0806;Liempde
+0807;Lieshout
+0808;Lith
+0809;Loon op Zand
+0810;Luyksgestel
+0811;Maarheeze
+0812;Made en Drimmelen
+0813;Megen, Haren en Macharen
+0814;Mierlo
+0815;Mill en Sint Hubert
+0816;Moergestel
+0817;Nieuw-Ginneken
+0818;Nieuw-Vossemeer
+0819;Nistelrode
+0820;Nuenen, Gerwen en Nederwetten
+0821;Nuland
+0822;Oeffelt
+0823;Oirschot
+0824;Oisterwijk
+0825;Oost-, West- en Middelbeers
+0826;Oosterhout
+0827;Oploo, St. Anthonis en Ledeacker
+0828;Oss
+0829;Ossendrecht
+0830;Oudenbosch
+0831;Oud en Nieuw Gastel
+0832;Prinsenbeek
+0833;Putte
+0834;Raamsdonk
+0835;Ravenstein
+0836;Reusel
+0837;Riethoven
+0838;Roosendaal en Nispen
+0839;Rosmalen
+0840;Rucphen
+0841;Rijsbergen
+0842;Rijswijk (NB)
+0843;Schaijk
+0844;Schijndel
+0845;Sint-Michielsgestel
+0846;Sint-Oedenrode
+0847;Someren
+0848;Son en Breugel
+0849;Sprang-Capelle
+0850;Standdaarbuiten
+0851;Steenbergen
+0852;Waterland
+0853;Terheijden
+0854;Teteringen
+0855;Tilburg
+0856;Uden
+0857;Udenhout
+0858;Valkenswaard
+0859;Veen
+0860;Veghel
+0861;Veldhoven
+0862;Vessem, Wintelre en Knegsel
+0863;Vierlingsbeek
+0864;Vlijmen
+0865;Vught
+0866;Waalre
+0867;Waalwijk
+0868;Wanroij
+0869;Waspik
+0870;Werkendam
+0871;Westerhoven
+0872;Willemstad
+0873;Woensdrecht
+0874;Woudrichem
+0875;Wouw
+0876;Wijk en Aalburg
+0877;Zeeland
+0878;Zevenbergen
+0879;Zundert
+0880;Wormerland
+0881;Onderbanken
+0882;Landgraaf
+0883;Amby
+0884;Amstenrade
+0885;Arcen en Velden
+0886;Baexem
+0887;Beegden
+0888;Beek
+0889;Beesel
+0890;Belfeld
+0891;Bemelen
+0892;Berg en Terblijt
+0893;Bergen (L)
+0894;Bingelrade
+0895;Bocholtz
+0896;Borgharen
+0897;Born
+0898;Broekhuizen
+0899;Brunssum
+0900;Bunde
+0901;Cadier en Keer
+0902;Echt
+0903;Elsloo
+0904;Eygelshoven
+0905;Eijsden
+0906;Geleen
+0907;Gennep
+0908;Geulle
+0909;Grathem
+0910;Grevenbicht
+0911;Gronsveld
+0912;Grubbenvorst
+0913;Gulpen
+0914;Haelen
+0915;Heel en Panheel
+0916;Heer
+0917;Heerlen
+0918;Helden
+0919;Herten
+0920;Heythuysen
+0921;Hoensbroek
+0922;Horn
+0923;Horst
+0924;Hulsberg
+0925;Hunsel
+0926;Itteren
+0927;Jabeek
+0928;Kerkrade
+0929;Kessel
+0930;Klimmen
+0931;Limbricht
+0932;Linne
+0933;Maasbracht
+0934;Maasbree
+0935;Maastricht
+0936;Margraten
+0937;Meerlo
+0938;Meerssen
+0939;Melick en Herkenbosch
+0940;Merkelbeek
+0941;Meijel
+0942;Mheer
+0943;Montfort
+0944;Mook en Middelaar
+0945;Munstergeleen
+0946;Nederweert
+0947;Neer
+0948;Nieuwenhagen
+0949;Nieuwstadt
+0950;Noorbeek
+0951;Nuth
+0952;Obbicht en Papenhoven
+0953;Ohé en Laak
+0954;Oirsbeek
+0955;Ottersum
+0956;Posterholt
+0957;Roermond
+0958;Roggel
+0959;Roosteren
+0960;Schaesberg
+0961;Schimmert
+0962;Schinnen
+0963;Schinveld
+0964;Sevenum
+0965;Simpelveld
+0966;Sint Geertruid
+0967;Sint Odiliënberg
+0968;Sittard
+0969;Slenaken
+0970;Spaubeek
+0971;Stein
+0972;Stevensweert
+0973;Stramproy
+0974;Susteren
+0975;Swalmen
+0976;Tegelen
+0977;Thorn
+0978;Ubach over Worms
+0979;Ulestraten
+0980;Urmond
+0981;Vaals
+0982;Valkenburg-Houthem
+0983;Venlo
+0984;Venray
+0985;Vlodrop
+0986;Voerendaal
+0987;Wanssum
+0988;Weert
+0989;Wessem
+0990;Wittem
+0991;Wijlre
+0992;Wijnandsrade
+0993;Meerlo-Wanssum
+0994;Valkenburg aan de Geul
+0995;Lelystad
+0996;Zuidelijke IJsselmeerpolders
+0997;Centraal Persoonsregister (Niet GBA)
+0998;Buitenland (Niet GBA)
+0999;Onbekend (Niet GBA)
+1000;Aagtekerke
+1001;Aalst
+1002;Aarlanderveen
+1003;Abcoude-Baambrugge
+1004;Abcoude-Proostdij
+1005;Achttienhoven
+1006;Aengwirden
+1007;Alem, Maren en Kessel
+1008;Alphen
+1009;Ambt-Almelo
+1010;Ambt-Doetinchem
+1011;Ambt-Hardenberg
+1012;Ambt-Ommen
+1013;Ambt-Vollenhove
+1014;Ankeveen
+1015;Baardwijk
+1016;Balgoij
+1017;Barwoutswaarder
+1018;Bath
+1019;Bellingwolde
+1020;Besoijen
+1021;Beugen en Rijkevoort
+1022;Biggekerke
+1023;Bokhoven
+1024;Den Bommel
+1025;Bommenede
+1026;Borkel en Schaft
+1027;Boschkapelle
+1028;Breukelen-Nijenrode
+1029;Breukelen-Sint Pieters
+1030;Broek
+1031;Broek op Langendijk
+1032;Broeksittard
+1033;Buggenum
+1034;Buiksloot
+1035;Burgh
+1036;Capelle
+1037;Charlois
+1038;Colijnsplaat
+1039;Cromvoirt
+1040;Delfshaven
+1041;Deurne en Liessel
+1042;Deursen en Dennenburg
+1043;Dieden, Demen en Langel
+1044;Dinther
+1045;Dommelen
+1046;Doorwerth
+1047;Dreischor
+1048;Driebergen
+1049;Drongelen
+1050;Duivendijke
+1051;Duizel en Steensel
+1052;Eede
+1053;Elkerzee
+1054;Ellemeet
+1055;Elten
+1056;Emmikhoven en Waardhuizen
+1057;Escharen
+1058;Gameren
+1059;Gassel
+1060;Genderen
+1061;Gestel en Blaarthem
+1062;Giessen-Nieuwkerk
+1063;Giessendam
+1064;Ginneken en Bavel
+1065;Grafhorst
+1066;Groote Lindt
+1067;Grijpskerke
+1068;Haamstede
+1069;Haarzuilens
+1070;Hardinxveld
+1071;Hedikhuizen
+1072;Heeswijk
+1073;Heille
+1074;Hekelingen
+1075;Hekendorp
+1076;Hemmen
+1077;Hengstdijk
+1078;Herkingen
+1079;Herpen
+1080;Herpt
+1081;Hillegersberg
+1082;Hof van Delft
+1083;Hoogezand
+1084;Hoogkerk
+1085;Hoogvliet
+1086;Houthem
+1087;Houtrijk en Polanen
+1088;Huisseling en Neerloon
+1089;Hurwenen
+1090;Ittervoort
+1091;Jaarsveld
+1092;Kamperveen
+1093;Katendrecht
+1094;Kats
+1095;Kerkwerve
+1096;Kethel en Spaland
+1097;Kortenhoef
+1098;Koudekerke
+1099;Kralingen
+1100;Laag-Nieuwkoop
+1101;Lange Ruige Weide
+1102;Lierop
+1103;Linden
+1104;Lithoijen
+1105;Loenersloot
+1106;Lonneker
+1107;Loosduinen
+1108;Maarsseveen
+1109;Maashees en Overloon
+1110;Maasniel
+1111;Meeuwen
+1112;Meliskerke
+1113;Melissant
+1114;Mesch
+1115;Nederhemert
+1116;Neeritter
+1117;Nieuw- en Sint Joosland
+1118;Nieuw-Helvoet
+1119;Nieuwe Tonge
+1120;Nieuwendam
+1121;Nieuwenhoorn
+1122;Nieuwerkerk
+1123;Nieuwkuijk
+1124;Noord-Scharwoude
+1125;Noord-Waddinxveen
+1126;Noordbroek
+1127;Noorddijk
+1128;Noordgouwe
+1129;Noordwelle
+1130;Nunhem
+1131;Odijk
+1132;Oerle
+1133;Ooltgensplaat
+1134;Oost- en West-Barendrecht
+1135;Oost- en West-Souburg
+1136;Oosterland
+1137;Oostkapelle
+1138;Ossenisse
+1139;Oud- en Nieuw-Mathenesse
+1140;Oud-Valkenburg
+1141;Oud-Vroenhoven
+1142;Ouddorp
+1143;Oude-Tonge
+1144;Oudenrijn
+1145;Oudheusden
+1146;Oudkarspel
+1147;Oudshoorn
+1148;Ouwerkerk
+1149;Overschie
+1150;Oijen en Teeffelen
+1151;Papekop
+1152;Pernis
+1153;Petten
+1154;Peursum
+1155;Poederoijen
+1156;Princenhage
+1157;Ransdorp
+1158;Reek
+1159;Renesse
+1160;Rietveld
+1161;Rilland
+1162;Rimburg
+1163;Ritthem
+1164;Ruwiel
+1165;Rijckholt
+1166;Rijsenburg
+1167;Sambeek
+1168;Sappemeer
+1169;Schalkwijk
+1170;Schiebroek
+1171;Schin op Geul
+1172;Schore
+1173;Schoten
+1174;Schoterland
+1175;Serooskerke (Schouwen)
+1176;Serooskerke (Walcheren)
+1177;St. Anna ter Muiden
+1178;Sint Kruis
+1179;Sint Laurens
+1180;Sint Pieter
+1181;Sloten (NH)
+1182;Sluipwijk
+1183;Soerendonk, Sterksel en Gastel
+1184;Sommelsdijk
+1185;Spaarndam
+1186;Spanbroek
+1187;Sprang
+1188;Stad aan 't Haringvliet
+1189;Stad-Almelo
+1190;Stad-Doetinchem
+1191;Stad-Hardenberg
+1192;Stad-Ommen
+1193;Stad-Vollenhove
+1194;Stein (ZH)
+1195;Stellendam
+1196;Stiphout
+1197;Stompwijk
+1198;Stoppeldijk
+1199;Stratum
+1200;Strucht
+1201;Strijp
+1202;Tienhoven (U)
+1203;Tongelre
+1204;Tudderen
+1205;Tull en 't Waal
+1206;Veldhoven en Meerveldhoven
+1207;Veldhuizen
+1208;Velp
+1209;Veur
+1210;Vlaardinger-Ambacht
+1211;Vleuten
+1212;Vlierden
+1213;Vreeland
+1214;Vrouwenpolder
+1215;Vrijenban
+1216;Vrijhoeve-Capelle
+1217;Waarder
+1218;Wadenoijen
+1219;Watergraafsmeer
+1220;Wedde
+1221;Weesperkarspel
+1222;de Werken en Sleeuwijk
+1223;Werkhoven
+1224;Westbroek
+1225;Wildervank
+1226;Willige-Langerak
+1227;Wilsum
+1228;Woensel
+1229;Wijk aan Zee en Duin
+1230;IJsselmonde
+1231;IJzendoorn
+1232;Zalk en Veecaten
+1233;Zeelst
+1234;Zegwaart
+1235;Zesgehuchten
+1236;Zonnemaire
+1237;Zoutelande
+1238;Zuid-Scharwoude
+1239;Zuid-Waddinxveen
+1240;Zuidbroek
+1241;Zuidschalkwijk
+1242;Zuilen
+1243;Zuilichem
+1244;Zwammerdam
+1245;Zwollerkerspel
+1246;Bangert
+1247;Beek (NB)
+1248;Driel
+1249;Nieuwer-Amstel
+1250;Onstwedde
+1251;Etten en Leur
+1252;Valkenburg (L)
+1253;Wissekerke
+1254;Borssele
+1255;Eethen, Genderen en Heesbeen
+1256;Koudekerk
+1257;Staveren
+1258;Rijsoort en Strevelshoek
+1259;Millingen
+1260;Hemelumer Oldephaert en Noordwolde
+1261;Simonshaven
+1262;Bleskensgraaf
+1263;Drongelen, Hangoort,Gansoyen en Doeveren
+1264;Dussen, Munster en Muilkerk
+1265;Meeuwen, Hill en Babyloniënbroek
+1301;Abtsregt
+1302;Achthoven
+1303;Achttienhoven (bij Nieuwkoop)
+1304;Ackersdijk en Vrouwenregt
+1305;Benthorn
+1306;Berkenrode
+1307;Biert
+1308;Biesland
+1309;Bijlmermeer
+1310;Cabauw
+1311;Cillaarshoek
+1312;Darthuizen
+1313;Dorth
+1314;Duist
+1315;Edam
+1316;Etersheim
+1317;Gapinge
+1318;Gerverscop
+1319;Goidschalxoord
+1320;'s-Gravenambacht
+1321;'s-Gravesloot
+1322;Groeneveld
+1323;Groet
+1324;Grosthuizen
+1325;Haarlemmerliede
+1326;'s Heer Hendriks Kinderen
+1327;Heer Oudelands Ambacht
+1328;Hodenpijl
+1329;Hofwegen
+1330;Hoog en Woud Harnasch
+1331;Hoogeveen in Delfland
+1332;Hoogeveen in Rijnland
+1333;Hoogmade
+1334;Kalslagen
+1335;Kamerik Houtdijken
+1336;Kamerik Mijzijde
+1337;Kijfhoek
+1338;Kleine Lindt
+1339;Kleverskerke
+1340;Laagblokland
+1341;Loenen en Wolveren
+1342;Maarssenbroek
+1343;Meerdervoort
+1344;Middelburg (ZH)
+1345;De Mijl
+1346;Naters
+1347;Nederslingelandt
+1348;Nieuwland, Kortland en 's-Graveland
+1349;Nieuwveen in Delfland
+1350;Noord-Polsbroek
+1351;Onwaard
+1352;Oost-Barendrecht
+1353;Oost-Souburg
+1355;Oud-Wulven
+1356;Oude en Nieuwe Struiten
+1357;Oudhuizen
+1358;Oukoop
+1359;Portengen
+1360;Rhijnauwen
+1361;Rietwijkeroord
+1362;Rijsoort
+1363;Roxenisse
+1364;Ruijven
+1365;Sandelingen-Ambacht
+1366;Schardam
+1367;Scharwoude
+1368;Schellingwoude
+1369;Schokland
+1370;Schonauwen
+1371;Schuddebeurs en Simonshaven
+1372;Sint Anthonypolder
+1373;St. Maartensregt
+1374;Spaarnwoude
+1375;Spijk
+1376;Steenbergen en Kruisland
+1377;Sterkenburg
+1378;Stormpolder
+1380;Strevelshoek
+1381;Strijensas
+1382;Teckop
+1383;Tempel
+1384;Veenhuizen
+1385;De Vennip
+1386;Verwolde
+1387;Vinkeveen
+1388;Vliet
+1390;Vrije en Lage Boekhorst
+1391;Vrijhoeven
+1392;de Vuursche
+1393;Waverveen
+1394;West-Barendrecht
+1395;West-Souburg
+1396;Wieldrecht
+1397;Wimmenum
+1398;Wulverhorst
+1399;Zevender
+1400;Zouteveen
+1401;Zuid-Polsbroek
+1402;Zuidbroek (ZH)
+1403;Zuidwijk
+1404;de Noordoostelijke Polder
+1507;Horst aan de Maas
+1509;Oude IJsselstreek
+1525;Teylingen
+1581;Utrechtse Heuvelrug
+1586;Oost Gelre
+1598;Koggenland
+1621;Lansingerland
+1640;Leudal
+1641;Maasgouw
+1651;Eemsmond
+1652;Gemert-Bakel
+1655;Halderberge
+1658;Heeze-Leende
+1659;Laarbeek
+1661;Reiderland
+1663;De Marne
+1665;Made
+1666;Zevenhuizen-Moerkapelle
+1667;Reusel-De Mierden
+1669;Roerdalen
+1670;Roggel en Neer
+1671;Maasdonk
+1672;Rijnwoude
+1673;Liemeer
+1674;Roosendaal
+1676;Schouwen-Duiveland
+1679;Ambt Montfort
+1680;Aa en Hunze
+1681;Borger-Odoorn
+1684;Cuijk
+1685;Landerd
+1690;De Wolden
+1691;St. Anthonis
+1695;Noord-Beveland
+1696;Wijdemeren
+1697;Middenveld
+1698;Sluis-Aardenburg
+1699;Noordenveld
+1700;Twenterand
+1701;Westerveld
+1702;Sint Anthonis
+1705;Lingewaard
+1706;Cranendonck
+1708;Steenwijkerland
+1709;Moerdijk
+1711;Echt-Susteren
+1714;Sluis
+1719;Drimmelen
+1721;Bernheze
+1722;Ferwerderadiel
+1723;Alphen-Chaam
+1724;Bergeijk
+1728;Bladel
+1729;Gulpen-Wittem
+1730;Tynaarlo
+1731;Midden-Drenthe
+1734;Overbetuwe
+1735;Hof van Twente
+1740;Neder-Betuwe
+1742;Rijssen-Holten
+1771;Geldrop-Mierlo
+1773;Olst-Wijhe
+1774;Dinkelland
+1783;Westland
+1842;Midden-Delfland
+1859;Berkelland
+1876;Bronckhorst
+1883;Sittard-Geleen
+1884;Kaag en Braassem
+1891;Dantumadiel
+1892;Zuidplas
+1894;Peel en Maas
+1895;Oldambt
+1896;Zwartewaterland
+1900;Súdwest-Fryslân
+1901;Bodegraven-Reeuwijk
+1903;Eijsden-Margraten
+1904;Stichtse Vecht
+1908;Menameradiel
+1911;Hollands Kroon
+1916;Leidschendam-Voorburg
+1921;De Friese Meren
+1924;Goeree-Overflakkee
+1926;Pijnacker-Nootdorp
+1927;Molenwaard
+1930;Nissewaard
+1931;Krimpenerwaard
+1937;Heel
+1940;De Fryske Marren
+1942;Gooise Meren
+1945;Berg en Dal
+1948;Meierijstad
+1949;Waadhoeke
+1950;Westerwolde
+1952;Midden-Groningen
+1954;Beekdaelen
+1955;Montferland
+1959;Altena
+1960;West Betuwe
+1961;Vijfheerenlanden
+1963;Hoeksche Waard
+1966;Het Hogeland
+1969;Westerkwartier
+1970;Noardeast-Fryslân
+1978;Molenlanden
+1979;Eemsdelta
+1980;Dijk en Waard
+1982;Land van Cuijk
+1987;Menterwolde
+1991;Maashorst
+1992;Voorne aan Zee
+1999;Registratie Niet Ingezetenen (RNI)
