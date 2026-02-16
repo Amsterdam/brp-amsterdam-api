@@ -11,9 +11,9 @@ class TestBrpPartnerhistorieView:
 
     def test_partnerhistorie_view(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
-        with open("tests/data/example.xml").read() as mock_response:
+        with open("tests/data/example.xml") as mock_response:
 
-            requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response)
+            requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")
             token = build_jwt_token(
@@ -37,7 +37,39 @@ class TestBrpPartnerhistorieView:
                         "geslacht": "V",
                         "naam": {
                             "geslachtsnaam": "Ayaan Nasra Si'id Ahmed",
-                            "inOnderzoek": "050000",
+                        },
+                        "soortVerbintenis": "H",
+                    },
+                ]
+            }
+
+    def test_partnerhistorie_view_null_values(self, api_client, requests_mock, common_headers):
+        """Prove that search is possible"""
+        with open("tests/data/example.xml") as mock_response:
+            requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
+
+            url = reverse("brp-partnerhistorie")
+            token = build_jwt_token(
+                [
+                    "benk-brp-personen-api",
+                    "benk-brp-partnerhistorie-api",
+                ]
+            )
+            response = api_client.post(
+                f"{url}?resultaat-formaat=volledig",
+                {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "123456789"},
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    **common_headers,
+                },
+            )
+            assert response.status_code == 200, response.data
+            assert response.json() == {
+                "partnerhistorie": [
+                    {
+                        "geslacht": "V",
+                        "naam": {
+                            "geslachtsnaam": "Ayaan Nasra Si'id Ahmed",
                         },
                         "soortVerbintenis": "H",
                     },
