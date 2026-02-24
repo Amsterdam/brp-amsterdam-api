@@ -25,5 +25,4 @@ ENDPOINTS = [
 )
 @click.option("-l", "--load-test", type=bool, default=False, help="Perform a load test")
 def cli(endpoints: list, load_test: bool):
-    print("TESTING ENDPOINTS: ", endpoints)
     run_tests(endpoints)
