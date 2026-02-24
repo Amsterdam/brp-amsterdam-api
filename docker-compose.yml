@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: src/brp_personen_mock/Dockerfile
       args:
-        - JSON_URL=https://raw.githubusercontent.com/BRP-API/personen-informatie-service/refs/heads/main/src/config/BrpService/test-data.json
+        - JSON_URL=https://raw.githubusercontent.com/Amsterdam/brp-amsterdam-api/refs/heads/main/src/brp_personen_mock/test-data.json
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://+:5010
