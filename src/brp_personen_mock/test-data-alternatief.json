@@ -32393,6 +32393,9 @@
                     "plaats": {
                         "omschrijving": "Ksar Boukhari"
                     }
+                },
+                "ontbindingHuwelijkPartnerschap": {
+                    "datum": "20250303"
                 }
             }
         ],
@@ -105414,6 +105417,9 @@
                         "code": "0363",
                         "omschrijving": "Amsterdam"
                     }
+                },
+                "ontbindingHuwelijkPartnerschap": {
+                    "datum": "20250815"
                 }
             }
         ],
