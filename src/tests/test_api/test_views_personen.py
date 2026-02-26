@@ -108,6 +108,27 @@ class TestBrpPersonenView:
         assert response.status_code == 403, response.data
         assert response.data["code"] == "permissionDenied"
 
+    def test_expired_token(self, api_client, common_headers):
+        """Prove that an expired token results in an error"""
+        url = reverse("brp-personen")
+        token = build_jwt_token(["benk-brp-personen-api"], expiration=-200)
+
+        response = api_client.post(
+            url,
+            {
+                "type": "ZoekMetPostcodeEnHuisnummer",
+                "postcode": "1074VE",
+                "huisnummer": 1,
+                "fields": ["naam"],
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 401
+        assert response.json()["error"] == "expired_token"
+
     def test_transform_include_nulls_zipcode(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
