@@ -48,4 +48,5 @@ def common_headers(request) -> dict:
         "X-Correlation-ID": request.node.name,
         "X-User": "foobar",
         "X-Task-Description": "unittest",
+        "Accept": "application/json",
     }
