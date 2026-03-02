@@ -129,7 +129,7 @@ class BrpVAdhocServiceClient(BaseBrpClient):
     def _get_soap_request(self, burgerservicenummer: str):
         return self.factory.Vraag(
             indicatieAdresvraag=0,
-            indicatieZoekenInHistorie=0,
+            indicatieZoekenInHistorie=1,
             masker=[{"item": _get_category_masks()}],
             parameters=[
                 {
@@ -149,8 +149,8 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         """
         partner_history = []
         for persoonslijst in response.persoonslijsten.item:
-            partner = {}
             for categoriestapel in persoonslijst.categoriestapels.item:
+                partner = {}
                 for categorievoorkomen in categoriestapel.categorievoorkomens.item:
                     category = categorievoorkomen.categorienummer
                     for item in categorievoorkomen.elementen.item:
@@ -159,7 +159,7 @@ class BrpVAdhocServiceClient(BaseBrpClient):
                             int(category), int(group), int(element)
                         ):
                             partner[fields[0]] = item.waarde
-            partner_history.append(_group_dotted_result(partner))
+                partner_history.append(_group_dotted_result(partner))
 
         for p in partner_history:
             _derive_values(p)
