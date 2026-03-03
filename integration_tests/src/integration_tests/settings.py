@@ -10,6 +10,8 @@ LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG" if DEBUG else "INFO").upper()
 ALLOWED_FAILURES = int(os.environ.get("ALLOWED_FAILURES", 0))
 
 if CLOUD_ENV.startswith("azure"):
+    TOKEN = None
+
     # On Azure we'll get a token from the app registration
     TENANT_ID = os.environ.get("TENANT_ID")
     AUDIENCE = os.environ.get("AUDIENCE")
