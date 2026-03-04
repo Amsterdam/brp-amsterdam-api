@@ -26,6 +26,7 @@ def analyze_results(environment, **kwargs):
 
     if total_stats.num_failures > settings.ALLOWED_FAILURES:
         logger.error("BRP Amsterdam API Integration Tests Failed")
+        exit(1)
     else:
         logger.info("BRP Amsterdam API Integration Tests Passed")
 
