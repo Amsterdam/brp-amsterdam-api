@@ -382,9 +382,9 @@ cryptography==46.0.5 \
     #   jwcrypto
     #   msal
     #   pyjwt
-datapunt-authorization-django==2.0.1 \
-    --hash=sha256:a0ba561dc754db8a8b6b42e76f68afee2f40069b85bdb90aa44aae6543f77f86 \
-    --hash=sha256:ba2f9b41357a193b59ea219b58afb79717ca3f94d5e549add4528047bb23be5d
+datapunt-authorization-django==2.0.2 \
+    --hash=sha256:52edd8fa490f34d32e1479b53026583d7050f1914148753df26f199bc5fe711f \
+    --hash=sha256:e1e4480bebf9e9fc321c1581292648131e4743e75eb6f79e59fbf0c30a942a4c
     # via -r requirements.in
 django==5.2.12 \
     --hash=sha256:4853482f395c3a151937f6991272540fcbf531464f254a347bf7c89f53c8cff7 \
@@ -766,9 +766,9 @@ uwsgi-readiness-check==0.2.0 \
 uwsgitop==0.12 \
     --hash=sha256:4f9330951f0fb9633226de36cf0c28c04dcf323efab608834aa81f638b6019b2
     # via -r requirements.in
-whitenoise==6.11.0 \
-    --hash=sha256:0f5bfce6061ae6611cd9396a8231e088722e4fc67bc13a111be74c738d99375f \
-    --hash=sha256:b2aeb45950597236f53b5342b3121c5de69c8da0109362aee506ce88e022d258
+whitenoise==6.12.0 \
+    --hash=sha256:f723ebb76a112e98816ff80fcea0a6c9b8ecde835f8ddda25df7a30a3c2db6ad \
+    --hash=sha256:fc5e8c572e33ebf24795b47b6a7da8da3c00cff2349f5b04c02f28d0cc5a3cc2
     # via -r requirements.in
 wrapt==1.17.2 \
     --hash=sha256:08e7ce672e35efa54c5024936e559469436f8b8096253404faeb54d2a878416f \
