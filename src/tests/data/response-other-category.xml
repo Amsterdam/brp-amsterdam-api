@@ -12,19 +12,23 @@
                     <ns2:elementen>
                       <ns2:item>
                         <ns2:nummer>120</ns2:nummer>
-                        <ns2:waarde>999998791</ns2:waarde>
+                        <ns2:waarde>999998912</ns2:waarde>
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>210</ns2:nummer>
-                        <ns2:waarde>Adam</ns2:waarde>
+                        <ns2:waarde>Koosje</ns2:waarde>
+                      </ns2:item>
+                      <ns2:item>
+                        <ns2:nummer>230</ns2:nummer>
+                        <ns2:waarde>van</ns2:waarde>
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>240</ns2:nummer>
-                        <ns2:waarde>Arendsen</ns2:waarde>
+                        <ns2:waarde>Krabben</ns2:waarde>
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>310</ns2:nummer>
-                        <ns2:waarde>19810101</ns2:waarde>
+                        <ns2:waarde>19820401</ns2:waarde>
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>320</ns2:nummer>
@@ -36,11 +40,11 @@
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>410</ns2:nummer>
-                        <ns2:waarde>M</ns2:waarde>
+                        <ns2:waarde>V</ns2:waarde>
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>610</ns2:nummer>
-                        <ns2:waarde>20141201</ns2:waarde>
+                        <ns2:waarde>20190401</ns2:waarde>
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>620</ns2:nummer>
@@ -52,7 +56,24 @@
                       </ns2:item>
                       <ns2:item>
                         <ns2:nummer>1510</ns2:nummer>
-                        <ns2:waarde>H</ns2:waarde>
+                        <ns2:waarde>P</ns2:waarde>
+                      </ns2:item>
+                    </ns2:elementen>
+                  </ns2:item>
+                </ns2:categorievoorkomens>
+              </ns2:item>
+              <ns2:item>
+                <ns2:categorievoorkomens>
+                  <ns2:item>
+                    <ns2:categorienummer>7</ns2:categorienummer>
+                    <ns2:elementen>
+                      <ns2:item>
+                        <ns2:nummer>6710</ns2:nummer>
+                        <ns2:waarde>20200401</ns2:waarde>
+                      </ns2:item>
+                      <ns2:item>
+                        <ns2:nummer>6720</ns2:nummer>
+                        <ns2:waarde>O</ns2:waarde>
                       </ns2:item>
                     </ns2:elementen>
                   </ns2:item>
@@ -65,7 +86,7 @@
           <code>0</code>
           <letter>A</letter>
           <omschrijving>Aantal: 1.</omschrijving>
-          <referentie>7b26120f-e7fd-4cae-bddc-e0f451041599</referentie>
+          <referentie>580370ff-12a9-46d4-a5fc-890a2c7b4fa2</referentie>
         </resultaat>
       </vraagReturn>
     </vraagResponse>

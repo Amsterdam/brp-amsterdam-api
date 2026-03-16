@@ -31,11 +31,17 @@ LOGGING = {
         "handlers": ["console"],
     },
     "loggers": {
-        name: {
-            **conf,
-            "propagate": True,
-        }
-        for name, conf in LOGGING["handlers"].items()
+        **{
+            name: {
+                **conf,
+                "propagate": True,
+            }
+            for name, conf in LOGGING["handlers"].items()
+        },
+        # Set zeep to INFO because it is very verbose in DEBUG mode
+        "zeep": {
+            "level": "INFO",
+        },
     },
 }
 
