@@ -31,10 +31,10 @@ class TestBrpVAdhocServiceClient:
         assert data["soortVerbintenis"]["omschrijving"] == "geregistreerd partnerschap"
 
     def test_derive_reason_dissolution(self):
-        data = {"ontbindingHuwelijkParnerschap": {"reden": {"code": "S"}}}
+        data = {"ontbindingHuwelijkPartnerschap": {"reden": {"code": "S"}}}
         _derive_values(data)
         assert (
-            data["ontbindingHuwelijkParnerschap"]["reden"]["omschrijving"]
+            data["ontbindingHuwelijkPartnerschap"]["reden"]["omschrijving"]
             == "echtsch of huw.ontb na sch van tfl en bed/eindigen partnersch door ovk of ontb"
         )
 
@@ -54,7 +54,7 @@ class TestBrpVAdhocServiceClient:
                 "050620",
                 {
                     "extra": {"inOnderzoek": "050620"},
-                    "aangaanHuwelijkParnerschap": {"inOnderzoek": {"plaats": True}},
+                    "aangaanHuwelijkPartnerschap": {"inOnderzoek": {"plaats": True}},
                 },
             ),
         ],
