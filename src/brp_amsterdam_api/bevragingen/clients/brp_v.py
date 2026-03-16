@@ -46,35 +46,35 @@ BRP_CATEGORY_MAPPING = {
         "function": derive_description,
         "args": "COUNTRY_CODE_TABLE",
     },
-    "aangaanHuwelijkParnerschap.datum": "05.06.10",
-    "aangaanHuwelijkParnerschap.plaats.code": "05.06.20",
-    "aangaanHuwelijkParnerschap.plaats.omschrijving": {
-        "source": "aangaanHuwelijkParnerschap.plaats.code",
+    "aangaanHuwelijkPartnerschap.datum": "05.06.10",
+    "aangaanHuwelijkPartnerschap.plaats.code": "05.06.20",
+    "aangaanHuwelijkPartnerschap.plaats.omschrijving": {
+        "source": "aangaanHuwelijkPartnerschap.plaats.code",
         "function": derive_description,
         "args": "CITY_CODE_TABLE",
     },
-    "aangaanHuwelijkParnerschap.land.code": "05.06.30",
-    "aangaanHuwelijkParnerschap.land.omschrijving": {
-        "source": "aangaanHuwelijkParnerschap.land.code",
+    "aangaanHuwelijkPartnerschap.land.code": "05.06.30",
+    "aangaanHuwelijkPartnerschap.land.omschrijving": {
+        "source": "aangaanHuwelijkPartnerschap.land.code",
         "function": derive_description,
         "args": "COUNTRY_CODE_TABLE",
     },
-    "ontbindingHuwelijkParnerschap.datum": "05.07.10",
-    "ontbindingHuwelijkParnerschap.plaats.code": "05.07.20",
-    "ontbindingHuwelijkParnerschap.plaats.omschrijving": {
-        "source": "ontbindingHuwelijkParnerschap.plaats.code",
+    "ontbindingHuwelijkPartnerschap.datum": "05.07.10",
+    "ontbindingHuwelijkPartnerschap.plaats.code": "05.07.20",
+    "ontbindingHuwelijkPartnerschap.plaats.omschrijving": {
+        "source": "ontbindingHuwelijkPartnerschap.plaats.code",
         "function": derive_description,
         "args": "CITY_CODE_TABLE",
     },
-    "ontbindingHuwelijkParnerschap.land.code": "05.07.30",
-    "ontbindingHuwelijkParnerschap.land.omschrijving": {
-        "source": "ontbindingHuwelijkParnerschap.land.code",
+    "ontbindingHuwelijkPartnerschap.land.code": "05.07.30",
+    "ontbindingHuwelijkPartnerschap.land.omschrijving": {
+        "source": "ontbindingHuwelijkPartnerschap.land.code",
         "function": derive_description,
         "args": "COUNTRY_CODE_TABLE",
     },
-    "ontbindingHuwelijkParnerschap.reden.code": "05.07.40",
-    "ontbindingHuwelijkParnerschap.reden.omschrijving": {
-        "source": "ontbindingHuwelijkParnerschap.reden.code",
+    "ontbindingHuwelijkPartnerschap.reden.code": "05.07.40",
+    "ontbindingHuwelijkPartnerschap.reden.omschrijving": {
+        "source": "ontbindingHuwelijkPartnerschap.reden.code",
         "function": derive_description,
         "args": "REASON_DISSOLUTION_TABLE",
     },
@@ -84,6 +84,9 @@ ADDITIONAL_FIELDS_FOR_DERIVATION = {
     "extra.inOnderzoek": "05.83.10",
     "extra.datumIngangOnderzoek": "05.83.20",
     "extra.datumEindeOnderzoek": "05.83.30",
+    "extra.aangaanHuwelijkPartnerschap.datum": "55.06.10",
+    "extra.aangaanHuwelijkPartnerschap.plaats.code": "55.06.20",
+    "extra.aangaanHuwelijkPartnerschap.land.code": "55.06.30",
 }
 
 
@@ -153,15 +156,21 @@ class BrpVAdhocServiceClient(BaseBrpClient):
                 partner = {}
                 for categorievoorkomen in categoriestapel.categorievoorkomens.item:
                     category = categorievoorkomen.categorienummer
+                    # We're only interested in category 5/55 (partner)
+                    if category not in [5, 55]:
+                        break
                     for item in categorievoorkomen.elementen.item:
                         group, element = re.findall("..", f"{item.nummer:04}")
                         if fields := _get_fields_by_category(
                             int(category), int(group), int(element)
                         ):
                             partner[fields[0]] = item.waarde
-                partner_history.append(_group_dotted_result(partner))
+                if partner:
+                    partner_history.append(_group_dotted_result(partner))
 
         for p in partner_history:
+            _derive_relation_start(p)
+
             _derive_values(p)
 
             _derive_date_fields(p)
@@ -169,7 +178,26 @@ class BrpVAdhocServiceClient(BaseBrpClient):
             # Add the fields which are under investigation
             _derive_under_investigation(p)
 
+            # Remove the fields which are only used for derivation
+            if "extra" in p:
+                del p["extra"]
+
         return {"partnerhistorie": partner_history}
+
+
+def _derive_relation_start(data: dict):
+    # If the relation has been dissolved, the start date of the relation can be derived the extra
+    # fields in category 55.
+    extra_relation_fields = [
+        field
+        for field in ADDITIONAL_FIELDS_FOR_DERIVATION
+        if field.startswith("extra.aangaanHuwelijkPartnerschap")
+    ]
+
+    for field in extra_relation_fields:
+        if source_value := _get_dotted_field_value(data, field):
+            relation_start_field = field.replace("extra.", "")
+            _set_dotted_field_value(data, relation_start_field, source_value)
 
 
 def _derive_values(data: dict):
@@ -202,7 +230,7 @@ def _derive_under_investigation(data: dict):
 
     - 050000 -> The whole category partner is under investigation
     - 050200 -> The group name under category is under investigation
-    - 050610 -> The element aangaanHuwelijkParnerschap.datum is under investigation
+    - 050610 -> The element aangaanHuwelijkPartnerschap.datum is under investigation
 
     The result will be that the boolean flags on all elements match this logic
     """
@@ -245,7 +273,10 @@ def _get_category_field_mapping() -> dict:
     Returns a dictionary by category, group and element number
     """
     categories = defaultdict(lambda: defaultdict(dict))
-    for field, number in BRP_CATEGORY_MAPPING.items():
+
+    all_fields = {**BRP_CATEGORY_MAPPING, **ADDITIONAL_FIELDS_FOR_DERIVATION}
+
+    for field, number in all_fields.items():
         # Skip deducted variables, since these are not in the response of the Ad Hoc Service
         if isinstance(number, dict):
             continue

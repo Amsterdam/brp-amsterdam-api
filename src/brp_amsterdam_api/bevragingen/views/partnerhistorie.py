@@ -59,6 +59,5 @@ class BrpPartnerhistorieView(BaseProxyView):
         """Insert any null values that the user does have access to.
         This allows the client to distinguish between having 'no value' instead of 'no access'.
         """
-        print("HALLLO")
         request_fields = group_dotted_names(BRP_CATEGORY_MAPPING.keys())
         self._include_nulls(request_fields, hc_response["partnerhistorie"])
