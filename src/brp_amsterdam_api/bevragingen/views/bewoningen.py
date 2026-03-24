@@ -64,12 +64,20 @@ class BrpBewoningenView(BaseProxyView):
         )
 
         if exception is None:
+            seen_bsn = set()
             # Separate log message for every person that's being accessed.
             personen = []
             for bewoning in hc_response["bewoningen"]:
                 personen += bewoning.get("bewoners", []) + bewoning.get("mogelijkeBewoners", [])
             for persoon in personen:
                 msg_params = {}
+                bsn = persoon.get("burgerservicenummer")
+
+                # Skip if already processed
+                if bsn is not None and bsn in seen_bsn:
+                    continue
+                seen_bsn.add(bsn)
+
                 extra = {
                     "request": request.data,
                     "hcRequest": hc_request,
