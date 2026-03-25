@@ -27,6 +27,7 @@ class BRPAuditLogHandler(logging.Handler):
         self._client = LogsIngestionClient(
             endpoint=self.endpoint, credential=self._credential, logging_enable=True
         )
+        self.buffer = []
 
     def emit(self, record) -> None:
         # Data collection endpoint expects a list of records
@@ -35,12 +36,20 @@ class BRPAuditLogHandler(logging.Handler):
 
         # The custom jsonformatter returns a json string, so we'll convert it to python
         logs = [json.loads(self.format(r)) for r in record]
+        self.buffer.extend(logs)
+
+        # Send records in batches of 15
+        buffered_logs = []
+        if len(self.buffer) >= 15:
+            batch = self.buffer[:15]
+            self.buffer = self.buffer[15:]
+            buffered_logs.append(batch)
 
         try:
             self._client.upload(
                 rule_id=self.rule_id,
                 stream_name=self.stream_name,
-                logs=logs,
+                logs=buffered_logs,
             )
         except HttpResponseError as e:
             logger.error(e)
