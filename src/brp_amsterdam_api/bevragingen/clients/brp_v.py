@@ -92,6 +92,10 @@ ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION = {
 }
 
 
+class PasswordNotChanged(Exception):
+    pass
+
+
 class BrpVAdhocServiceClient(BaseBrpClient):
     """
     BRP V Adhoc Service Client for connection to the ad-hoc BRP service to request partner history
@@ -146,6 +150,14 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         transformed_response = self._transform_response(response, requested_fields)
 
         return JsonResponse(transformed_response)
+
+    def change_password(self, password: str) -> None:
+        """
+        Change the password for the BRP V Ad Hoc Service. This is needed every 90 days.
+        """
+        response = self.client.service.changePassword(password)
+        if response["code"] in [101, 110, 111, 112, 113, 114]:
+            raise PasswordNotChanged("Failed to change password for BRP V Ad Hoc Service")
 
     def _get_soap_request(self, burgerservicenummer: str, fields: list[str]):
         return self.factory.Vraag(
