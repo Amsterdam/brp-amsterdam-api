@@ -377,6 +377,9 @@ BRP_V_ADHOC_URL = env.str(
 BRP_PARTNERHISTORIE_URL = env.str(
     "BRP_PARTNERHISTORIE_URL", default=f"{BRP_V_ADHOC_URL}/partnerhistorie"
 )
+
+AZURE_KEYVAULT_URL = env.str("AZURE_KEYVAULT_URL", None)
+
 if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):
     BRP_V_ADHOC_PASSWORD = Path("/mnt/secrets-store/brp-v-adhoc-password").read_text()
 else:

@@ -19,6 +19,7 @@ zeep==4.3.3
 azure-monitor-ingestion == 1.1.0
 azure-monitor-opentelemetry == 1.8.6
 azure-identity == 1.25.3
+azure-keyvault == 4.2.0
 uwsgitop == 0.12
 uwsgi-readiness-check == 0.2.0
 

@@ -25,6 +25,9 @@ azure-core==1.38.3 \
     # via
     #   azure-core-tracing-opentelemetry
     #   azure-identity
+    #   azure-keyvault-certificates
+    #   azure-keyvault-keys
+    #   azure-keyvault-secrets
     #   azure-monitor-ingestion
     #   azure-monitor-opentelemetry
     #   azure-monitor-opentelemetry-exporter
@@ -39,6 +42,22 @@ azure-identity==1.25.3 \
     # via
     #   -r requirements.in
     #   azure-monitor-opentelemetry-exporter
+azure-keyvault==4.2.0 \
+    --hash=sha256:16b29039244cbe8b940c98a0d795626d76d2a579cb9b8c559983ad208082c0de \
+    --hash=sha256:731add108a3e29ab4fd501a3c477256c286c34d0996b383fb6a3945462933761
+    # via -r requirements.in
+azure-keyvault-certificates==4.10.0 \
+    --hash=sha256:004ff47a73152f9f40f678e5a07719b753a3ca86f0460bfeaaf6a23304872e05 \
+    --hash=sha256:fa76cbc329274cb5f4ab61b0ed7d209d44377df4b4d6be2fd01e741c2fbb83a9
+    # via azure-keyvault
+azure-keyvault-keys==4.11.0 \
+    --hash=sha256:f257b1917a2c3a88983e3f5675a6419449eb262318888d5b51e1cb3bed79779a \
+    --hash=sha256:fa5febd5805f0fed4c0a1d13c9096081c72a6fa36ccae1299a137f34280eda53
+    # via azure-keyvault
+azure-keyvault-secrets==4.10.0 \
+    --hash=sha256:666fa42892f9cee749563e551a90f060435ab878977c95265173a8246d546a36 \
+    --hash=sha256:9dbde256077a4ee1a847646671580692e3f9bea36bcfc189c3cf2b9a94eb38b9
+    # via azure-keyvault
 azure-monitor-ingestion==1.1.0 \
     --hash=sha256:41765fb3df8e0933f1a7eaf1cb0a5f30acce856afa8831bfa4777ad26594f019 \
     --hash=sha256:97afee780d9ae3069128cde77027d4cc62fa824fe64d5bac880ac4a64b0a0c4e
@@ -479,6 +498,7 @@ cryptography==48.0.1 \
     --hash=sha256:fe0180af5bf9236518a087e35bf2d9a347d5f5f51e63c579d683ddff424e3d46
     # via
     #   azure-identity
+    #   azure-keyvault-keys
     #   jwcrypto
     #   msal
     #   pyjwt
@@ -556,6 +576,9 @@ isodate==0.7.2 \
     --hash=sha256:28009937d8031054830160fce6d409ed342816b543597cece116d966c6d99e15 \
     --hash=sha256:4cd1aa0f43ca76f4a6c6c0292a85f40b35ec2e43e315b59f06e6d32171a953e6
     # via
+    #   azure-keyvault-certificates
+    #   azure-keyvault-keys
+    #   azure-keyvault-secrets
     #   azure-monitor-ingestion
     #   msrest
     #   zeep
@@ -1363,6 +1386,9 @@ typing-extensions==4.15.0 \
     # via
     #   azure-core
     #   azure-identity
+    #   azure-keyvault-certificates
+    #   azure-keyvault-keys
+    #   azure-keyvault-secrets
     #   azure-monitor-ingestion
     #   jwcrypto
     #   opentelemetry-api
