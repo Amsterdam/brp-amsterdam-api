@@ -31,6 +31,27 @@ class TestBaseProxyView:
             "instance": url,
         }
 
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "/bevragingen/v1/personen",
+            "/bevragingen/v1/bewoningen",
+            "/bevragingen/v1/verblijfplaatshistorie",
+        ],
+    )
+    def test_options_call(self, api_client, url):
+        """Prove that an options call doesn't raise any errors."""
+        response = api_client.options(url)
+        assert response.status_code == 200
+        assert response.data == {
+            "parses": [
+                "application/json",
+            ],
+            "renders": [
+                "application/json",
+            ],
+        }
+
     def test_invalid_api_key(self, api_client, requests_mock, caplog, common_headers):
         """Prove that incorrect API-key settings are handled gracefully."""
         requests_mock.post(

@@ -301,11 +301,15 @@ HEALTH_CHECKS = {
 HEALTH_CHECKS_ERROR_CODE = 503
 
 REST_FRAMEWORK = dict(
+    DEFAULT_PARSER_CLASSES=[
+        "rest_framework.parsers.JSONParser",
+    ],
     DEFAULT_RENDERER_CLASSES=[
         # Removed HTML rendering, Give pure application/problem+json responses instead.
         # The HTML rendering is not needed and conflicts with the exception_handler code.
         "rest_framework.renderers.JSONRenderer",
     ],
+    DEFAULT_METADATA_CLASS="brp_amsterdam_api.bevragingen.metadata.CustomMetadata",
     EXCEPTION_HANDLER="brp_amsterdam_api.views.exception_handler",
     DEFAULT_THROTTLE_RATES={
         "anon": "10/m",

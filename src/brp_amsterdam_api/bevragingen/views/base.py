@@ -108,6 +108,9 @@ class BaseProxyView(ClientMixin, APIView):
         super().initial(request, *args, **kwargs)
 
         # Token is validated, extract token scopes that are set by the middleware
+        if request.method == "OPTIONS":
+            return
+
         self.user_scopes = set(request.get_token_scopes)
         self.upn = request.get_token_claims.get("email", request.get_token_subject)
         self.appid = request.get_token_claims.get("appid")
@@ -230,6 +233,7 @@ class BaseProxyView(ClientMixin, APIView):
             hc_response = (
                 e.__cause__.response.json()
                 if isinstance(e.__cause__, requests.RequestException)
+                and e.__cause__.response is not None
                 else None
             )
 
