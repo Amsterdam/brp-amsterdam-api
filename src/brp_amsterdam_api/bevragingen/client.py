@@ -11,8 +11,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from more_ds.network.url import URL
-from oauthlib.oauth2 import BackendApplicationClient
-from requests import Timeout
+from oauthlib.oauth2 import BackendApplicationClient, InvalidClientError
+from requests import ConnectionError, Timeout
 from requests_oauthlib import OAuth2Session
 from rest_framework import status
 from rest_framework.exceptions import APIException, NotFound
@@ -155,11 +155,15 @@ class BrpClient:
                     "User-Agent": USER_AGENT,
                 },
             )
+        except InvalidClientError as e:
+            # OAuth client credentials are invalid.
+            logger.error("Proxy call to %s failed, invalid OAuth client credentials: %s", host, e)
+            raise ServiceUnavailable() from e
         except (TimeoutError, Timeout) as e:
             # Socket timeout
             logger.error("Proxy call to %s failed, timeout from remote server: %s", host, e)
             raise GatewayTimeout() from e
-        except OSError as e:
+        except (OSError, ConnectionError) as e:
             # Socket connect / SSL error.
             logger.error("Proxy call to %s failed, error when connecting to server: %s", host, e)
             raise ServiceUnavailable() from e
