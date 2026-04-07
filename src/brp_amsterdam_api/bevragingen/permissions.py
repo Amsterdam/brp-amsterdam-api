@@ -236,6 +236,10 @@ class IsUserScope(BasePermission):
 
     def has_permission(self, request, view):
         """Check whether the user has all required scopes"""
+        # Allow preflight requests
+        if request.method == "OPTIONS":
+            return True
+
         # When the access is granted, this skips going into the authorization middleware.
         # This is solely done to avoid incorrect log messages of "access granted",
         # because additional checks may still deny access.
@@ -276,6 +280,8 @@ class HasRequiredHeaders(BasePermission):
     code = "missingHeaders"  # this helps both clients and unittest to see the difference.
 
     def has_permission(self, request, view):
+        if request.method == "OPTIONS":
+            return True
         return all(request.headers.get(header) for header in self.required_headers)
 
     def has_object_permission(self, request, view, obj):
