@@ -10,8 +10,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
 from more_ds.network.url import URL
-from oauthlib.oauth2 import BackendApplicationClient, InvalidClientError
-from requests import ConnectionError, Timeout
+from oauthlib.oauth2 import BackendApplicationClient
+from requests import Timeout
 from requests_oauthlib import OAuth2Session
 from rest_framework import status
 from rest_framework.exceptions import APIException, NotFound
