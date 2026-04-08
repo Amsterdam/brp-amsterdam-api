@@ -1,12 +1,11 @@
 import logging
 import time
-
-from oauthlib.oauth2 import InvalidClientError
 from urllib.parse import urlparse
 
 import requests
 from more_ds.network import URL
-from requests import Timeout, ConnectionError
+from oauthlib.oauth2 import InvalidClientError
+from requests import ConnectionError, Timeout
 from rest_framework.exceptions import APIException
 
 from brp_amsterdam_api.bevragingen.exceptions import GatewayTimeout, ServiceUnavailable
@@ -71,7 +70,9 @@ class BaseBrpClient:
             )
         except InvalidClientError as e:
             # OAuth client credentials are invalid.
-            logger.error("Proxy call to %s failed, invalid OAuth client credentials: %s", host, e)
+            logger.error(
+                "Proxy call to %s failed, invalid OAuth client credentials: %s", self._host, e
+            )
             raise ServiceUnavailable() from e
         except (TimeoutError, Timeout) as e:
             # Socket timeout
