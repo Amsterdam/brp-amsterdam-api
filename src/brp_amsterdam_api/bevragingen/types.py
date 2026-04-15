@@ -47,6 +47,14 @@ class PersonenQuery(BasePersonenQuery):
     adresseerbaarObjectIdentificatie: NotRequired[str]
 
 
+class PartnerhistorieQuery(BaseQuery):
+    """Stub for the BRP Partnerhistorie API request"""
+
+    type: Literal["RaadpleegMetBurgerservicenummer",]
+    fields: NotRequired[list[str]]
+    burgerservicenummer: str
+
+
 class BaseResponse(TypedDict):
     pass
 
@@ -76,12 +84,6 @@ class VerblijfsplaatshistorieResponse(TypedDict):
     """Stub for the BRP Verblijfsplaatshistorie API response"""
 
     bewoningen: list[Bewoning]
-
-
-class PartnerhistorieQuery(BaseQuery):
-    """Stub for the BRP Verblijfsplaatshistorie API request"""
-
-    burgerservicenummer: str
 
 
 class PartnerhistorieResponse(TypedDict):

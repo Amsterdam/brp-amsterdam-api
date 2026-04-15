@@ -80,13 +80,16 @@ BRP_CATEGORY_MAPPING = {
     },
 }
 
-ADDITIONAL_FIELDS_FOR_DERIVATION = {
-    "extra.inOnderzoek": "05.83.10",
-    "extra.datumIngangOnderzoek": "05.83.20",
-    "extra.datumEindeOnderzoek": "05.83.30",
+ADDITIONAL_FIELDS_FOR_RELATION_START = {
     "extra.aangaanHuwelijkPartnerschap.datum": "55.06.10",
     "extra.aangaanHuwelijkPartnerschap.plaats.code": "55.06.20",
     "extra.aangaanHuwelijkPartnerschap.land.code": "55.06.30",
+}
+
+ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION = {
+    "extra.inOnderzoek": "05.83.10",
+    "extra.datumIngangOnderzoek": "05.83.20",
+    "extra.datumEindeOnderzoek": "05.83.30",
 }
 
 
@@ -122,18 +125,21 @@ class BrpVAdhocServiceClient(BaseBrpClient):
 
     def call(self, hc_request: dict | None = None) -> HttpResponse | APIException:
         burgerservicenummer = hc_request["burgerservicenummer"]
+        requested_fields = hc_request["fields"]
 
         # Prepare request for the BRP Ad Hoc Service
-        response = self.client.service.vraag(self._get_soap_request(burgerservicenummer))
-        transformed_response = self._transform_response(response)
+        response = self.client.service.vraag(
+            self._get_soap_request(burgerservicenummer, requested_fields)
+        )
+        transformed_response = self._transform_response(response, requested_fields)
 
         return JsonResponse(transformed_response)
 
-    def _get_soap_request(self, burgerservicenummer: str):
+    def _get_soap_request(self, burgerservicenummer: str, fields: list[str]):
         return self.factory.Vraag(
             indicatieAdresvraag=0,
             indicatieZoekenInHistorie=1,
-            masker=[{"item": _get_category_masks()}],
+            masker=[{"item": _get_category_masks(fields)}],
             parameters=[
                 {
                     "item": [
@@ -146,7 +152,7 @@ class BrpVAdhocServiceClient(BaseBrpClient):
             ],
         )
 
-    def _transform_response(self, response) -> dict:
+    def _transform_response(self, response, requested_fields: list[str]) -> dict:
         """
         Transform the response from the BRP-V Ad Hoc service to a JSON response.
         """
@@ -169,20 +175,39 @@ class BrpVAdhocServiceClient(BaseBrpClient):
                     partner_history.append(_group_dotted_result(partner))
 
         for p in partner_history:
-            _derive_relation_start(p)
+            _transform_partner_data(p, requested_fields)
 
-            _derive_values(p)
+        return {"partnerhistorie": [_clean_empty_dicts(p) for p in partner_history]}
 
-            _derive_date_fields(p)
 
-            # Add the fields which are under investigation
-            _derive_under_investigation(p)
+def _transform_partner_data(partner: dict, requested_fields: list[str]) -> dict:
+    """
+    Transforms the partner data from the BRP Ad Hoc Service to the desired format.
 
-            # Remove the fields which are only used for derivation
-            if "extra" in p:
-                del p["extra"]
+    This includes:
+    - Deriving values based on other values (e.g. deriving the description of a code)
+    - Deriving date fields to a standard format
+    - Adding boolean flags for fields that are under investigation
+    - Clean up the response by removing fields that are disallowed
+    """
+    _derive_relation_start(partner)
 
-        return {"partnerhistorie": partner_history}
+    _derive_values(partner)
+
+    _derive_date_fields(partner)
+
+    # Add the fields which are under investigation
+    _derive_under_investigation(partner)
+
+    # Remove the fields which are only used for derivation
+    if "extra" in partner:
+        del partner["extra"]
+
+    # Remove any disallowed fields
+    for field in BRP_CATEGORY_MAPPING:
+        if field in requested_fields or any(field.startswith(f) for f in requested_fields):
+            continue
+        _remove_dotted_field(partner, field)
 
 
 def _derive_relation_start(data: dict):
@@ -190,7 +215,7 @@ def _derive_relation_start(data: dict):
     # fields in category 55.
     extra_relation_fields = [
         field
-        for field in ADDITIONAL_FIELDS_FOR_DERIVATION
+        for field in ADDITIONAL_FIELDS_FOR_RELATION_START
         if field.startswith("extra.aangaanHuwelijkPartnerschap")
     ]
 
@@ -256,15 +281,40 @@ def _derive_under_investigation(data: dict):
             _set_dotted_field_value(data, under_investigation_field_name, True)
 
 
-def _get_categories() -> list:
-    return [cat for cat in BRP_CATEGORY_MAPPING.values() if isinstance(cat, str)]
-
-
-def _get_category_masks() -> list:
+def _get_category_masks(fields) -> list:
     """
-    Returns all needed categories defined in the mapping formatted as integers
+    Returns all requested categories defined in the mapping formatted as integers
     """
-    categories = _get_categories() + list(ADDITIONAL_FIELDS_FOR_DERIVATION.values())
+    categories = []
+    for field, cat in BRP_CATEGORY_MAPPING.items():
+        if field not in fields:
+            continue
+
+        if isinstance(cat, str):
+            categories.append(cat)
+
+        # If we are authorized to see the source field of a derived field, we also need to request
+        # the category of the source field
+        if isinstance(cat, dict):
+            source_field = cat["source"]
+            source_cat = BRP_CATEGORY_MAPPING[cat["source"]]
+            if source_field in fields and source_cat not in categories:
+                categories.append(source_cat)
+
+    # Add the additional fields for derivation of relation start
+    categories += [
+        cat
+        for field, cat in ADDITIONAL_FIELDS_FOR_RELATION_START.items()
+        if field.replace("extra.", "") in fields
+    ]
+
+    # Add the additional fields for under investigation
+    categories += [
+        cat
+        for field, cat in ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION.items()
+        if field.replace("extra.", "") in fields
+    ]
+
     return [int(cat.replace(".", "")) for cat in categories]
 
 
@@ -274,7 +324,11 @@ def _get_category_field_mapping() -> dict:
     """
     categories = defaultdict(lambda: defaultdict(dict))
 
-    all_fields = {**BRP_CATEGORY_MAPPING, **ADDITIONAL_FIELDS_FOR_DERIVATION}
+    all_fields = {
+        **BRP_CATEGORY_MAPPING,
+        **ADDITIONAL_FIELDS_FOR_RELATION_START,
+        **ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION,
+    }
 
     for field, number in all_fields.items():
         # Skip deducted variables, since these are not in the response of the Ad Hoc Service
@@ -339,3 +393,26 @@ def _set_dotted_field_value(data, dotted_field, value):
             continue
         tree_level = tree_level[k]
     tree_level[leaf] = value
+
+
+def _remove_dotted_field(data, dotted_field):
+    """
+    Removes the value on the dotted path from the data in-place
+    """
+    tree_level = data
+    *keys, leaf = dotted_field.split(".")
+    for k in keys:
+        if k not in tree_level:
+            return
+        tree_level = tree_level[k]
+    if leaf in tree_level:
+        del tree_level[leaf]
+
+
+def _clean_empty_dicts(data):
+    """
+    Cleans empty dicts from the data
+    """
+    if not isinstance(data, dict):
+        return data
+    return {key: v for key, value in data.items() if (v := _clean_empty_dicts(value)) != {}}

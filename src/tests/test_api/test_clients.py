@@ -1,6 +1,7 @@
 import pytest
 
 from brp_amsterdam_api.bevragingen.clients.brp_v import (
+    _clean_empty_dicts,
     _derive_date_fields,
     _derive_under_investigation,
     _derive_values,
@@ -73,3 +74,21 @@ class TestBrpVAdhocServiceClient:
             "naam.geslachtsnaam",
         ]
         assert _get_fields_by_category(7, 0, 0) == []
+
+    def test_clean_empty_dicts(self):
+        data = {
+            "field1": {
+                "subfield1": "value1",
+                "subfield2": {},
+                "subfield3": "",
+                "subfield4": None,
+            },
+            "field2": {},
+        }
+        assert _clean_empty_dicts(data) == {
+            "field1": {
+                "subfield1": "value1",
+                "subfield3": "",
+                "subfield4": None,
+            },
+        }
