@@ -302,7 +302,7 @@ def _get_category_masks(fields) -> list:
     """
     categories = []
     for field, cat in BRP_CATEGORY_MAPPING.items():
-        if field not in fields:
+        if field not in fields and not any(field.startswith(f) for f in fields):
             continue
 
         if isinstance(cat, str):
@@ -313,7 +313,9 @@ def _get_category_masks(fields) -> list:
         if isinstance(cat, dict):
             source_field = cat["source"]
             source_cat = BRP_CATEGORY_MAPPING[cat["source"]]
-            if source_field in fields and source_cat not in categories:
+            if (
+                source_field in fields or any(field.startswith(f) for f in fields)
+            ) and source_cat not in categories:
                 categories.append(source_cat)
 
     # Add the additional fields for derivation of relation start
