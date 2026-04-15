@@ -53,6 +53,38 @@ class TestBrpPartnerhistorieView:
                 ]
             }
 
+    def test_partnerhistorie_error_response(self, api_client, requests_mock, common_headers):
+        """Prove an error response is properly handled and logged."""
+        with open("tests/data/response-error.xml") as mock_response:
+
+            requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
+
+            url = reverse("brp-partnerhistorie")
+            token = build_jwt_token(
+                [
+                    "benk-brp-personen-api",
+                    "benk-brp-partnerhistorie-api",
+                    "benk-brp-gegevensset-20",
+                ]
+            )
+            response = api_client.post(
+                url,
+                {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "123456789"},
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    **common_headers,
+                },
+            )
+            assert response.status_code == 502, response.data
+            assert response.json() == {
+                "code": "badGateway",
+                "detail": "Unexpected error from BRP Ad Hoc Service",
+                "instance": "/bevragingen/v1/partnerhistorie",
+                "status": 502,
+                "title": "Connection failed (bad gateway)",
+                "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.3",
+            }
+
     def test_partnerhistorie_disallow_fields(self, api_client, requests_mock, common_headers):
         """Prove a search is denied if fields are requested without proper permissions"""
         url = reverse("brp-partnerhistorie")

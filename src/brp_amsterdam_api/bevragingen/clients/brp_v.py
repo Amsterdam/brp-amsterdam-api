@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import defaultdict
 from functools import reduce
@@ -8,8 +9,12 @@ from rest_framework.exceptions import APIException
 from zeep import Client, Transport
 from zeep.plugins import HistoryPlugin
 
+from brp_amsterdam_api.bevragingen.exceptions import BadGateway
+
 from .base import BaseBrpClient
 from .utils import derive_date, derive_description, derive_initials
+
+logger = logging.getLogger(__name__)
 
 BRP_CATEGORY_MAPPING = {
     "burgerservicenummer": "05.01.20",
@@ -131,6 +136,16 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         response = self.client.service.vraag(
             self._get_soap_request(burgerservicenummer, requested_fields)
         )
+
+        # Log an error if we get an unexpected error from the BRP Ad Hoc Service
+        if response.resultaat.letter == "X":
+            logger.error(
+                "Proxy call failed, unexpected error X%s: %s",
+                response.resultaat.code,
+                response.resultaat.omschrijving,
+            )
+            raise BadGateway("Unexpected error from BRP Ad Hoc Service")
+
         transformed_response = self._transform_response(response, requested_fields)
 
         return JsonResponse(transformed_response)

@@ -1,0 +1,15 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <vraagResponse xmlns="http://www.bprbzk.nl/GBA/LRDPlus/version1.1" xmlns:ns2="http://www.bprbzk.nl/GBA/LO3/version1.1">
+      <vraagReturn>
+        <persoonslijsten xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+        <resultaat>
+          <code>25</code>
+          <letter>X</letter>
+          <omschrijving>Dubbel rubrieknummer in masker niet toegestaan: 050210.</omschrijving>
+          <referentie>7db60678-b2b8-4b70-8124-fee99a488f9c</referentie>
+        </resultaat>
+      </vraagReturn>
+    </vraagResponse>
+  </soap:Body>
+</soap:Envelope>
