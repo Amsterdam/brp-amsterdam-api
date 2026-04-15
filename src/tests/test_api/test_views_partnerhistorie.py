@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from brp_amsterdam_api.bevragingen.views import BrpPartnerhistorieView
 from tests.utils import build_jwt_token
 
 
@@ -21,6 +22,7 @@ class TestBrpPartnerhistorieView:
                 [
                     "benk-brp-personen-api",
                     "benk-brp-partnerhistorie-api",
+                    "benk-brp-gegevensset-20",
                 ]
             )
             response = api_client.post(
@@ -41,29 +43,48 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "1 december 2014",
                                 "type": "Datum",
                             },
-                            "land": {"code": "6030", "omschrijving": "Nederland"},
-                            "plaats": {"code": "0518", "omschrijving": "'s-Gravenhage"},
                         },
-                        "burgerservicenummer": "999998791",
-                        "geboorte": {
-                            "datum": {
-                                "datum": "1981-01-01",
-                                "langFormaat": "1 januari 1981",
-                                "type": "Datum",
-                            },
-                            "land": {"code": "6030", "omschrijving": "Nederland"},
-                            "plaats": {"code": "0518", "omschrijving": "'s-Gravenhage"},
-                        },
-                        "geslacht": {"code": "M", "omschrijving": "man"},
                         "naam": {
                             "geslachtsnaam": "Arendsen",
                             "voorletters": "A.",
-                            "voornamen": "Adam",
                         },
                         "soortVerbintenis": {"code": "H", "omschrijving": "huwelijk"},
                     }
                 ]
             }
+
+    def test_partnerhistorie_disallow_fields(self, api_client, requests_mock, common_headers):
+        """Prove a search is denied if fields are requested without proper permissions"""
+        url = reverse("brp-partnerhistorie")
+        token = build_jwt_token(
+            [
+                "benk-brp-personen-api",
+                "benk-brp-partnerhistorie-api",
+                "benk-brp-gegevensset-20",
+            ]
+        )
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": "123456789",
+                "fields": ["burgerservicenummer"],
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 403, response.data
+        assert response.json() == {
+            "code": "permissionDenied",
+            "detail": "U bent niet geautoriseerd voor fields = burgerservicenummer.",
+            "instance": "/bevragingen/v1/partnerhistorie",
+            "invalidParams": [{"code": "denied", "name": "fields", "reason": "Geen toegang."}],
+            "status": 403,
+            "title": "U bent niet geautoriseerd voor deze operatie.",
+            "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.3",
+        }
 
     def test_partnerhistorie_view_null_values(self, api_client, requests_mock, common_headers):
         """Prove that the 'resultaat-formaat=volledig' query parameter results in null values
@@ -76,6 +97,7 @@ class TestBrpPartnerhistorieView:
                 [
                     "benk-brp-personen-api",
                     "benk-brp-partnerhistorie-api",
+                    "benk-brp-gegevensset-22",
                 ]
             )
             response = api_client.post(
@@ -96,8 +118,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "1 december 2014",
                                 "type": "Datum",
                             },
-                            "land": {"code": "6030", "omschrijving": "Nederland"},
-                            "plaats": {"code": "0518", "omschrijving": "'s-Gravenhage"},
                         },
                         "burgerservicenummer": "999998791",
                         "geboorte": {
@@ -106,10 +126,7 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "1 januari 1981",
                                 "type": "Datum",
                             },
-                            "land": {"code": "6030", "omschrijving": "Nederland"},
-                            "plaats": {"code": "0518", "omschrijving": "'s-Gravenhage"},
                         },
-                        "geslacht": {"code": "M", "omschrijving": "man"},
                         "naam": {
                             "adellijkeTitelPredicaat": None,
                             "geslachtsnaam": "Arendsen",
@@ -120,18 +137,6 @@ class TestBrpPartnerhistorieView:
                         "soortVerbintenis": {"code": "H", "omschrijving": "huwelijk"},
                         "ontbindingHuwelijkPartnerschap": {
                             "datum": None,
-                            "land": {
-                                "code": None,
-                                "omschrijving": None,
-                            },
-                            "plaats": {
-                                "code": None,
-                                "omschrijving": None,
-                            },
-                            "reden": {
-                                "code": None,
-                                "omschrijving": None,
-                            },
                         },
                     }
                 ]
@@ -149,6 +154,7 @@ class TestBrpPartnerhistorieView:
                 [
                     "benk-brp-personen-api",
                     "benk-brp-partnerhistorie-api",
+                    "benk-brp-gegevensset-22",
                 ]
             )
             response = api_client.post(
@@ -169,14 +175,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "1 augustus 2008",
                                 "type": "Datum",
                             },
-                            "land": {
-                                "code": "6030",
-                                "omschrijving": "Nederland",
-                            },
-                            "plaats": {
-                                "code": "0363",
-                                "omschrijving": "Amsterdam",
-                            },
                         },
                         "burgerservicenummer": "999991747",
                         "geboorte": {
@@ -185,18 +183,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "31 maart 1990",
                                 "type": "Datum",
                             },
-                            "land": {
-                                "code": "6045",
-                                "omschrijving": "Joegoslavië",
-                            },
-                            "plaats": {
-                                "code": "Belgrado",
-                                "omschrijving": "Belgrado",
-                            },
-                        },
-                        "geslacht": {
-                            "code": "V",
-                            "omschrijving": "vrouw",
                         },
                         "naam": {
                             "geslachtsnaam": "Bilgiç",
@@ -215,14 +201,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "30 juli 2001",
                                 "type": "Datum",
                             },
-                            "plaats": {
-                                "code": "0363",
-                                "omschrijving": "Amsterdam",
-                            },
-                            "land": {
-                                "code": "6030",
-                                "omschrijving": "Nederland",
-                            },
                         },
                         "burgerservicenummer": "999992958",
                         "geboorte": {
@@ -231,18 +209,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "15 december 1969",
                                 "type": "Datum",
                             },
-                            "land": {
-                                "code": "6030",
-                                "omschrijving": "Nederland",
-                            },
-                            "plaats": {
-                                "code": "0294",
-                                "omschrijving": "Winterswijk",
-                            },
-                        },
-                        "geslacht": {
-                            "code": "V",
-                            "omschrijving": "vrouw",
                         },
                         "naam": {
                             "geslachtsnaam": "Buren",
@@ -255,19 +221,6 @@ class TestBrpPartnerhistorieView:
                                 "datum": "2003-09-21",
                                 "langFormaat": "21 september 2003",
                                 "type": "Datum",
-                            },
-                            "land": {
-                                "code": "6030",
-                                "omschrijving": "Nederland",
-                            },
-                            "plaats": {
-                                "code": "0363",
-                                "omschrijving": "Amsterdam",
-                            },
-                            "reden": {
-                                "code": "S",
-                                "omschrijving": "echtsch of huw.ontb na sch van tfl en "
-                                "bed/eindigen partnersch door ovk of ontb",
                             },
                         },
                         "soortVerbintenis": {
@@ -290,6 +243,7 @@ class TestBrpPartnerhistorieView:
                 [
                     "benk-brp-personen-api",
                     "benk-brp-partnerhistorie-api",
+                    "benk-brp-gegevensset-22",
                 ]
             )
             response = api_client.post(
@@ -311,18 +265,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "1 april 1982",
                                 "type": "Datum",
                             },
-                            "land": {
-                                "code": "6030",
-                                "omschrijving": "Nederland",
-                            },
-                            "plaats": {
-                                "code": "0518",
-                                "omschrijving": "'s-Gravenhage",
-                            },
-                        },
-                        "geslacht": {
-                            "code": "V",
-                            "omschrijving": "vrouw",
                         },
                         "naam": {
                             "geslachtsnaam": "Krabben",
@@ -340,15 +282,30 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "1 april 2019",
                                 "type": "Datum",
                             },
-                            "land": {
-                                "code": "6030",
-                                "omschrijving": "Nederland",
-                            },
-                            "plaats": {
-                                "code": "0518",
-                                "omschrijving": "'s-Gravenhage",
-                            },
                         },
                     },
                 ],
             }
+
+    def test_transform_includes_bsn(self):
+        """Prove that BSN is added to the request for logging purposes even if the user has no
+        permissions for this field.
+        """
+        view = BrpPartnerhistorieView()
+        view.user_scopes = {
+            "benk-brp-partnerhistorie-api",
+            "benk-brp-gegevensset-20",
+        }
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "burgerservicenummer": "123456789",
+            "fields": ["aangaanHuwelijkPartnerschap"],
+        }
+        view.transform_request(hc_request)
+        assert view.inserted_id_fields == ["burgerservicenummer"]
+
+        assert hc_request == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "burgerservicenummer": "123456789",
+            "fields": ["aangaanHuwelijkPartnerschap", "burgerservicenummer"],
+        }
