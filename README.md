@@ -119,11 +119,12 @@ response will be returned.
 
 The following URLs are available:
 
-| API                                      | Description                              | Setting for Proxy URL            | Docs                                                                      |
-|------------------------------------------|------------------------------------------|----------------------------------|---------------------------------------------------------------------------|
-| `/bevragingen/v1/personen`               | Person details.                          | `BRP_PERSONEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)             |
-| `/bevragingen/v1/bewoningen`             | Who lived at an address.                 | `BRP_BEWONINGEN_URL`             | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)             |
-| `/bevragingen/v1/verblijfplaatshistorie` | All addresses where someone lived.       | `BRP_VERBLIJFPLAATSHISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)    |
+| API                                      | Description                        | Setting for Proxy URL            | Docs                                                                      |
+|------------------------------------------|------------------------------------|----------------------------------|---------------------------------------------------------------------------|
+| `/bevragingen/v1/personen`               | Person details.                    | `BRP_PERSONEN_URL`               | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bevragen/)             |
+| `/bevragingen/v1/bewoningen`             | Who lived at an address.           | `BRP_BEWONINGEN_URL`             | [docs](https://brp-api.github.io/Haal-Centraal-BRP-bewoning/)             |
+| `/bevragingen/v1/verblijfplaatshistorie` | All addresses where someone lived. | `BRP_VERBLIJFPLAATSHISTORIE_URL` | [docs](https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/)    |
+| `/bevragingen/v1/partnerhistorie`        | The partners someone had.          | `BRP_PARTNERHISTORIE_URL`        | [docs](https://www.rvig.nl/node/2281)    |
 
 ## Environment Settings
 
@@ -142,6 +143,7 @@ The following environment variables are useful for configuring a local developme
   * `BRP_PERSONEN_URL` endpoint for the RvIG BRP Personen API.
   * `BRP_BEWONINGEN_URL` endpoint for the BRP occupancy URL.
   * `BRP_VERBLIJFPLAATSHISTORIE_URL` endpoint for the address history URL.
+  * `BRP_PARTNERHISTORIE_URL` endpoint for the partner history URL.
 * `BRP_MTLS_CERT_FILE` the mTLS client certificate.
 * `BRP_MTLS_KEY_FILE` the mTLS client key file.
 
