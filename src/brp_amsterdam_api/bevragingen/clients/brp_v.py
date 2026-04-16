@@ -119,7 +119,10 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         self._session.auth = (user, password)
 
         # Import the WSDL locally to bypass http import in the online file
-        wsdl = f"{settings.SRC_DIR}/brp_amsterdam_api/bevragingen/clients/lrd_plus.wsdl"
+        if settings.ENVIRONMENT == "prd":
+            wsdl = f"{settings.SRC_DIR}/brp_amsterdam_api/bevragingen/clients/prd_lrd_plus.wsdl"
+        else:
+            wsdl = f"{settings.SRC_DIR}/brp_amsterdam_api/bevragingen/clients/lrd_plus.wsdl"
 
         # For debugging purposes
         self.history = HistoryPlugin()
