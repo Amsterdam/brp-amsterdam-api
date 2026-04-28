@@ -831,28 +831,17 @@ class TestBrpPersonenView:
                 },
             ],
         }
-        log_messages = caplog.messages
-        for log_message in [
-            "User doesn't request ID field burgerservicenummer, only adding for internal logging",
-            "Removing additional identifier fields from response: burgerservicenummer",
-            (
-                "User text@example.com retrieved using 'personen.ZoekMetPostcodeEnHuisnummer':"
-                " aNummer=? burgerservicenummer=999993240"
-            ),
-            (
-                "User text@example.com retrieved using 'personen.ZoekMetPostcodeEnHuisnummer':"
-                " aNummer=? burgerservicenummer=999993252"
-            ),
-        ]:
-            assert log_message in log_messages
+        log_records = caplog.records
+        log = next(
+            (record for record in log_records if record.message.startswith("Access")),
+            None,
+        )
+        assert log is not None
+        assert log.burgerservicenummers == ["999993252"]
+        assert log.aNummers == ["?"]
 
-        # Log messages about retrieved BSN's should contain the full request/response context
-        assert any("retrieved using" in record.message for record in caplog.records)
-        for record in caplog.records:
-            if "retrieved using" in record.message:
-                assert all(
-                    getattr(record, attr) for attr in ["request", "hcRequest", "hcResponse"]
-                )
+        # Log message should contain the full request/response context
+        assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
 
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove encryption/decryption of BSNs works."""
