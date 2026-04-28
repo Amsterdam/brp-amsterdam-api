@@ -49,30 +49,22 @@ class TestBrpBewoningenView:
         assert response.status_code == 200, response
         assert response.json() == self.RESPONSE_BEWONINGEN, response.data
 
-        log_messages = caplog.messages
-        for log_message in [
+        log_records = caplog.records
+        log = next(
             (
-                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
-                " burgerservicenummer=999993240"
+                record
+                for record in log_records
+                if record.message.startswith("User text@example.com retrieved")
             ),
-            (
-                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
-                " burgerservicenummer=999993241"
-            ),
-            (
-                "User text@example.com retrieved using 'bewoningen.BewoningMetPeildatum':"
-                " burgerservicenummer=999991371"
-            ),
-        ]:
-            assert log_message in log_messages
+            None,
+        )
+        assert log is not None
+
+        bsns = log.burgerservicenummers
+        assert {"999993241", "999991371", "999993240"} == set(bsns)
 
         # Log messages about retrieved BSN's should contain the full request/response context
-        assert any("retrieved using" in record.message for record in caplog.records)
-        for record in caplog.records:
-            if "retrieved using" in record.message:
-                assert all(
-                    getattr(record, attr) for attr in ["request", "hcRequest", "hcResponse"]
-                )
+        assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
 
     def test_address_id_search_deny(self, api_client, common_headers):
         """Prove that access is checked"""
