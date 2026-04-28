@@ -4,7 +4,7 @@ from rest_framework.exceptions import APIException
 from brp_amsterdam_api.bevragingen import fields, types
 from brp_amsterdam_api.bevragingen.permissions import ParameterPolicy
 
-from .base import BaseHealthCheckView, BaseProxyView, audit_log, group_dotted_names
+from .base import BaseHealthCheckView, BaseProxyView, group_dotted_names
 
 ALL_FIELD_NAMES = fields.read_config("rvig_brp_api/bewoningen/fields.csv")
 
@@ -59,17 +59,39 @@ class BrpBewoningenView(BaseProxyView):
         exception: OSError | APIException | None = None,
     ) -> None:
         """Extend logging to also include each BSN that was returned in the response"""
-        super().log_access_granted(
-            request, hc_request, hc_response, final_response, needed_scopes, exception
-        )
 
         if exception is None:
-            # Separate log message for every person that's being accessed.
+            # Create an array of BSNs for every person that's being accessed.
             personen = []
             for bewoning in hc_response["bewoningen"]:
                 personen += bewoning.get("bewoners", []) + bewoning.get("mogelijkeBewoners", [])
-            bsns = set()
+            bsns = []
             for persoon in personen:
+                bsn = persoon.get("burgerservicenummer", "?")
+                if bsn not in bsns:
+                    bsns.append(bsn)
+
+            super().log_access_granted(
+                request,
+                hc_request,
+                hc_response,
+                final_response,
+                needed_scopes,
+                exception,
+                burgerservicenummers=bsns,
+            )
+
+            """
+            msg_params = {}
+            extra = {
+                "request": request.data,
+                "hcRequest": hc_request,
+                "hcResponse": final_response or hc_response,
+            }
+            msg = ["User %(upn)s retrieved using '%(service)s.%(queryType)s':"]
+            msg_params["burgerservicenummers"] = bsns
+            extra["burgerservicenummers"] = bsns.replace("?", None)
+            msg.append("burgerservicenummers=%(burgerservicenummers)s")
                 bsns.add(persoon.get("burgerservicenummer", None))
             # bsns.discard(None) Is dit nodig? Voor als een persoon geen bsn heeft (???)
             msg_params = {}

@@ -213,40 +213,27 @@ class BrpPersonenView(BaseProxyView):
         exception: OSError | APIException | None = None,
     ) -> None:
         """Extend logging to also include each BSN that was returned in the response"""
-        super().log_access_granted(
-            request, hc_request, hc_response, final_response, needed_scopes, exception
-        )
 
         if exception is None:
-            # Separate log message for every person that's being accessed.
-            for persoon in hc_response["personen"]:
-                msg_params = {}
-                extra = {
-                    "request": request.data,
-                    "hcRequest": hc_request,
-                    "hcResponse": final_response or hc_response,
-                }
-                msg = ["User %(upn)s retrieved using '%(service)s.%(queryType)s':"]
-                for id_field in self.always_insert_id_fields:
-                    msg_params[id_field] = persoon.get(id_field, "?")
-                    extra[id_field] = persoon.get(id_field, None)
-                    msg.append(f"{id_field}=%({id_field})s")
 
-                audit_log.info(
-                    # Visible log message
-                    " ".join(msg),
-                    {
-                        "service": self.service_log_id,
-                        "queryType": hc_request["type"],
-                        "upn": self.upn,
-                        **msg_params,
-                    },
-                    # Extra JSON fields for log querying
-                    extra={
-                        **self.default_log_fields,
-                        **extra,
-                    },
-                )
+            # Create an arrays of BSNs and aNummers for every person that's being accessed.
+            extra = {}
+            for id_field in self.always_insert_id_fields:
+                for persoon in hc_response["personen"]:
+                    extra[f"{id_field}s"] = []
+                    value = persoon.get(id_field, "?")
+                    if value not in extra[f"{id_field}s"]:
+                        extra[f"{id_field}s"].append(value)
+
+            super().log_access_granted(
+                request,
+                hc_request,
+                hc_response,
+                final_response,
+                needed_scopes,
+                exception,
+                **extra,
+            )
 
     def transform_request(self, hc_request: types.PersonenQuery) -> None:
         """Extra rules before passing the request to RvIG BRP API"""

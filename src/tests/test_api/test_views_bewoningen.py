@@ -51,19 +51,13 @@ class TestBrpBewoningenView:
 
         log_records = caplog.records
         log = next(
-            (
-                record
-                for record in log_records
-                if record.message.startswith("User text@example.com retrieved")
-            ),
+            (record for record in log_records if record.message.startswith("Access")),
             None,
         )
         assert log is not None
+        assert log.burgerservicenummers == ["999993240", "999993241", "999991371"]
 
-        bsns = log.burgerservicenummers
-        assert {"999993241", "999991371", "999993240"} == set(bsns)
-
-        # Log messages about retrieved BSN's should contain the full request/response context
+        # Log message should contain the full request/response context
         assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
 
     def test_address_id_search_deny(self, api_client, common_headers):
