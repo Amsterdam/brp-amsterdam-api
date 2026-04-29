@@ -80,46 +80,11 @@ class BrpBewoningenView(BaseProxyView):
                 exception,
                 burgerservicenummers=bsns,
             )
+            return
 
-            """
-            msg_params = {}
-            extra = {
-                "request": request.data,
-                "hcRequest": hc_request,
-                "hcResponse": final_response or hc_response,
-            }
-            msg = ["User %(upn)s retrieved using '%(service)s.%(queryType)s':"]
-            msg_params["burgerservicenummers"] = bsns
-            extra["burgerservicenummers"] = bsns.replace("?", None)
-            msg.append("burgerservicenummers=%(burgerservicenummers)s")
-                bsns.add(persoon.get("burgerservicenummer", None))
-            # bsns.discard(None) Is dit nodig? Voor als een persoon geen bsn heeft (???)
-            msg_params = {}
-            extra = {
-                "request": request.data,
-                "hcRequest": hc_request,
-                "hcResponse": final_response or hc_response,
-            }
-            msg = ["User %(upn)s retrieved using '%(service)s.%(queryType)s':"]
-            msg_params["burgerservicenummers"] = list(bsns)
-            extra["burgerservicenummers"] = list(bsns)
-            msg.append("burgerservicenummers=%(burgerservicenummers)s")
-
-            audit_log.info(
-                # Visible log message
-                " ".join(msg),
-                {
-                    "service": self.service_log_id,
-                    "queryType": hc_request["type"],
-                    "upn": self.upn,
-                    **msg_params,
-                },
-                # Extra JSON fields for log querying
-                extra={
-                    **self.default_log_fields,
-                    **extra,
-                },
-            )
+        super().log_access_granted(
+            request, hc_request, hc_response, final_response, needed_scopes, exception
+        )
 
     def _insert_null_values(
         self, hc_request: types.BaseQuery, hc_response: types.BaseResponse

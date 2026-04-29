@@ -215,7 +215,6 @@ class BrpPersonenView(BaseProxyView):
         """Extend logging to also include each BSN that was returned in the response"""
 
         if exception is None:
-
             # Create an arrays of BSNs and aNummers for every person that's being accessed.
             extra = {}
             for id_field in self.always_insert_id_fields:
@@ -234,6 +233,11 @@ class BrpPersonenView(BaseProxyView):
                 exception,
                 **extra,
             )
+            return
+
+        super().log_access_granted(
+            request, hc_request, hc_response, final_response, needed_scopes, exception
+        )
 
     def transform_request(self, hc_request: types.PersonenQuery) -> None:
         """Extra rules before passing the request to RvIG BRP API"""
