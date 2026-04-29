@@ -910,18 +910,34 @@ class TestBrpPersonenView:
         assert request_data["burgerservicenummer"][0] == "999993367"
 
         # Expect the unencrypted bsn to show up in the logs
-        log_messages = caplog.messages
-        for log_message in [
+        log_records = caplog.records
+        log_1 = next(
             (
-                "User text@example.com retrieved using 'personen.ZoekMetPostcodeEnHuisnummer':"
-                " aNummer=? burgerservicenummer=999993367"
+                record
+                for record in log_records
+                if record.message.startswith(
+                    "Access granted for 'personen.ZoekMetPostcodeEnHuisnummer"
+                )
             ),
+            None,
+        )
+        assert log_1 is not None
+        assert log_1.burgerservicenummers == ["999993367"]
+        assert log_1.aNummers == ["?"]
+
+        log_2 = next(
             (
-                "User text@example.com retrieved using 'personen.RaadpleegMetBurgerservicenummer':"
-                " aNummer=? burgerservicenummer=999993367"
+                record
+                for record in log_records
+                if record.message.startswith(
+                    "Access granted for 'personen.RaadpleegMetBurgerservicenummer"
+                )
             ),
-        ]:
-            assert log_message in log_messages
+            None,
+        )
+        assert log_2 is not None
+        assert log_2.burgerservicenummers == ["999993367"]
+        assert log_2.aNummers == ["?"]
 
     def test_encryption_salt_required(self, api_client, requests_mock, caplog, common_headers):
         """Prove that the correlation id is used as a salt to encrypt/decrypt"""

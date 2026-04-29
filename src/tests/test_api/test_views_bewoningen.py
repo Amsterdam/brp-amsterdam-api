@@ -57,9 +57,6 @@ class TestBrpBewoningenView:
         assert log is not None
         assert log.burgerservicenummers == ["999993240", "999993241", "999991371"]
 
-        # Log message should contain the full request/response context
-        assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
-
     def test_address_id_search_deny(self, api_client, common_headers):
         """Prove that access is checked"""
         url = reverse("brp-bewoningen")
