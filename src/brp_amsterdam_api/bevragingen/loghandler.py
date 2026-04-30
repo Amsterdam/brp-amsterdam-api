@@ -36,6 +36,8 @@ class BRPAuditLogHandler(logging.Handler):
         # The custom jsonformatter returns a json string, so we'll convert it to python
         logs = [json.loads(self.format(r)) for r in record]
 
+        # Add logSize to each log, so BenK can use the gzippedResponse for large logs
+        logs = [{**log, "logSize": len(json.dumps(log).encode("utf-8"))} for log in logs]
         try:
             self._client.upload(
                 rule_id=self.rule_id,

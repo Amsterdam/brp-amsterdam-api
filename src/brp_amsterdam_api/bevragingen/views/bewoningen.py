@@ -1,3 +1,7 @@
+import base64
+import gzip
+import json
+
 from django.conf import settings
 from rest_framework.exceptions import APIException
 
@@ -57,9 +61,10 @@ class BrpBewoningenView(BaseProxyView):
         final_response: types.BewoningenResponse | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
+        extra: dict | None = None,
     ) -> None:
-        """Extend logging to also include each BSN that was returned in the response"""
-
+        """Extend logging to also include each BSN that was returned in the response and
+        a gzippedResponse to get around azure limits on log size."""
         if exception is None:
             # Create an array of BSNs for every person that's being accessed.
             personen = []
@@ -71,6 +76,13 @@ class BrpBewoningenView(BaseProxyView):
                 if burgerservicenummer and burgerservicenummer not in burgerservicenummers:
                     burgerservicenummers.append(burgerservicenummer)
 
+            extra = {
+                "burgerservicenummers": burgerservicenummers,
+                "hcResponseGzip": base64.b64encode(
+                    gzip.compress(json.dumps(hc_response).encode("utf-8"))
+                ),
+            }
+
             super().log_access_granted(
                 request,
                 hc_request,
@@ -78,7 +90,7 @@ class BrpBewoningenView(BaseProxyView):
                 final_response,
                 needed_scopes,
                 exception,
-                extra={"burgerservicenummers": burgerservicenummers},
+                extra=extra,
             )
             return
 

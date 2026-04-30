@@ -317,6 +317,7 @@ class BaseProxyView(ClientMixin, APIView):
         Per service type, it may need more refinement.
         """
         extra = extra or {}
+
         extra.update(
             {
                 **self.default_log_fields,
