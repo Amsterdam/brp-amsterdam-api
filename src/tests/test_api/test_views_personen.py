@@ -838,7 +838,7 @@ class TestBrpPersonenView:
         )
         assert log is not None
         assert log.burgerservicenummers == ["999993252"]
-        assert log.aNummers == ["?"]
+        assert log.aNummers == []
 
         # Log message should contain the full request/response context
         assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
@@ -923,7 +923,7 @@ class TestBrpPersonenView:
         )
         assert log_1 is not None
         assert log_1.burgerservicenummers == ["999993367"]
-        assert log_1.aNummers == ["?"]
+        assert log_1.aNummers == []
 
         log_2 = next(
             (
@@ -937,7 +937,7 @@ class TestBrpPersonenView:
         )
         assert log_2 is not None
         assert log_2.burgerservicenummers == ["999993367"]
-        assert log_2.aNummers == ["?"]
+        assert log_2.aNummers == []
 
     def test_encryption_salt_required(self, api_client, requests_mock, caplog, common_headers):
         """Prove that the correlation id is used as a salt to encrypt/decrypt"""
