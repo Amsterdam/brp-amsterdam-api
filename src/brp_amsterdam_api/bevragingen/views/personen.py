@@ -231,7 +231,7 @@ class BrpPersonenView(BaseProxyView):
                 final_response,
                 needed_scopes,
                 exception,
-                extra_params=extra,
+                extra=extra,
             )
             return
 
