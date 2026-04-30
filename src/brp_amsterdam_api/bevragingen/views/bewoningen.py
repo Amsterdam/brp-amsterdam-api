@@ -78,7 +78,7 @@ class BrpBewoningenView(BaseProxyView):
                 final_response,
                 needed_scopes,
                 exception,
-                burgerservicenummers=bsns,
+                extra_params={"burgerservicenummers": bsns},
             )
             return
 
