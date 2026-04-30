@@ -167,3 +167,29 @@ class TestBrpBewoningenView:
                 },
             ],
         }
+
+    def test_gzipped_response_added_to_logs(
+        self, api_client, caplog, requests_mock, common_headers
+    ):
+        """Prove that the gzipped response is added to the logs"""
+        requests_mock.post(
+            "/lap/api/brp/bewoning/bewoningen",
+            json=self.RESPONSE_BEWONINGEN,
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-bewoningen")
+        token = build_jwt_token(["benk-brp-bewoning-api"])
+        api_client.post(
+            f"{url}?resultaat-formaat=volledig",
+            {
+                "type": "BewoningMetPeildatum",
+                "adresseerbaarObjectIdentificatie": "0518010000832200",
+                "peildatum": "2020-09-24",
+            },
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert any("hcResponseGzip" in r.__dict__ for r in caplog.records)

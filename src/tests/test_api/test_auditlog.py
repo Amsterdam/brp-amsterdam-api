@@ -64,6 +64,8 @@ class TestAuditLogHandler:
         mock_log_upload.assert_called_with(
             rule_id="mock-rule-id", stream_name="mock-stream-name", logs=ANY
         )
+        # Assert logSize have been added to the logs
+        assert all("logSize" in log for log in mock_log_upload.call_args_list[0][1]["logs"])
 
         assert log_message in caplog.messages
 
