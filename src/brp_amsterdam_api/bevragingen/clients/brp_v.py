@@ -24,12 +24,6 @@ BRP_CATEGORY_MAPPING = {
         "function": derive_description,
         "args": "GENDER_CODE_TABLE",
     },
-    "soortVerbintenis.code": "05.15.10",
-    "soortVerbintenis.omschrijving": {
-        "source": "soortVerbintenis.code",
-        "function": derive_description,
-        "args": "ENGAGEMENT_TYPE_TABLE",
-    },
     "naam.voornamen": "05.02.10",
     "naam.adellijkeTitelPredicaat": "05.02.20",
     "naam.voorvoegsel": "05.02.30",
