@@ -67,8 +67,8 @@ class BrpBewoningenView(BaseProxyView):
                 personen += bewoning.get("bewoners", []) + bewoning.get("mogelijkeBewoners", [])
             bsns = []
             for persoon in personen:
-                bsn = persoon.get("burgerservicenummer", "?")
-                if bsn not in bsns:
+                bsn = persoon.get("burgerservicenummer", None)
+                if bsn and bsn not in bsns:
                     bsns.append(bsn)
 
             super().log_access_granted(

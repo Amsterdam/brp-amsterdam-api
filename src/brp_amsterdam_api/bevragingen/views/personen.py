@@ -215,13 +215,13 @@ class BrpPersonenView(BaseProxyView):
         """Extend logging to also include each BSN that was returned in the response"""
 
         if exception is None:
-            # Create an arrays of BSNs and aNummers for every person that's being accessed.
+            # Create arrays of BSNs and aNummers for every person that's being accessed.
             extra = {}
             for id_field in self.always_insert_id_fields:
                 for persoon in hc_response["personen"]:
                     extra[f"{id_field}s"] = []
-                    value = persoon.get(id_field, "?")
-                    if value not in extra[f"{id_field}s"]:
+                    value = persoon.get(id_field, None)
+                    if value and value not in extra[f"{id_field}s"]:
                         extra[f"{id_field}s"].append(value)
 
             super().log_access_granted(

@@ -88,9 +88,8 @@ class TestBaseProxyView:
                 **common_headers,
             },
         )
-        print(caplog.messages)
+
         assert response.status_code == 502
-        print(response.json())
         assert any(
             m.startswith("Access granted for 'personen.ZoekMetPostcodeEnHuisnummer' to '")
             for m in caplog.messages
