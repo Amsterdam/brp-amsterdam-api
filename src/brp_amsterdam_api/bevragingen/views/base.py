@@ -309,7 +309,7 @@ class BaseProxyView(ClientMixin, APIView):
         final_response: types.BaseResponse | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
-        **kwargs,
+        extra_params: dict | None = None,
     ) -> None:
         """Perform the audit logging for the request/response.
 
@@ -325,8 +325,10 @@ class BaseProxyView(ClientMixin, APIView):
             "requestStarted": self.start_date,
             "requestProcessed": now(),
             "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
-            **kwargs,
         }
+
+        if extra_params:
+            extra.update(extra_params)
 
         if exception is None:
             msg = (
@@ -346,7 +348,6 @@ class BaseProxyView(ClientMixin, APIView):
                 "service": self.service_log_id,
                 "queryType": hc_request["type"],
                 "upn": self.upn,
-                **kwargs,
             },
             extra=extra,
         )
