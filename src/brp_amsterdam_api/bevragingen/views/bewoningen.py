@@ -65,11 +65,11 @@ class BrpBewoningenView(BaseProxyView):
             personen = []
             for bewoning in hc_response["bewoningen"]:
                 personen += bewoning.get("bewoners", []) + bewoning.get("mogelijkeBewoners", [])
-            bsns = []
+            burgerservicenummers = []
             for persoon in personen:
-                bsn = persoon.get("burgerservicenummer", None)
-                if bsn and bsn not in bsns:
-                    bsns.append(bsn)
+                burgerservicenummer = persoon.get("burgerservicenummer", None)
+                if burgerservicenummer and burgerservicenummer not in burgerservicenummers:
+                    burgerservicenummers.append(burgerservicenummer)
 
             super().log_access_granted(
                 request,
@@ -78,7 +78,7 @@ class BrpBewoningenView(BaseProxyView):
                 final_response,
                 needed_scopes,
                 exception,
-                extra_params={"burgerservicenummers": bsns},
+                extra={"burgerservicenummers": burgerservicenummers},
             )
             return
 

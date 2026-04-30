@@ -309,26 +309,26 @@ class BaseProxyView(ClientMixin, APIView):
         final_response: types.BaseResponse | None,
         needed_scopes: set[str],
         exception: OSError | APIException | None = None,
-        extra_params: dict | None = None,
+        extra: dict | None = None,
     ) -> None:
         """Perform the audit logging for the request/response.
 
         This is a very basic global logging.
         Per service type, it may need more refinement.
         """
-        extra = {
-            **self.default_log_fields,
-            "needed": sorted(needed_scopes),
-            "request": request.data,
-            "hcRequest": hc_request,
-            "hcResponse": final_response or hc_response,
-            "requestStarted": self.start_date,
-            "requestProcessed": now(),
-            "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
-        }
-
-        if extra_params:
-            extra.update(extra_params)
+        extra = extra or {}
+        extra.update(
+            {
+                **self.default_log_fields,
+                "needed": sorted(needed_scopes),
+                "request": request.data,
+                "hcRequest": hc_request,
+                "hcResponse": final_response or hc_response,
+                "requestStarted": self.start_date,
+                "requestProcessed": now(),
+                "processingTime": (time.perf_counter_ns() - self.start_time) * 1e-9,
+            }
+        )
 
         if exception is None:
             msg = (
