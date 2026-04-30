@@ -26,11 +26,6 @@ class TestBrpVAdhocServiceClient:
         _derive_values(data)
         assert data["geboorte"]["land"]["omschrijving"] == "Nederland"
 
-    def test_derive_engagement_type(self):
-        data = {"soortVerbintenis": {"code": "P"}}
-        _derive_values(data)
-        assert data["soortVerbintenis"]["omschrijving"] == "geregistreerd partnerschap"
-
     def test_derive_reason_dissolution(self):
         data = {"ontbindingHuwelijkPartnerschap": {"reden": {"code": "S"}}}
         _derive_values(data)

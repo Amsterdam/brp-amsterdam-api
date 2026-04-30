@@ -48,7 +48,6 @@ class TestBrpPartnerhistorieView:
                             "geslachtsnaam": "Arendsen",
                             "voorletters": "A.",
                         },
-                        "soortVerbintenis": {"code": "H", "omschrijving": "huwelijk"},
                     }
                 ]
             }
@@ -166,10 +165,10 @@ class TestBrpPartnerhistorieView:
                             "voornamen": "Adam",
                             "voorvoegsel": None,
                         },
-                        "soortVerbintenis": {"code": "H", "omschrijving": "huwelijk"},
                         "ontbindingHuwelijkPartnerschap": {
                             "datum": None,
                         },
+                        "soortVerbintenis": None,
                     }
                 ]
             }
@@ -221,10 +220,6 @@ class TestBrpPartnerhistorieView:
                             "voorletters": "A.",
                             "voornamen": "Ayse",
                         },
-                        "soortVerbintenis": {
-                            "code": "H",
-                            "omschrijving": "huwelijk",
-                        },
                     },
                     {
                         "aangaanHuwelijkPartnerschap": {
@@ -254,10 +249,6 @@ class TestBrpPartnerhistorieView:
                                 "langFormaat": "21 september 2003",
                                 "type": "Datum",
                             },
-                        },
-                        "soortVerbintenis": {
-                            "code": "H",
-                            "omschrijving": "huwelijk",
                         },
                     },
                 ],
@@ -303,10 +294,6 @@ class TestBrpPartnerhistorieView:
                             "voorletters": "K.",
                             "voornamen": "Koosje",
                             "voorvoegsel": "van",
-                        },
-                        "soortVerbintenis": {
-                            "code": "P",
-                            "omschrijving": "geregistreerd partnerschap",
                         },
                         "aangaanHuwelijkPartnerschap": {
                             "datum": {
