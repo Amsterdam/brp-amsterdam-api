@@ -25,6 +25,7 @@ SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
 # Can be removed once the BRP API supports partner history
 DISALLOWED_FIELDS = [
     "partners.soortVerbintenis",
+    "partners.geslacht",
     "partners.geboorte.plaats",
     "partners.geboorte.land",
     "partners.aangaanHuwelijkPartnerschap.plaats",
