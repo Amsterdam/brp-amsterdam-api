@@ -20,11 +20,22 @@ env_dir = "prd" if settings.ENVIRONMENT == "prd" else "npr"
 SCOPES_FOR_FIELDS = fields.read_dataset_fields_files(
     f"dataset_fields/{env_dir}/personen/*.txt", accepted_field_names=ALL_FIELD_NAMES
 )
-# We need to match the field names a scope is allow to request to the partnerhistorie field names
+
+# Fields we currently don't have access to for the in the Ad Hoc Service.
+# Can be removed once the BRP API supports partner history
+DISALLOWED_FIELDS = [
+    "partners.soortVerbintenis",
+    "partners.aangaanHuwelijkPartnerschap.plaats",
+    "partners.aangaanHuwelijkPartnerschap.land",
+    "partners.ontbindingHuwelijkPartnerschap.plaats",
+    "partners.ontbindingHuwelijkPartnerschap.land",
+]
+
+# We need to match the field names a scope is allowed to request to the partnerhistorie field names
 SCOPES_FOR_FIELDS = {
     field.replace("partners.", ""): scopes
     for field, scopes in SCOPES_FOR_FIELDS.items()
-    if field.startswith("partners.")
+    if field.startswith("partners.") and field not in DISALLOWED_FIELDS
 }
 
 

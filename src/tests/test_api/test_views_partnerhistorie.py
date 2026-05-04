@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from brp_amsterdam_api.bevragingen.views import BrpPartnerhistorieView
+from brp_amsterdam_api.bevragingen.views.partnerhistorie import DISALLOWED_FIELDS
 from tests.utils import build_jwt_token
 
 
@@ -168,7 +169,6 @@ class TestBrpPartnerhistorieView:
                         "ontbindingHuwelijkPartnerschap": {
                             "datum": None,
                         },
-                        "soortVerbintenis": None,
                     }
                 ]
             }
@@ -328,3 +328,20 @@ class TestBrpPartnerhistorieView:
             "burgerservicenummer": "123456789",
             "fields": ["aangaanHuwelijkPartnerschap", "burgerservicenummer"],
         }
+
+    def test_disallowed_fields_not_requested(self):
+        """Prove that disallowed fields are not requested in the partnerhistorie endpoint.
+        Gegevensset-18 includes aangaanHuwelijkPartnerschap.plaats and
+        aangaanHuwelijkPartnerschap.land
+        """
+        view = BrpPartnerhistorieView()
+        view.user_scopes = {
+            "benk-brp-partnerhistorie-api",
+            "benk-brp-gegevensset-18",
+        }
+        hc_request = {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "burgerservicenummer": "123456789",
+        }
+        view.transform_request(hc_request)
+        assert all(field not in hc_request["fields"] for field in DISALLOWED_FIELDS)
