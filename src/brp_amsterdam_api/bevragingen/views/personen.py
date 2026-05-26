@@ -218,8 +218,8 @@ class BrpPersonenView(BaseProxyView):
             # Create arrays of BSNs and aNummers for every person that's being accessed.
             extra = {}
             for id_field in self.always_insert_id_fields:
+                extra[f"{id_field}s"] = []
                 for persoon in hc_response["personen"]:
-                    extra[f"{id_field}s"] = []
                     value = persoon.get(id_field, None)
                     if value and value not in extra[f"{id_field}s"]:
                         extra[f"{id_field}s"].append(value)
