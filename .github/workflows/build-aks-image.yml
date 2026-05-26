@@ -24,4 +24,4 @@ jobs:
             organisation: ${{ secrets.AZURE_DEVOPS_ORG }}
             project: ${{ secrets.AZURE_DEVOPS_PROJECT }}
             pat-token: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-            template-params: '{"environments": "- dev\n- test\n- acc", "branch": "main", "akscluster": "blue"}'
+            template-params: '{"environments": "- dev\n- test\n- acc", "branch": "main", "backend": "rvig"}'
