@@ -837,7 +837,7 @@ class TestBrpPersonenView:
             None,
         )
         assert log is not None
-        assert log.burgerservicenummers == ["999993252"]
+        assert log.burgerservicenummers == ["999993240", "999993252"]
         assert log.aNummers == []
 
         # Log message should contain the full request/response context
