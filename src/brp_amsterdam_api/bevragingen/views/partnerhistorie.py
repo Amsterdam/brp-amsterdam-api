@@ -2,6 +2,7 @@ import logging
 
 from django.conf import settings
 from rest_framework import status
+from rest_framework.exceptions import APIException
 from rest_framework.request import Request
 
 from brp_amsterdam_api.bevragingen import fields, types
@@ -113,6 +114,43 @@ class BrpPartnerhistorieView(BaseProxyView):
         # even through the user has no access to these fields.
         if self.inserted_id_fields:
             self._hide_inserted_identifiers(hc_request, hc_response)
+
+    def log_access_granted(
+        self,
+        request,
+        hc_request: types.BaseQuery,
+        hc_response: types.BaseResponse | None,
+        final_response: types.BaseResponse | None,
+        needed_scopes: set[str],
+        exception: OSError | APIException | None = None,
+        extra: dict | None = None,
+    ) -> None:
+        """Extend logging to also include each BSN that was returned in the response"""
+
+        if exception is None:
+            # Create arrays of BSNs and aNummers for every person that's being accessed.
+            extra = {}
+            for id_field in self.always_insert_id_fields:
+                extra[f"{id_field}s"] = []
+                for partner in hc_response["partnerhistorie"]:
+                    value = partner.get(id_field, None)
+                    if value and value not in extra[f"{id_field}s"]:
+                        extra[f"{id_field}s"].append(value)
+
+            super().log_access_granted(
+                request,
+                hc_request,
+                hc_response,
+                final_response,
+                needed_scopes,
+                exception,
+                extra=extra,
+            )
+            return
+
+        super().log_access_granted(
+            request, hc_request, hc_response, final_response, needed_scopes, exception
+        )
 
     def _add_fields_filter(self, hc_request: types.PartnerhistorieQuery) -> None:
         """Determine all values for the "fields" parameter that the user has access to.
