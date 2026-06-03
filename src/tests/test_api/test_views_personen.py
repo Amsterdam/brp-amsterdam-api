@@ -843,6 +843,80 @@ class TestBrpPersonenView:
         # Log message should contain the full request/response context
         assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
 
+    def test_log_requested_bsns(
+        self, api_client, requests_mock, caplog, monkeypatch, common_headers
+    ):
+        """
+        Prove that requested BSNs are always logged and not duplicated between request and response
+        """
+        requests_mock.post(
+            "/lap/api/brp/personen",
+            json={
+                "type": "RaadpleegMetBurgerservicenummer",
+                "personen": [
+                    {
+                        "burgerservicenummer": "999993240",
+                    },
+                    {
+                        "burgerservicenummer": "999993252",
+                    },
+                ],
+            },
+            headers={"content-type": "application/json"},
+        )
+
+        url = reverse("brp-personen")
+        scopes = [
+            "benk-brp-personen-api",
+            "benk-brp-zoekvraag-bsn",
+            "benk-brp-gegevensset-1",
+        ]
+        response = api_client.post(
+            url,
+            {
+                "type": "RaadpleegMetBurgerservicenummer",
+                "burgerservicenummer": ["999993367", "999993252"],
+                "fields": ["burgerservicenummer"],
+            },
+            headers={
+                "Authorization": f"Bearer {build_jwt_token(scopes)}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 200, response.data
+        response = response.json()
+
+        assert response == {
+            "type": "RaadpleegMetBurgerservicenummer",
+            "personen": [
+                # burgerservicenummer retrieved from endpoint, but stripped before sending response
+                {
+                    "burgerservicenummer": "999993240",
+                },
+                {
+                    "burgerservicenummer": "999993252",
+                },
+            ],
+        }
+        log_records = caplog.records
+        log = next(
+            (record for record in log_records if record.message.startswith("Access")),
+            None,
+        )
+        assert log is not None
+        assert all(
+            bsn in log.burgerservicenummers for bsn in ["999993240", "999993252", "999993367"]
+        )
+        # Make sure there are no duplicates in de bsn log
+        duplicates = [
+            i for i in set(log.burgerservicenummers) if log.burgerservicenummers.count(i) > 1
+        ]
+        assert duplicates == []
+        assert log.aNummers == []
+
+        # Log message should contain the full request/response context
+        assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
+
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove encryption/decryption of BSNs works."""
         requests_mock.post(

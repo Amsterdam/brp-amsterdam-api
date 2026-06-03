@@ -306,6 +306,68 @@ class TestBrpPartnerhistorieView:
                 ],
             }
 
+    def test_partnerhistorie_bsns_logger(self, api_client, requests_mock, caplog, common_headers):
+        """Prove that bsns from both the request and response are logged."""
+        with open("tests/data/response-other-category.xml") as mock_response:
+            requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
+
+            url = reverse("brp-partnerhistorie")
+            token = build_jwt_token(
+                [
+                    "benk-brp-personen-api",
+                    "benk-brp-partnerhistorie-api",
+                    "benk-brp-gegevensset-22",
+                ]
+            )
+            response = api_client.post(
+                f"{url}",
+                {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "123456789"},
+                headers={
+                    "Authorization": f"Bearer {token}",
+                    **common_headers,
+                },
+            )
+            assert response.status_code == 200, response.data
+            assert response.json() == {
+                "partnerhistorie": [
+                    {
+                        "burgerservicenummer": "999998912",
+                        "geboorte": {
+                            "datum": {
+                                "datum": "1982-04-01",
+                                "langFormaat": "1 april 1982",
+                                "type": "Datum",
+                            },
+                        },
+                        "naam": {
+                            "geslachtsnaam": "Krabben",
+                            "voorletters": "K.",
+                            "voornamen": "Koosje",
+                            "voorvoegsel": "van",
+                        },
+                        "aangaanHuwelijkPartnerschap": {
+                            "datum": {
+                                "datum": "2019-04-01",
+                                "langFormaat": "1 april 2019",
+                                "type": "Datum",
+                            },
+                        },
+                    },
+                ],
+            }
+
+            log_records = caplog.records
+            log = next(
+                (record for record in log_records if record.message.startswith("Access")),
+                None,
+            )
+            assert log is not None
+            assert all(bsn in log.burgerservicenummers for bsn in ["123456789", "999998912"])
+            assert log.aNummers == []
+
+            # Log message should contain the full request/response context
+            assert all(getattr(log, attr) for attr in ["request", "hcRequest", "hcResponse"])
+
     def test_transform_includes_bsn(self):
         """Prove that BSN is added to the request for logging purposes even if the user has no
         permissions for this field.
