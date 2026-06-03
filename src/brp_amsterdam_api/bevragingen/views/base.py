@@ -331,6 +331,22 @@ class BaseProxyView(ClientMixin, APIView):
             }
         )
 
+        # Make sure burgerservicenummers and aNummers are always a (empty) list
+        extra["aNummers"] = extra.get("aNummers", [])
+        extra["burgerservicenummers"] = extra.get("burgerservicenummers", [])
+
+        # Always add BSN to the list of BSN's if it's submitted in the request
+        if "burgerservicenummer" in hc_request and hc_request["burgerservicenummer"] is not None:
+            if isinstance(hc_request["burgerservicenummer"], str):
+                request_burgerservicenummers = [hc_request["burgerservicenummer"]]
+            elif isinstance(hc_request["burgerservicenummer"], list):
+                request_burgerservicenummers = hc_request["burgerservicenummer"]
+
+            # Join the two possible lists and remove duplicates
+            extra["burgerservicenummers"] = list(
+                set(extra["burgerservicenummers"]) | set(request_burgerservicenummers)
+            )
+
         if exception is None:
             msg = (
                 "Access granted for '%(service)s.%(queryType)s' to '%(upn)s'"
