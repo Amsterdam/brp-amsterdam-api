@@ -340,7 +340,10 @@ class BaseProxyView(ClientMixin, APIView):
             if isinstance(hc_request["burgerservicenummer"], str):
                 request_burgerservicenummers = [hc_request["burgerservicenummer"]]
             elif isinstance(hc_request["burgerservicenummer"], list):
-                request_burgerservicenummers = hc_request["burgerservicenummer"]
+                # Make sure all logged BSN's are a string
+                request_burgerservicenummers = [
+                    str(bsn) for bsn in hc_request["burgerservicenummer"]
+                ]
 
             # Join the two possible lists and remove duplicates
             extra["burgerservicenummers"] = list(
