@@ -94,7 +94,7 @@ def _validate_password(password) -> list:
         errors.append("[2] Password can only contain ASCII characters between 32 <= x < 127")
 
     # 3. There should be no ascending or descending streaks of 4 characters, e.g. ABCD, 1234, zyxw
-    if [abs(c1 - c2) for c1, c2 in zip(ascii_codes[:-1], ascii_codes[1:])].count(1) >= 3:
+    if _find_consecutive_run(ascii_codes) >= 4:
         errors.append("[3] Password can't contain a ascending or descending range of 4 characters")
 
     """
@@ -119,3 +119,30 @@ def _validate_password(password) -> list:
         )
 
     return errors
+
+
+def _find_consecutive_run(values):
+    """ "
+    Find the longest consecutive run (asc or desc) in the given list of ascii values.
+
+    For example:
+
+    [1, 2, 3, 4, 6] -> 4
+    [1, 2, 5, 3, 4, 5] -> 3
+    [F, E, D, C, B, A] -> 6
+    """
+    if not values:
+        return 0
+    ascii_changes = [abs(c1 - c2) for c1, c2 in zip(values[:-1], values[1:])]
+
+    current = 1
+    longest = 1
+
+    for change in ascii_changes:
+        if change == 1:
+            current += 1
+        else:
+            current = 1
+        longest = max(longest, current)
+
+    return longest
