@@ -80,7 +80,7 @@ class BrpBewoningenView(BaseProxyView):
                 "burgerservicenummers": burgerservicenummers,
                 "hcResponseGzip": base64.b64encode(
                     gzip.compress(json.dumps(hc_response).encode("utf-8"))
-                ),
+                ).decode("utf-8"),
             }
 
             super().log_access_granted(
