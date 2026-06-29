@@ -25,7 +25,7 @@ class Command(BaseCommand):
         password = _generate_password()
 
         # Make sure we've generated a valid password, if not, keep trying until we do.
-        while not _validate_password(password):
+        while len(_validate_password(password)) > 0:
             password = _generate_password()
 
         client = BrpVAdhocServiceClient(
