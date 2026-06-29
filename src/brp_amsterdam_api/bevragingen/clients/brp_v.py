@@ -156,10 +156,8 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         Change the password for the BRP V Ad Hoc Service. This is needed every 90 days.
         """
         response = self.client.service.changePassword(password)
-        if response["code"] in [101, 110, 111, 112, 113, 114]:
-            error_message = (
-                f'Code: {response.get("code")} \nDetail: {response.get("omschrijving")}'
-            )
+        if response.code in [101, 110, 111, 112, 113, 114]:
+            error_message = f"Code: {response.code} \nDetail: {response.omschrijving}"
             raise PasswordNotChanged(
                 f"Failed to change password for BRP V Ad Hoc Service\n{error_message}"
             )
