@@ -157,7 +157,12 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         """
         response = self.client.service.changePassword(password)
         if response["code"] in [101, 110, 111, 112, 113, 114]:
-            raise PasswordNotChanged("Failed to change password for BRP V Ad Hoc Service")
+            error_message = (
+                f'Code: {response.get("code")} \nDetail: {response.get("omschrijving")}'
+            )
+            raise PasswordNotChanged(
+                f"Failed to change password for BRP V Ad Hoc Service\n{error_message}"
+            )
 
     def _get_soap_request(self, burgerservicenummer: str, fields: list[str]):
         return self.factory.Vraag(
