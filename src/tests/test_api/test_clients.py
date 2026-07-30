@@ -44,6 +44,32 @@ class TestBrpVAdhocServiceClient:
         }
 
     @pytest.mark.parametrize(
+        "source_value, expected",
+        [
+            (
+                "19650000",
+                {
+                    "datum": "1965-00-00",
+                    "type": "Datum",
+                    "langFormaat": "1965",
+                },
+            ),
+            (
+                "19650400",
+                {
+                    "datum": "1965-04-00",
+                    "type": "Datum",
+                    "langFormaat": "april 1965",
+                },
+            ),
+        ],
+    )
+    def test_derive_partial_dates(self, source_value, expected):
+        data = {"geboorte": {"datum": source_value}}
+        _derive_date_fields(data)
+        assert data["geboorte"]["datum"] == expected
+
+    @pytest.mark.parametrize(
         "value, expected",
         [
             (
