@@ -19,12 +19,36 @@ MONTH_NAMES = [
 
 
 def derive_date(value: str) -> dict:
-    """ """
-    date_value = datetime.strptime(value, "%Y%m%d").astimezone()
+    """
+    Derive a date dictionary from a string value in the format YYYYMMDD. The value may contain
+    0s for unknown months or days. For example, 19650000 means the year is known but not the
+    month or day.
+    """
+    if not value.endswith("00"):
+        date_value = datetime.strptime(value, "%Y%m%d").astimezone()
+        return {
+            "type": "Datum",
+            "datum": date_value.strftime("%Y-%m-%d"),
+            "langFormaat": f"{date_value.day} {MONTH_NAMES[date_value.month - 1]} "
+            f"{date_value.year}",
+        }
+
+    year = value[:4]
+    month = value[4:6]
+
+    if month != "00":
+        month_number = int(month)
+        month_name = MONTH_NAMES[month_number - 1]
+        return {
+            "type": "Datum",
+            "datum": f"{year}-{month}-00",
+            "langFormaat": f"{month_name} {year}",
+        }
+
     return {
         "type": "Datum",
-        "datum": date_value.strftime("%Y-%m-%d"),
-        "langFormaat": f"{date_value.day} {MONTH_NAMES[date_value.month - 1]} {date_value.year}",
+        "datum": f"{year}-00-00",
+        "langFormaat": year,
     }
 
 
