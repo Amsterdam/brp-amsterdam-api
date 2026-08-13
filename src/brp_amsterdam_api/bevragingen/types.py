@@ -80,8 +80,8 @@ class BewoningenResponse(TypedDict):
     bewoningen: list[Bewoning]
 
 
-class VerblijfsplaatshistorieResponse(TypedDict):
-    """Stub for the BRP Verblijfsplaatshistorie API response"""
+class VerblijfplaatshistorieResponse(TypedDict):
+    """Stub for the BRP Verblijfplaatshistorie API response"""
 
     bewoningen: list[Bewoning]
 
