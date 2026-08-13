@@ -6,7 +6,7 @@ from integration_tests import settings
 from integration_tests.tasks import (
     Bewoningen,
     Personen,
-    Verblijfsplaatshistorie,
+    Verblijfplaatshistorie,
 )
 
 
@@ -15,7 +15,7 @@ class BRPUser(HttpUser):
     base_path: str = "/bevragingen/v1"
     base_url: str = f"{host}{base_path}"
 
-    tasks = {Personen, Bewoningen, Verblijfsplaatshistorie}
+    tasks = {Personen, Bewoningen, Verblijfplaatshistorie}
 
     def on_start(self):
         self.client.headers = {

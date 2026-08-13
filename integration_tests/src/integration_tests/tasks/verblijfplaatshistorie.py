@@ -4,9 +4,9 @@ from requests import JSONDecodeError
 from integration_tests.tasks.base import BaseTaskSet
 
 
-@tag("verblijfsplaatshistorie")
-class Verblijfsplaatshistorie(BaseTaskSet):
-    path = "/verblijfsplaatshistorie"
+@tag("verblijfplaatshistorie")
+class Verblijfplaatshistorie(BaseTaskSet):
+    path = "/verblijfplaatshistorie"
 
     @task
     def raadpleeg_met_peildatum(self):
