@@ -10,7 +10,7 @@ logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 ENDPOINTS = [
     "personen",
     "bewoningen",
-    "verblijfsplaatshistorie",
+    "verblijfplaatshistorie",
 ]
 
 
