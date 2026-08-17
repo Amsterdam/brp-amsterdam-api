@@ -17,7 +17,7 @@ class Bewoningen(BaseTaskSet):
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
             try:
-                if len(response.json()["personen"]) == 2:
+                if len(response.json()["bewoningen"][0]["bewoners"]) == 2:
                     response.success()
             except (KeyError, JSONDecodeError):
                 response.failure("Expected output not in response")
@@ -27,12 +27,12 @@ class Bewoningen(BaseTaskSet):
         data = {
             "type": "BewoningMetPeriode",
             "adresseerbaarObjectIdentificatie": "0363010012064483",
-            "datumVan": "2019-01-01",
-            "datumTot": "2020-01-01",
+            "datumVan": "2025-01-01",
+            "datumTot": "2025-01-02",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
             try:
-                if len(response.json()["personen"]) == 0:
+                if len(response.json()["bewoningen"][0]["bewoners"]) == 2:
                     response.success()
             except (KeyError, JSONDecodeError):
                 response.failure("Expected output not in response")
