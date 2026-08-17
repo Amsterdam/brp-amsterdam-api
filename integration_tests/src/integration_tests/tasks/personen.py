@@ -1,7 +1,11 @@
+import logging
+
 from locust import tag, task
 from requests import JSONDecodeError
 
 from integration_tests.tasks.base import BaseTaskSet
+
+logger = logging.getLogger(__name__)
 
 
 @tag("personen")
@@ -15,6 +19,9 @@ class Personen(BaseTaskSet):
             "burgerservicenummer": ["010082426"],
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if response.json()["personen"][0]["aNummer"] == "9358151057":
                     response.success()
@@ -28,6 +35,9 @@ class Personen(BaseTaskSet):
             "burgerservicenummer": ["010239005"],
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             if response.json()["personen"] == []:
                 response.success()
 
@@ -38,6 +48,9 @@ class Personen(BaseTaskSet):
             "adresseerbaarObjectIdentificatie": "0363010012064483",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if len(response.json()["personen"]) == 2:
                     response.success()
@@ -52,6 +65,9 @@ class Personen(BaseTaskSet):
             "geslachtsnaam": "Verstratenmaker",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if response.json()["personen"][0]["burgerservicenummer"] == "010082426":
                     response.success()
@@ -67,6 +83,9 @@ class Personen(BaseTaskSet):
             "voornamen": "Pieter",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if response.json()["personen"][0]["burgerservicenummer"] == "010082426":
                     response.success()
@@ -80,6 +99,9 @@ class Personen(BaseTaskSet):
             "nummeraanduidingIdentificatie": "0363200012064527",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if len(response.json()["personen"]) == 2:
                     response.success()
@@ -94,6 +116,9 @@ class Personen(BaseTaskSet):
             "huisnummer": "6",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if len(response.json()["personen"]) == 2:
                     response.success()
@@ -109,6 +134,9 @@ class Personen(BaseTaskSet):
             "gemeenteVanInschrijving": "0363",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
+            if response.status_code != 200:
+                logger.error(response.text)
+                logger.error(response.status_code)
             try:
                 if len(response.json()["personen"]) == 2:
                     response.success()
