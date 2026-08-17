@@ -20,6 +20,7 @@ ouders.naam.voorvoegsel
 ouders.naam.geslachtsnaam
 ouders.geboorte.datum
 ouders.ouderAanduiding
+overlijden.datum
 gemeenteVanInschrijving
 datumInschrijvingInGemeente
 verblijfplaats.functieAdres
