@@ -28,7 +28,7 @@ class Personen(BaseTaskSet):
             "burgerservicenummer": ["010239005"],
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code == 404:
+            if response.json()["personen"] == []:
                 response.success()
 
     @task
