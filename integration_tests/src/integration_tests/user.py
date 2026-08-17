@@ -5,6 +5,7 @@ from locust import HttpUser
 from integration_tests import settings
 from integration_tests.tasks import (
     Bewoningen,
+    Partnerhistorie,
     Personen,
     Verblijfplaatshistorie,
 )
@@ -15,7 +16,7 @@ class BRPUser(HttpUser):
     base_path: str = "/bevragingen/v1"
     base_url: str = f"{host}{base_path}"
 
-    tasks = {Personen, Bewoningen, Verblijfplaatshistorie}
+    tasks = {Personen, Bewoningen, Verblijfplaatshistorie, Partnerhistorie}
 
     def on_start(self):
         self.client.headers = {
