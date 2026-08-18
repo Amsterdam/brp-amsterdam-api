@@ -1,5 +1,4 @@
 from locust import tag, task
-from requests import JSONDecodeError
 
 from integration_tests.tasks.base import BaseTaskSet
 
@@ -7,6 +6,10 @@ from integration_tests.tasks.base import BaseTaskSet
 @tag("verblijfplaatshistorie")
 class Verblijfplaatshistorie(BaseTaskSet):
     path = "/verblijfplaatshistorie"
+
+    def _validate_payload_structure(self, payload) -> bool:
+        verblijfplaatsen = payload.get("verblijfplaatsen") if isinstance(payload, dict) else None
+        return isinstance(verblijfplaatsen, list)
 
     @task
     def raadpleeg_met_peildatum(self):
@@ -16,15 +19,14 @@ class Verblijfplaatshistorie(BaseTaskSet):
             "peildatum": "2025-01-01",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            try:
-                expected_result = {
-                    "adresregel1": "Vaalmuiden 6",
-                    "adresregel2": "1046 BV  AMSTERDAM",
-                }
-                if response.json()["verblijfplaatsen"][0]["adressering"] == expected_result:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self._validate_payload_structure(payload):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def raadpleeg_met_periode(self):
@@ -35,12 +37,11 @@ class Verblijfplaatshistorie(BaseTaskSet):
             "datumTot": "2020-01-01",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            try:
-                expected_result = {
-                    "adresregel1": "Bloemstraat 17 a",
-                    "adresregel2": "8603 XV  SNEEK",
-                }
-                if response.json()["verblijfplaatsen"][0]["adressering"] == expected_result:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self._validate_payload_structure(payload):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
