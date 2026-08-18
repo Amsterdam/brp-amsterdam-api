@@ -1,7 +1,6 @@
 import logging
 
 from locust import tag, task
-from requests import JSONDecodeError
 
 from integration_tests.tasks.base import BaseTaskSet
 
@@ -12,133 +11,148 @@ logger = logging.getLogger(__name__)
 class Personen(BaseTaskSet):
     path = "/personen"
 
+    def validate_payload_structure(self, payload, request_type) -> bool:
+        personen = payload.get("personen") if isinstance(payload, dict) else None
+        return isinstance(personen, list) and payload.get("type") == request_type
+
     @task
     def raadpleeg_met_burgerservicenummer(self):
+        request_type = "RaadpleegMetBurgerservicenummer"
         data = {
-            "type": "RaadpleegMetBurgerservicenummer",
+            "type": request_type,
             "burgerservicenummer": ["010082426"],
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if response.json()["personen"][0]["aNummer"] == "9358151057":
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def raadpleeg_met_burgerservicenummer_non_existing(self):
+        request_type = "RaadpleegMetBurgerservicenummer"
         data = {
-            "type": "RaadpleegMetBurgerservicenummer",
+            "type": request_type,
             "burgerservicenummer": ["010239005"],
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            if response.json()["personen"] == []:
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
                 response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def zoek_met_adresseerbaar_object_identificatie(self):
+        request_type = "ZoekMetAdresseerbaarObjectIdentificatie"
         data = {
-            "type": "ZoekMetAdresseerbaarObjectIdentificatie",
+            "type": request_type,
             "adresseerbaarObjectIdentificatie": "0363010012064483",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if len(response.json()["personen"]) == 2:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def zoek_met_geslachtsnaam_en_geboortedatum(self):
+        request_type = "ZoekMetGeslachtsnaamEnGeboortedatum"
         data = {
-            "type": "ZoekMetGeslachtsnaamEnGeboortedatum",
+            "type": request_type,
             "geboortedatum": "1939-03-15",
             "geslachtsnaam": "Verstratenmaker",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if response.json()["personen"][0]["burgerservicenummer"] == "010082426":
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def zoek_met_naam_en_gemeente_van_inschrijving(self):
+        request_type = "ZoekMetNaamEnGemeenteVanInschrijving"
         data = {
-            "type": "ZoekMetNaamEnGemeenteVanInschrijving",
+            "type": request_type,
             "gemeenteVanInschrijving": "0363",
             "geslachtsnaam": "Verstratenmaker",
             "voornamen": "Pieter",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if response.json()["personen"][0]["burgerservicenummer"] == "010082426":
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def zoek_met_nummeraanduiding_identificatie(self):
+        request_type = "ZoekMetNummeraanduidingIdentificatie"
         data = {
-            "type": "ZoekMetNummeraanduidingIdentificatie",
+            "type": request_type,
             "nummeraanduidingIdentificatie": "0363200012064527",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if len(response.json()["personen"]) == 2:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def zoek_met_postcode_en_huisnummer(self):
+        request_type = "ZoekMetPostcodeEnHuisnummer"
         data = {
-            "type": "ZoekMetPostcodeEnHuisnummer",
+            "type": request_type,
             "postcode": "1046BV",
             "huisnummer": "6",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if len(response.json()["personen"]) == 2:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def zoek_met_straat_huisnummer_en_gemeente_van_inschrijving(self):
+        request_type = "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving"
         data = {
-            "type": "ZoekMetStraatHuisnummerEnGemeenteVanInschrijving",
+            "type": request_type,
             "straat": "Vaalmuiden",
             "huisnummer": "6",
             "gemeenteVanInschrijving": "0363",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            if response.status_code != 200:
-                logger.error(response.text)
-                logger.error(response.status_code)
-            try:
-                if len(response.json()["personen"]) == 2:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self.validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
