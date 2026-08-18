@@ -44,10 +44,10 @@ def run_tests(endpoints, **kwargs):
     gevent.spawn(stats_history, env.runner)
 
     # start the test
-    runner.start(user_count=1, spawn_rate=10)
+    runner.start(user_count=1, spawn_rate=1)
 
     # in 30 seconds stop the runner
-    gevent.spawn_later(10, runner.quit)
+    gevent.spawn_later(30, runner.quit)
 
     # wait for the greenlets
     runner.greenlet.join()
