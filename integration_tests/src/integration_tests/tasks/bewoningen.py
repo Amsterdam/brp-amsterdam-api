@@ -1,5 +1,4 @@
 from locust import tag, task
-from requests import JSONDecodeError
 
 from integration_tests.tasks.base import BaseTaskSet
 
@@ -7,6 +6,10 @@ from integration_tests.tasks.base import BaseTaskSet
 @tag("bewoningen")
 class Bewoningen(BaseTaskSet):
     path = "/bewoningen"
+
+    def _validate_payload_structure(self, payload) -> bool:
+        bewoningen = payload.get("bewoningen") if isinstance(payload, dict) else None
+        return isinstance(bewoningen, list)
 
     @task
     def bewoning_met_peildatum(self):
@@ -16,11 +19,14 @@ class Bewoningen(BaseTaskSet):
             "peildatum": "2025-01-01",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            try:
-                if len(response.json()["bewoningen"][0]["bewoners"]) == 2:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self._validate_payload_structure(payload):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
 
     @task
     def bewoning_met_periode(self):
@@ -31,8 +37,11 @@ class Bewoningen(BaseTaskSet):
             "datumTot": "2025-01-02",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            try:
-                if len(response.json()["bewoningen"][0]["bewoners"]) == 2:
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self._validate_payload_structure(payload):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")

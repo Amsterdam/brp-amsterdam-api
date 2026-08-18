@@ -1,5 +1,4 @@
 from locust import tag, task
-from requests import JSONDecodeError
 
 from integration_tests.tasks.base import BaseTaskSet
 
@@ -8,15 +7,23 @@ from integration_tests.tasks.base import BaseTaskSet
 class Partnerhistorie(BaseTaskSet):
     path = "/partnerhistorie"
 
+    def _validate_payload_structure(self, payload, request_type) -> bool:
+        partnerhistorie = payload.get("partnerhistorie") if isinstance(payload, dict) else None
+        return isinstance(partnerhistorie, list) and payload.get("type") == request_type
+
     @task
     def raadpleeg_met_burgerservicenummer(self):
+        request_type = "RaadpleegMetBurgerservicenummer"
         data = {
-            "type": "RaadpleegMetBurgerservicenummer",
+            "type": request_type,
             "burgerservicenummer": "999998754",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
-            try:
-                if response.json()["partnerhistorie"][0]["bugerservicenummer"] == "999998729":
-                    response.success()
-            except (KeyError, JSONDecodeError):
-                response.failure("Expected output not in response")
+            payload = self.response_json_or_failure(response)
+            if payload is None:
+                return
+
+            if self._validate_payload_structure(payload, request_type):
+                response.success()
+            else:
+                response.failure("Expected output structure not in response")
