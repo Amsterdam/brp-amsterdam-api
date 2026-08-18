@@ -4,7 +4,7 @@ from pathlib import Path
 from integration_tests.exceptions import ImproperlyConfigured
 
 CLOUD_ENV = os.environ.get("CLOUD_ENV", "default").lower()
-BRP_URL = os.environ.get("BRP_URL", "http://localhost:8095")
+BRP_AMSTERDAM_URL = os.environ.get("BRP_AMSTERDAM_URL", "http://localhost:8095")
 DEBUG = os.environ.get("DEBUG", False)
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG" if DEBUG else "INFO").upper()
 ALLOWED_FAILURES = int(os.environ.get("ALLOWED_FAILURES", 0))

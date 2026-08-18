@@ -11,4 +11,4 @@ services:
       - personen-mock
     environment:
       TOKEN: "${TOKEN}"
-      BRP_URL: "${BRP_URL:-http://web:8000}"
+      BRP_AMSTERDAM_URL: "${BRP_AMSTERDAM_URL:-http://web:8000}"
