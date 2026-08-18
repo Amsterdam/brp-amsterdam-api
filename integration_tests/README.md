@@ -19,7 +19,7 @@ To be able to run the tests you will need a valid token to be able to make the r
 direnv with an `.envrc` file or export a token from the command line:
 
 ```shell
-export TOKEN="$(docker compose run web python get-token.py benk-brp-personen-api benk-brp-gegevensset-1 benk-brp-zoekvraag-bsn benk-brp-zoekvraag-geslachtsnaam-geboortedatum benk-brp-zoekvraag-naam-gemeente benk-brp-zoekvraag-adresseerbaar-object benk-brp-zoekvraag-nummeraanduiding benk-brp-zoekvraag-postcode-huisnummer benk-brp-zoekvraag-straatnaam-huisnummer benk-brp-bewoning-api benk-brp-verblijfplaatshistorie-api)"
+export TOKEN="$(docker compose run web python get-token.py benk-brp-personen-api benk-brp-gegevensset-3 benk-brp-zoekvraag-bsn benk-brp-zoekvraag-geslachtsnaam-geboortedatum benk-brp-zoekvraag-naam-gemeente benk-brp-zoekvraag-adresseerbaar-object benk-brp-zoekvraag-nummeraanduiding benk-brp-zoekvraag-postcode-huisnummer benk-brp-zoekvraag-straatnaam-huisnummer benk-brp-bewoning-api benk-brp-verblijfplaatshistorie-api)"
 ```
 
 After having a valid token in your environment you'll be able to start the tests using:
@@ -38,12 +38,15 @@ docker compose run tests -e personen
 
 ## Using Local Python
 
-Make sure you have the BRP Amsterdam API and BRP Personen Mock running
+Make sure you have the BRP Amsterdam API and BRP Personen Mock running and a environment variable `BRP_AMSTERDAM_URL`
+set to the URL of the BRP Amsterdam API. You can use uv to start the services:
 
 ```shell
 docker compose up -d -f ../docker-compose.yml
+export BRP_AMSTERDAM_URL=http://localhost:8095
 ```
 
 ```shell
 uv sync
+uv run brp-test -e personen
 ```
