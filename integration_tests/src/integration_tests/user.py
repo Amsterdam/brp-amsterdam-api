@@ -12,7 +12,7 @@ from integration_tests.tasks import (
 
 
 class BRPUser(HttpUser):
-    host: str = settings.BRP_URL
+    host: str = settings.BRP_AMSTERDAM_URL
     base_path: str = "/bevragingen/v1"
     base_url: str = f"{host}{base_path}"
 
