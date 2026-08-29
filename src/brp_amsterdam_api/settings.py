@@ -388,8 +388,9 @@ BRP_V_ADHOC_USER = env.str("BRP_V_ADHOC_USER", default=None)
 
 # Muse be a URL-safe base64-encoded 32-byte key
 if _USE_SECRET_STORE or CLOUD_ENV.startswith("azure"):
-    BRP_ENCRYPTION_KEYS = (
-        Path("/mnt/secrets-store/brp-bevragingen-encryption-keys").read_text().split(",")
+    # No default value when deployed
+    BRP_ENCRYPTION_KEYS = env.list(
+        "BRP_ENCRYPTION_KEYS",
     )
 else:
     BRP_ENCRYPTION_KEYS = env.list(
