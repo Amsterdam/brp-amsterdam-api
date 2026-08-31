@@ -5,9 +5,9 @@ django-cors-headers == 4.9.0
 django-csp == 4.0
 django-healthchecks == 1.5.0
 #amsterdam-schema-tools[django] == 6.0.1
-datapunt-authorization-django == 2.1.1
+datapunt-authorization-django == 2.2.0
 djangorestframework == 3.18.0
-python-json-logger==4.1.0
+python-json-logger==4.2.0
 requests == 2.34.2
 requests-oauthlib == 2.0.0
 #sentry-sdk == 2.13.0
