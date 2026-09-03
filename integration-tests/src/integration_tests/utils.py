@@ -1,5 +1,4 @@
 import requests
-
 from integration_tests import settings
 
 

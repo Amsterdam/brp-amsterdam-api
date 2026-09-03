@@ -2,13 +2,12 @@ import logging
 import sys
 
 import gevent
-from locust import events
-from locust.env import Environment
-from locust.stats import stats_history, stats_printer
-
 from integration_tests import settings
 from integration_tests.user import BRPUser
 from integration_tests.utils import get_token
+from locust import events
+from locust.env import Environment
+from locust.stats import stats_history, stats_printer
 
 logger = logging.getLogger(__name__)
 
