@@ -1,7 +1,6 @@
 import logging
 
 import click
-
 from integration_tests.testrunner import run_tests
 
 logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
