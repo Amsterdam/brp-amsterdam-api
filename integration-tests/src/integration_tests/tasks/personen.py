@@ -1,8 +1,7 @@
 import logging
 
-from locust import tag, task
-
 from integration_tests.tasks.base import BaseTaskSet
+from locust import tag, task
 
 logger = logging.getLogger(__name__)
 

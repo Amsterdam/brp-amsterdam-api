@@ -1,21 +1,20 @@
+from integration_tests.tasks.base import BaseTaskSet
 from locust import tag, task
 
-from integration_tests.tasks.base import BaseTaskSet
 
-
-@tag("bewoningen")
-class Bewoningen(BaseTaskSet):
-    path = "/bewoningen"
+@tag("verblijfplaatshistorie")
+class Verblijfplaatshistorie(BaseTaskSet):
+    path = "/verblijfplaatshistorie"
 
     def _validate_payload_structure(self, payload) -> bool:
-        bewoningen = payload.get("bewoningen") if isinstance(payload, dict) else None
-        return isinstance(bewoningen, list)
+        verblijfplaatsen = payload.get("verblijfplaatsen") if isinstance(payload, dict) else None
+        return isinstance(verblijfplaatsen, list)
 
     @task
-    def bewoning_met_peildatum(self):
+    def raadpleeg_met_peildatum(self):
         data = {
-            "type": "BewoningMetPeildatum",
-            "adresseerbaarObjectIdentificatie": "0363010012064483",
+            "type": "RaadpleegMetPeildatum",
+            "burgerservicenummer": "010082426",
             "peildatum": "2025-01-01",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
@@ -29,12 +28,12 @@ class Bewoningen(BaseTaskSet):
                 response.failure("Expected output structure not in response")
 
     @task
-    def bewoning_met_periode(self):
+    def raadpleeg_met_periode(self):
         data = {
-            "type": "BewoningMetPeriode",
-            "adresseerbaarObjectIdentificatie": "0363010012064483",
-            "datumVan": "2025-01-01",
-            "datumTot": "2025-01-02",
+            "type": "RaadpleegMetPeriode",
+            "burgerservicenummer": "010082426",
+            "datumVan": "2019-01-01",
+            "datumTot": "2020-01-01",
         }
         with self.client.post(self.url, json=data, catch_response=True) as response:
             payload = self.response_json_or_failure(response)
