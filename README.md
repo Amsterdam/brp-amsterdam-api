@@ -46,7 +46,6 @@ make install  # installs src/requirements_dev.txt
 Start the Django application:
 ```shell
 export PUB_JWKS="$(cat jwks_test.json)"
-export HAAL_CENTRAAL_BRP_URL="http://localhost:5010/haalcentraal/api/brp/personen"
 export DJANGO_DEBUG=true
 
 ./manage.py runserver localhost:8000
