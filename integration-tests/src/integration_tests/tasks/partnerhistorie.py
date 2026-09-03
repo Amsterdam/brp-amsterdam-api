@@ -1,6 +1,5 @@
-from locust import tag, task
-
 from integration_tests.tasks.base import BaseTaskSet
+from locust import tag, task
 
 
 @tag("partnerhistorie")
