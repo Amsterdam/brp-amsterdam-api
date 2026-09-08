@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bullseye AS builder
+FROM python:3.13-slim-trixie AS builder
 MAINTAINER datapunt@amsterdam.nl
 
 RUN apt update && apt install --no-install-recommends -y \
@@ -13,7 +13,7 @@ RUN python -m pip install uwsgi
 RUN python -m pip install --no-cache-dir --no-deps -r $PIP_REQUIREMENTS
 
 # Start runtime image,
-FROM python:3.13-slim-bullseye
+FROM python:3.13-slim-trixie
 RUN useradd -U -r brpamsterdamapi
 RUN apt update && apt install --no-install-recommends -y \
     curl \
@@ -38,7 +38,8 @@ ENV DJANGO_SETTINGS_MODULE=brp_amsterdam_api.settings \
 RUN pip install --no-cache-dir setuptools  # workaround for missing pkg_resources in opentelemetry
 
 RUN python manage.py collectstatic --noinput \
- && update-ca-certificates --verbose
+ && update-ca-certificates --verbose \
+ && python -c "import ssl; print('Linked OpenSSL:', ssl.OPENSSL_VERSION)"
 
 EXPOSE 8000
 USER brpamsterdamapi
