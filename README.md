@@ -115,27 +115,6 @@ be decrypted when the scope is present. The audit logs will still contain the or
 When unecrypted burgerservicenummers are in requests with the scope present, a permission denied
 response will be returned.
 
-This BSN token is symmetric encryption (AES-256-GCM) over an opaque, transient value — nothing is
-persisted, so the only applicable quantum threat is Grover's algorithm (a key-strength margin, not a
-post-quantum-*algorithm* migration). AES-256 already provides that margin.
-
-## Post-quantum TLS to RvIG
-
-The outbound mTLS connection to the RvIG BRP backend carries live, plaintext BSNs and address data
-over classical ECDHE key exchange today — this is the genuine "harvest now, decrypt later" risk in this
-service (per NIST/NSA/CISA/AIVD guidance), since a future quantum computer could retroactively decrypt
-any traffic recorded now. Setting `BRP_ENABLE_PQC_TLS=true` uses a TLS context on an OpenSSL >= 3.5 runtime, which defaults to
-preferring the NIST FIPS 203 (ML-KEM) hybrid group `X25519MLKEM768` for TLS 1.3 key exchange, alongside
-classical groups, so the handshake still succeeds against servers that don't support it yet. This
-requires OpenSSL >= 3.5; if the linked OpenSSL is older, it logs a warning and falls back to classical
-TLS rather than silently no-op'ing.
-The flag defaults to **off** so it cannot affect the live RvIG connection until explicitly enabled and
-verified against RvIG's actual endpoint.
-
-Inbound JWT verification (ES256/RS256, delegated to `datapunt-authorization-django` and signed by
-Microsoft Entra ID) is also Shor's-vulnerable, but is outside this repo's control — it depends on the
-IdP's own signing algorithm and PQC roadmap, not on code here.
-
 ## Available Endpoints
 
 The following URLs are available:
