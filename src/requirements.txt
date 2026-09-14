@@ -492,9 +492,9 @@ django-healthchecks==1.5.0 \
     --hash=sha256:0f167deaa30bde59552796799abf2a97a118bc190e8601eef713379703cf9f64 \
     --hash=sha256:25eb021a4a94240b28d996e82775ad6c3b392a2b262360b965a24b88fcfad78d
     # via -r requirements.in
-djangorestframework==3.18.0 \
-    --hash=sha256:2323a5111837e0b784dcb8323abc78ecc54fa2a5af7aff2677cf50cdd849477f \
-    --hash=sha256:381fc44d3249c9565c5f723850855b734e99030eb30957a49f506d3fe11d7dcb
+djangorestframework==3.18.1 \
+    --hash=sha256:605d79fa2ec2f02905492e5ea13d903c2d842d0b4c915a57f7bf02ab9f3c91dd \
+    --hash=sha256:f1409d698967aaf82d5d98d76b549c8fba8bd92ebd0d83d24454508f72168dc2
     # via -r requirements.in
 idna==3.15 \
     --hash=sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8 \
