@@ -1,4 +1,4 @@
-FROM python:3.13-slim-trixie AS builder
+FROM python:3.14-slim-trixie AS builder
 MAINTAINER datapunt@amsterdam.nl
 
 RUN apt update && apt install --no-install-recommends -y \
@@ -13,7 +13,7 @@ RUN python -m pip install uwsgi
 RUN python -m pip install --no-cache-dir --no-deps -r $PIP_REQUIREMENTS
 
 # Start runtime image,
-FROM python:3.13-slim-trixie
+FROM python:3.14-slim-trixie
 RUN useradd -U -r brpamsterdamapi
 RUN apt update && apt install --no-install-recommends -y \
     curl \
@@ -21,7 +21,7 @@ RUN apt update && apt install --no-install-recommends -y \
 
 # Copy python build artifacts from builder image
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
-COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
+COPY --from=builder /usr/local/lib/python3.14/site-packages/ /usr/local/lib/python3.14/site-packages/
 
 WORKDIR /app
 COPY . ./
