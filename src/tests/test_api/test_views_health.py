@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 
 
@@ -17,7 +18,7 @@ class TestHealthCheck:
     def test_backend_health_endpoint(self, api_client, requests_mock, caplog, common_headers):
         """Prove that incorrect API-key settings are handled gracefully."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_HEALTHCHECK,
             status_code=400,
             headers={"content-type": "application/json"},

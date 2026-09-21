@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 from brp_amsterdam_api.bevragingen.views.base import group_dotted_names
@@ -55,7 +56,7 @@ class TestBaseProxyView:
     def test_invalid_api_key(self, api_client, requests_mock, caplog, common_headers):
         """Prove that incorrect API-key settings are handled gracefully."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
                 "title": "Niet correct geauthenticeerd.",
@@ -139,7 +140,7 @@ class TestBaseProxyView:
     def test_error_response(self, api_client, requests_mock, caplog, common_headers, content_type):
         """Prove that RvIG BRP API errors are handled gracefully for all known content-types"""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "invalidParams": [
                     {
