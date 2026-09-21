@@ -2,6 +2,7 @@ import json
 from copy import deepcopy
 
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 from brp_amsterdam_api.bevragingen.fields import read_dataset_fields_files
@@ -58,7 +59,7 @@ class TestBrpPersonenView:
     def test_postcode_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -132,7 +133,7 @@ class TestBrpPersonenView:
     def test_transform_include_nulls_zipcode(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -194,7 +195,7 @@ class TestBrpPersonenView:
     def test_transform_include_nulls_bsn(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_BSN,
             headers={"content-type": "application/json"},
         )
@@ -411,7 +412,7 @@ class TestBrpPersonenView:
     ):
         """Prove that some search entries are only allowed for search within Amsterdam."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             headers={"content-type": "application/json"},
         )
 
@@ -448,7 +449,7 @@ class TestBrpPersonenView:
         """Prove that searching for postcode without SCOPE_SEARCH_POSTCODE_NATIONWIDE
         is not allowed."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -483,7 +484,7 @@ class TestBrpPersonenView:
     def test_allow_nationwide_search_for_postcode(self, requests_mock, api_client, common_headers):
         """Prove that it is possible to search for nationwide postcodes with the correct scopes."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -560,7 +561,7 @@ class TestBrpPersonenView:
     ):
         """Prove that 'inclusiefOverledenPersonen' accepts boolean values from JSON."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -605,7 +606,7 @@ class TestBrpPersonenView:
     ):
         """Prove that 'inclusiefOverledenPersonen' does not accept string values."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_POSTCODE_HUISNUMMER,
             headers={"content-type": "application/json"},
         )
@@ -722,7 +723,7 @@ class TestBrpPersonenView:
             "geheimhoudingPersoonsgegevens": "1",
         }
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "personen": [person1, person2],
@@ -780,7 +781,7 @@ class TestBrpPersonenView:
             )
 
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "type": "ZoekMetPostcodeEnHuisnummer",
                 "personen": [
@@ -850,7 +851,7 @@ class TestBrpPersonenView:
         Prove that requested BSNs are always logged and not duplicated between request and response
         """
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "type": "RaadpleegMetBurgerservicenummer",
                 "personen": [
@@ -920,7 +921,7 @@ class TestBrpPersonenView:
     def test_encrypt_decrypt_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove encryption/decryption of BSNs works."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )
@@ -1016,7 +1017,7 @@ class TestBrpPersonenView:
     def test_encryption_salt_required(self, api_client, requests_mock, caplog, common_headers):
         """Prove that the correlation id is used as a salt to encrypt/decrypt"""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )
@@ -1094,7 +1095,7 @@ class TestBrpPersonenView:
     def test_decrypt_unencrypted_bsn(self, api_client, requests_mock, caplog, common_headers):
         """Prove that not having access to a set is handled gracefully."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_ENCRYPT_BSN,
             headers={"content-type": "application/json"},
         )

@@ -3,6 +3,7 @@ from unittest.mock import ANY, patch
 
 import pytest
 from azure.core.exceptions import HttpResponseError
+from django.conf import settings
 from django.urls import reverse
 
 from brp_amsterdam_api.bevragingen.loghandler import (
@@ -85,7 +86,7 @@ class TestAuditLogHandler:
         mock_log_upload.side_effect = HttpResponseError("Failed to upload log")
 
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json=self.RESPONSE_BSN,
             headers={"content-type": "application/json"},
         )
