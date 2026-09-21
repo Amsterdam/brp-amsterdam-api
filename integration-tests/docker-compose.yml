@@ -1,0 +1,14 @@
+include:
+  - ../docker-compose.yml
+services:
+  tests:
+    build:
+      context: .
+    links:
+      - web
+    depends_on:
+      - web
+      - personen-mock
+    environment:
+      TOKEN: "${TOKEN}"
+      BRP_AMSTERDAM_URL: "${BRP_AMSTERDAM_URL:-http://web:8000}"

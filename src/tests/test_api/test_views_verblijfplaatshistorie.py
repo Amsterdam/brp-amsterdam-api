@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 
 from brp_amsterdam_api.bevragingen import encryption
@@ -56,7 +57,7 @@ class TestBrpVerblijfplaatshistorieView:
     def test_bsn_date_search(self, api_client, requests_mock, common_headers):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/verblijfplaatshistorie",
+            f"{settings.BRP_URL}/verblijfplaatshistorie",
             json=self.RESPONSE_VERBLIJFPLAATS,
             headers={"content-type": "application/json"},
         )
@@ -108,7 +109,7 @@ class TestBrpVerblijfplaatshistorieView:
     def test_encrypted_bsn(self, api_client, requests_mock, common_headers, caplog):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/verblijfplaatshistorie",
+            f"{settings.BRP_URL}/verblijfplaatshistorie",
             json=self.RESPONSE_VERBLIJFPLAATS,
             headers={"content-type": "application/json"},
         )
@@ -146,7 +147,7 @@ class TestBrpVerblijfplaatshistorieView:
     def test_null_values_added_2(self, api_client, requests_mock, common_headers):
         """Prove that null values can be added"""
         requests_mock.post(
-            "/lap/api/brp/verblijfplaatshistorie",
+            f"{settings.BRP_URL}/verblijfplaatshistorie",
             json=self.RESPONSE_VERBLIJFPLAATS,
             headers={"content-type": "application/json"},
         )
