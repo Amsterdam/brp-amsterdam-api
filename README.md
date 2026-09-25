@@ -146,6 +146,8 @@ The following environment variables are useful for configuring a local developme
   * `BRP_PARTNERHISTORIE_URL` endpoint for the partner history URL.
 * `BRP_MTLS_CERT_FILE` the mTLS client certificate.
 * `BRP_MTLS_KEY_FILE` the mTLS client key file.
+* `BRP_ENABLE_PQC_TLS` (true/false, default false) offers a hybrid post-quantum (ML-KEM) TLS group
+  alongside the classical ones on the outbound connection to RvIG. See "Post-quantum TLS to RvIG" below.
 
 The values for these can be found in the [Aansluitinstructies via Diginetwerk voor de stelselapplicaties](https://www.rvig.nl/Aansluitinstructies-Diginetwerk-voor-stelselapplicaties).
 

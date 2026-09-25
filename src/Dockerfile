@@ -38,7 +38,8 @@ ENV DJANGO_SETTINGS_MODULE=brp_amsterdam_api.settings \
 RUN pip install --no-cache-dir setuptools  # workaround for missing pkg_resources in opentelemetry
 
 RUN python manage.py collectstatic --noinput \
- && update-ca-certificates --verbose
+ && update-ca-certificates --verbose \
+ && python -c "import ssl; print('Linked OpenSSL:', ssl.OPENSSL_VERSION)"
 
 EXPOSE 8000
 USER brpamsterdamapi
