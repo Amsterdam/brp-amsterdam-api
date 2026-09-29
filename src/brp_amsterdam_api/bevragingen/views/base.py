@@ -231,12 +231,18 @@ class BaseProxyView(ClientMixin, APIView):
             downstream_response = self.client.call(hc_request)
         except (APIException, OSError) as e:
             # Even when the request failed, still log that we did grant access.
-            hc_response = (
-                e.__cause__.response.json()
-                if isinstance(e.__cause__, requests.RequestException)
+            if (
+                isinstance(e.__cause__, requests.RequestException)
                 and e.__cause__.response is not None
-                else None
-            )
+            ):
+                try:
+                    # Try to parse the response as JSON, if possible.
+                    hc_response = e.__cause__.response.json()
+                except ValueError:
+                    # If the response is not JSON, just log the text.
+                    hc_response = {"error": e.__cause__.response.text}
+            else:
+                hc_response = None
 
             self.log_access_granted(
                 request,
