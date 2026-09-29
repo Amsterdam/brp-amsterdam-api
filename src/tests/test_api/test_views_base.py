@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 from brp_amsterdam_api.bevragingen.views.base import group_dotted_names
@@ -55,7 +56,7 @@ class TestBaseProxyView:
     def test_invalid_api_key(self, api_client, requests_mock, caplog, common_headers):
         """Prove that incorrect API-key settings are handled gracefully."""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "type": "https://datatracker.ietf.org/doc/html/rfc7235#section-3.1",
                 "title": "Niet correct geauthenticeerd.",
@@ -139,7 +140,7 @@ class TestBaseProxyView:
     def test_error_response(self, api_client, requests_mock, caplog, common_headers, content_type):
         """Prove that RvIG BRP API errors are handled gracefully for all known content-types"""
         requests_mock.post(
-            "/lap/api/brp/personen",
+            f"{settings.BRP_URL}/personen",
             json={
                 "invalidParams": [
                     {
@@ -191,6 +192,46 @@ class TestBaseProxyView:
             "title": "Een of meerdere parameters zijn niet correct.",
             "type": "https://datatracker.ietf.org/doc/html/rfc7231#section-6.5.1",
         }
+
+    def test_500_error_response(self, api_client, requests_mock, caplog, common_headers):
+        """Prove that RvIG BRP 500 API errors are handled gracefully"""
+        error_html = "<html><body><h1>500 Internal Server Error</h1></body></html>"
+
+        requests_mock.post(
+            f"{settings.BRP_URL}/personen",
+            text=error_html,
+            status_code=500,
+            headers={"content-type": "text/html"},
+        )
+
+        url = reverse("brp-personen")
+        token = build_jwt_token(
+            ["benk-brp-personen-api", "benk-brp-zoekvraag-bsn", "benk-brp-gegevensset-1"]
+        )
+        response = api_client.post(
+            url,
+            {"type": "RaadpleegMetBurgerservicenummer", "burgerservicenummer": "000009830"},
+            headers={
+                "Authorization": f"Bearer {token}",
+                **common_headers,
+            },
+        )
+        assert response.status_code == 502
+
+        # Expect the unencrypted bsn to show up in the logs
+        log_records = caplog.records
+        audit_log = next(
+            (
+                record
+                for record in log_records
+                if record.message.startswith(
+                    "Access granted for 'personen.RaadpleegMetBurgerservicenummer"
+                )
+            ),
+            None,
+        )
+        assert audit_log is not None
+        assert audit_log.hcResponse == {"error": error_html}
 
 
 def test_group_dotted_names():
