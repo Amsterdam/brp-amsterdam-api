@@ -1,4 +1,6 @@
 import logging
+import os
+import ssl
 import time
 from urllib.parse import urlparse
 
@@ -6,6 +8,7 @@ import requests
 from more_ds.network import URL
 from oauthlib.oauth2 import InvalidClientError
 from requests import ConnectionError, Timeout
+from requests.adapters import HTTPAdapter
 from rest_framework.exceptions import APIException
 
 from brp_amsterdam_api.bevragingen.exceptions import GatewayTimeout, ServiceUnavailable
@@ -13,6 +16,60 @@ from brp_amsterdam_api.bevragingen.exceptions import GatewayTimeout, ServiceUnav
 logger = logging.getLogger(__name__)
 
 USER_AGENT = "BRP-Amsterdam-API/1.0"
+
+# OpenSSL >= 3.5 (April 2025) natively implements NIST FIPS 203 ML-KEM and, as of
+# that release, prefers the hybrid group X25519MLKEM768 by default for TLS 1.3 key
+# exchange - no explicit group configuration is required or (portably) possible:
+# Python's ssl.SSLContext.set_ecdh_curve() only accepts a single classical curve
+# name on every currently released CPython, so it cannot be used to request the
+# hybrid group. A plain client context on an OpenSSL >= 3.5 runtime is therefore
+# the correct way to offer it.
+_MIN_OPENSSL_FOR_PQC = (3, 5)
+_pqc_tls_status_logged = False
+
+
+def _build_pqc_ssl_context() -> ssl.SSLContext | None:
+    """Build a TLS context that offers the hybrid ML-KEM group, if enabled and supported.
+
+    Disabled by default (BRP_ENABLE_PQC_TLS unset/false) so this can never affect
+    the live RvIG connection until explicitly enabled and verified. Feature-detects
+    the linked OpenSSL version so it fails loud in the logs rather than silently
+    no-op'ing when the flag is on but the runtime is too old to support it.
+    """
+    global _pqc_tls_status_logged
+    if os.environ.get("BRP_ENABLE_PQC_TLS", "false").lower() not in ("1", "true", "yes"):
+        return None
+
+    if ssl.OPENSSL_VERSION_INFO[:2] < _MIN_OPENSSL_FOR_PQC:
+        if not _pqc_tls_status_logged:
+            logger.warning(
+                "PQC TLS requested (BRP_ENABLE_PQC_TLS) but linked OpenSSL %s is older "
+                "than 3.5 and does not support the ML-KEM hybrid TLS 1.3 group - "
+                "falling back to classical TLS.",
+                ssl.OPENSSL_VERSION,
+            )
+            _pqc_tls_status_logged = True
+        return None
+
+    if not _pqc_tls_status_logged:
+        logger.info(
+            "PQC TLS enabled: linked OpenSSL %s defaults to the hybrid ML-KEM TLS 1.3 group.",
+            ssl.OPENSSL_VERSION,
+        )
+        _pqc_tls_status_logged = True
+    return ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+
+
+class _PQCTLSAdapter(HTTPAdapter):
+    """HTTPAdapter mounting a hybrid ML-KEM TLS context on the connection pool."""
+
+    def __init__(self, ssl_context: ssl.SSLContext, *args, **kwargs):
+        self._ssl_context = ssl_context
+        super().__init__(*args, **kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        kwargs["ssl_context"] = self._ssl_context
+        return super().init_poolmanager(*args, **kwargs)
 
 
 class BaseBrpClient:
@@ -41,6 +98,10 @@ class BaseBrpClient:
         self._host = urlparse(endpoint_url).netloc
 
         self._session = requests.Session()
+
+        pqc_context = _build_pqc_ssl_context()
+        if pqc_context is not None:
+            self._session.mount("https://", _PQCTLSAdapter(pqc_context))
 
         if cert_file is not None:
             self._session.cert = (cert_file, key_file)
