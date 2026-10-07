@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 
 from tests.utils import build_jwt_token
@@ -26,7 +27,7 @@ class TestBrpBewoningenView:
     def test_address_id_search(self, api_client, requests_mock, common_headers, caplog):
         """Prove that search is possible"""
         requests_mock.post(
-            "/lap/api/brp/bewoning/bewoningen",
+            f"{settings.BRP_URL}/bewoning/bewoningen",
             json=self.RESPONSE_BEWONINGEN,
             headers={"content-type": "application/json"},
         )
@@ -87,7 +88,7 @@ class TestBrpBewoningenView:
     def test_null_values_added(self, api_client, requests_mock, common_headers):
         """Prove that null values can be added"""
         requests_mock.post(
-            "/lap/api/brp/bewoning/bewoningen",
+            f"{settings.BRP_URL}/bewoning/bewoningen",
             json=self.RESPONSE_BEWONINGEN,
             headers={"content-type": "application/json"},
         )
@@ -173,7 +174,7 @@ class TestBrpBewoningenView:
     ):
         """Prove that the gzipped response is added to the logs"""
         requests_mock.post(
-            "/lap/api/brp/bewoning/bewoningen",
+            f"{settings.BRP_URL}/bewoning/bewoningen",
             json=self.RESPONSE_BEWONINGEN,
             headers={"content-type": "application/json"},
         )
