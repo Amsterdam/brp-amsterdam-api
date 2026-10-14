@@ -1,18 +1,18 @@
 cryptography == 50.0.2
-Django == 5.2.17
+Django == 5.2.18
 django-environ == 0.14.0
 django-cors-headers == 4.9.0
 django-csp == 4.0
 django-healthchecks == 1.5.0
 #amsterdam-schema-tools[django] == 6.0.1
 datapunt-authorization-django == 3.0.0
-djangorestframework == 3.18.1
+djangorestframework == 3.18.3
 python-json-logger==4.2.0
 requests == 2.34.2
 requests-oauthlib == 2.0.0
 #sentry-sdk == 2.13.0
 more-ds == 0.0.6
-orjson == 3.12.0
+orjson == 3.13.0
 whitenoise == 6.12.0
 zeep==4.3.3
 
