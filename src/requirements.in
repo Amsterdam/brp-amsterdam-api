@@ -1,5 +1,5 @@
 cryptography == 50.0.2
-Django == 5.2.18
+Django == 5.2.19
 django-environ == 0.14.0
 django-cors-headers == 4.9.0
 django-csp == 4.0
@@ -18,7 +18,7 @@ zeep==4.3.3
 
 # Monitoring
 azure-monitor-ingestion == 1.1.0
-azure-monitor-opentelemetry == 1.8.11
+azure-monitor-opentelemetry == 1.8.12
 azure-identity == 1.27.0
 azure-keyvault == 4.2.0
 msal == 1.39.0
