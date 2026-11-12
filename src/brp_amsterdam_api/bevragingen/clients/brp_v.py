@@ -210,7 +210,10 @@ class BrpVAdhocServiceClient(BaseBrpClient):
                 response.resultaat.code,
                 response.resultaat.omschrijving,
             )
-            raise BadGateway("Unexpected error from BRP Ad Hoc Service")
+            raise BadGateway(
+                f"Unexpected error from BRP Ad Hoc Service. "
+                f"{response.resultaat.code}: {response.resultaat.omschrijving}"
+            )
 
         if hc_request["brp_v_type"] == "partnerhistorie":
             transformed_response = self._transform_partner_response(response, requested_fields)
