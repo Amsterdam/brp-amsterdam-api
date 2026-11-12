@@ -35,13 +35,13 @@ class BrpAdreshistorieView(BaseProxyView):
     endpoint_url = settings.BRP_ADRESHISTORIE_URL
 
     # Require extra scopes
-    needed_scopes = {"benk-brp-adreshistorie-api"}
+    needed_scopes = {"benk-brp-personen-api"}
 
     # A quick dictionary to automate permission-based access to certain filter parameters.
     parameter_ruleset = {
         "type": ParameterPolicy(
             scopes_for_values={
-                "RaadpleegMetBurgerservicenummer": {"benk-brp-adreshistorie-api"},
+                "RaadpleegMetBurgerservicenummer": {"benk-brp-personen-api"},
             }
         ),
         "fields": ParameterPolicy(
