@@ -1,6 +1,7 @@
 """Access to all BRP views"""
 
 # Split in a package for easier maintenance
+from .adreshistorie import BrpAdreshistorieView
 from .bewoningen import BrpBewoningenHealthView, BrpBewoningenView
 from .index import IndexView
 from .partnerhistorie import BrpPartnerhistorieView
@@ -19,4 +20,5 @@ __all__ = (
     "BrpPersonenHealthView",
     "BrpVerblijfplaatshistorieView",
     "BrpVerblijfplaatshistorieHealthView",
+    "BrpAdreshistorieView",
 )

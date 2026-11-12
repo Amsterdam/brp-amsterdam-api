@@ -375,6 +375,9 @@ BRP_V_ADHOC_URL = env.str(
 BRP_PARTNERHISTORIE_URL = env.str(
     "BRP_PARTNERHISTORIE_URL", default=f"{BRP_V_ADHOC_URL}/partnerhistorie"
 )
+BRP_ADRESHISTORIE_URL = env.str(
+    "BRP_ADRESHISTORIE_URL", default=f"{BRP_V_ADHOC_URL}/adreshistorie"
+)
 
 AZURE_KEYVAULT_URL = env.str("AZURE_KEYVAULT_URL", None)
 

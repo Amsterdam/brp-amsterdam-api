@@ -34,3 +34,8 @@ REASON_DISSOLUTION_TABLE = {
     "S": "echtsch of huw.ontb na sch van tfl en bed/eindigen partnersch door ovk of ontb",
     "V": "een naar vreemd recht anders beëind. huwelijk/geregistr. partnerschap",
 }
+
+ADDRESS_FUNCTION_TABLE = {
+    "W": "woonadres",
+    "B": "Briefadres",
+}

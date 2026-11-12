@@ -19,6 +19,11 @@ urlpatterns = [
         views.BrpVerblijfplaatshistorieView.as_view(),
         name="brp-verblijfplaatshistorie",
     ),
+    path(
+        "v1/adreshistorie",
+        views.BrpAdreshistorieView.as_view(),
+        name="brp-adreshistorie",
+    ),
 ]
 
 health_urls = [
