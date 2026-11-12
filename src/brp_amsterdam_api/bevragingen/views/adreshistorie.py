@@ -137,7 +137,7 @@ class BrpAdreshistorieView(BaseProxyView):
             request, hc_request, hc_response, final_response, needed_scopes, exception
         )
 
-    def _add_fields_filter(self, hc_request: types.PartnerhistorieQuery) -> None:
+    def _add_fields_filter(self, hc_request: types.AdreshistorieQuery) -> None:
         """Determine all values for the "fields" parameter that the user has access to.
 
         This value is used when no default is given.

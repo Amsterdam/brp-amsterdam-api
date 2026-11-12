@@ -198,6 +198,8 @@ class BrpVAdhocServiceClient(BaseBrpClient):
         burgerservicenummer = hc_request["burgerservicenummer"]
         requested_fields = hc_request["fields"]
 
+        self._add_history_fields(requested_fields)
+
         # Prepare request for the BRP Ad Hoc Service
         response = self.client.service.vraag(
             self._get_soap_request(burgerservicenummer, requested_fields)
@@ -212,7 +214,7 @@ class BrpVAdhocServiceClient(BaseBrpClient):
             )
             raise BadGateway(
                 f"Unexpected error from BRP Ad Hoc Service. "
-                f"{response.resultaat.code}: {response.resultaat.omschrijving}"
+                f"X{response.resultaat.code}: {response.resultaat.omschrijving}"
             )
 
         if hc_request["brp_v_type"] == "partnerhistorie":
@@ -251,6 +253,11 @@ class BrpVAdhocServiceClient(BaseBrpClient):
                 }
             ],
         )
+
+    def _add_history_fields(self, requested_fields: list[str]) -> None:
+        for field in requested_fields:
+            if f"historie.{field}" in BRP_CATEGORY_MAPPING:
+                requested_fields.append(f"historie.{field}")
 
     def _transform_partner_response(self, response, requested_fields: list[str]) -> dict:
         """
