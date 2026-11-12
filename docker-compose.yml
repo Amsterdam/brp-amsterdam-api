@@ -16,9 +16,7 @@ services:
 
   web:
     build:
-      context: src/
-      args:
-        PIP_REQUIREMENTS: requirements_dev.txt
+      context: .
     ports:
       - "8095:8000"
     links:
@@ -41,5 +39,5 @@ services:
       CLOUD_ENV: "${CLOUD_ENV:-local}"
       DJANGO_DEBUG: 1
     volumes:
-      - ./src:/app
+      - ./src:/app/src
     command: uwsgi --py-auto-reload=1 --enable-threads --lazy-apps --buffer-size=65535

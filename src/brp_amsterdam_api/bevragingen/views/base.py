@@ -428,7 +428,7 @@ class BaseProxyView(ClientMixin, APIView):
                         continue
                     item[key] = process_function(value, salt=correlation_id)
 
-                if isinstance(value, (dict, list)):
+                if isinstance(value, (dict|list)):
                     self._process_bsn(value, process_function)
 
     def transform_request(self, hc_request: types.BaseQuery) -> None:

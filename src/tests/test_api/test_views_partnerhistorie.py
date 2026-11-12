@@ -14,7 +14,7 @@ class TestBrpPartnerhistorieView:
     def test_partnerhistorie_view(self, api_client, requests_mock, common_headers):
         """Prove a search is possible and that the response is properly parsed and
         transformed to the expected output."""
-        with open("tests/data/response-simple.xml") as mock_response:
+        with open("src/tests/data/response-simple.xml") as mock_response:
 
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
@@ -55,7 +55,7 @@ class TestBrpPartnerhistorieView:
 
     def test_partnerhistorie_error_response(self, api_client, requests_mock, common_headers):
         """Prove an error response is properly handled and logged."""
-        with open("tests/data/response-error.xml") as mock_response:
+        with open("src/tests/data/response-error.xml") as mock_response:
 
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
@@ -121,7 +121,7 @@ class TestBrpPartnerhistorieView:
     def test_partnerhistorie_view_null_values(self, api_client, requests_mock, common_headers):
         """Prove that the 'resultaat-formaat=volledig' query parameter results in null values
         for missing fields instead of omitting them."""
-        with open("tests/data/response-simple.xml") as mock_response:
+        with open("src/tests/data/response-simple.xml") as mock_response:
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")
@@ -177,7 +177,7 @@ class TestBrpPartnerhistorieView:
         self, api_client, requests_mock, common_headers
     ):
         """Prove that historical relationships are derived from category 55 if it exists."""
-        with open("tests/data/response-historical-relationships.xml") as mock_response:
+        with open("src/tests/data/response-historical-relationships.xml") as mock_response:
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")
@@ -258,7 +258,7 @@ class TestBrpPartnerhistorieView:
         self, api_client, requests_mock, common_headers
     ):
         """Prove that possible other categories in the response are ignored."""
-        with open("tests/data/response-other-category.xml") as mock_response:
+        with open("src/tests/data/response-other-category.xml") as mock_response:
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")
@@ -308,7 +308,7 @@ class TestBrpPartnerhistorieView:
 
     def test_partnerhistorie_bsns_logger(self, api_client, requests_mock, caplog, common_headers):
         """Prove that bsns from both the request and response are logged."""
-        with open("tests/data/response-other-category.xml") as mock_response:
+        with open("src/tests/data/response-other-category.xml") as mock_response:
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")

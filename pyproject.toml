@@ -1,9 +1,68 @@
+[project]
+name = "brp-amsterdam-api"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "cryptography == 50.0.2",
+    "Django == 5.2.18",
+    "django-environ == 0.14.0",
+    "django-cors-headers == 4.9.0",
+    "django-csp == 4.0",
+    "django-healthchecks == 1.6.0",
+    # "amsterdam-schema-tools[django] == 6.0.1",
+    "datapunt-authorization-django == 3.1.0",
+    "djangorestframework == 3.18.3",
+    "python-json-logger==4.2.0",
+    "requests == 2.34.2",
+    "requests-oauthlib == 2.0.0",
+    # "sentry-sdk == 2.13.0",
+    "more-ds == 0.0.6",
+    "orjson == 3.13.0",
+    "whitenoise == 6.12.0",
+    "zeep==4.3.3",
+    "uwsgi==2.0.31",
+
+    # Monitoring
+    "azure-monitor-ingestion == 1.1.0",
+    "azure-monitor-opentelemetry == 1.8.11",
+    "azure-identity == 1.27.0",
+    "azure-keyvault == 4.2.0",
+    "msal == 1.39.0",
+    "uwsgitop == 0.12",
+    "uwsgi-readiness-check == 0.2.0",
+
+    # Testing
+    "pytest == 9.2.0",
+    "pytest-django == 4.14.0",
+    "pytest-cov == 7.1.0",
+    "python-owasp-zap-v2.4 == 0.1.0",
+    "requests-mock == 1.12.1",
+]
+
+[dependency-groups]
+dev = [
+    # Packaging
+    "pur == 7.4.0",
+
+    # Linting
+    "pre-commit==4.7.0",
+    "ruff==0.17.3",
+
+    # Testing
+    "pytest-sugar==1.1.1",
+    "termcolor==3.3.0",
+
+    # Debugging
+    "django-debug-toolbar==8.0.0",
+    "django-extensions==4.1",
+]
+
 # ==== pytest ====
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 minversion = "6.0"
 django_find_project = false
-pythonpath = "src/"
+pythonpath = ["src"]
 testpaths = ["tests"]
 addopts = [
     "--nomigrations",
@@ -24,16 +83,10 @@ source = ["gisserver"]
 omit = ["*/migrations/*.py", "*/test*.py", "*/tests/*"]
 plugins = ["django_coverage_plugin"]
 
-
-# ==== black ====
-[tool.black]
-line-length = 99
-target-version = ['py38']
-
 # ==== ruff ====
 [tool.ruff]
 line-length = 99
-target-version = "py38"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
