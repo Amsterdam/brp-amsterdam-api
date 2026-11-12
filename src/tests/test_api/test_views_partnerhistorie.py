@@ -200,54 +200,54 @@ class TestBrpPartnerhistorieView:
             assert response.json() == {
                 "partnerhistorie": [
                     {
-                        "aangaanHuwelijkPartnerschap": {
-                            "datum": {
-                                "datum": "2008-08-01",
-                                "langFormaat": "1 augustus 2008",
-                                "type": "Datum",
-                            },
-                        },
                         "burgerservicenummer": "999991747",
-                        "geboorte": {
-                            "datum": {
-                                "datum": "1990-03-31",
-                                "langFormaat": "31 maart 1990",
-                                "type": "Datum",
-                            },
-                        },
                         "naam": {
+                            "voornamen": "Ayse",
                             "geslachtsnaam": "Bilgiç",
                             "voorletters": "A.",
-                            "voornamen": "Ayse",
+                        },
+                        "geboorte": {
+                            "datum": {
+                                "type": "Datum",
+                                "datum": "1990-03-31",
+                                "langFormaat": "31 maart 1990",
+                            },
+                        },
+                        "aangaanHuwelijkPartnerschap": {
+                            "datum": {
+                                "type": "Datum",
+                                "datum": "2008-08-01",
+                                "langFormaat": "1 augustus 2008",
+                            },
                         },
                     },
                     {
-                        "aangaanHuwelijkPartnerschap": {
-                            "datum": {
-                                "datum": "2001-07-30",
-                                "langFormaat": "30 juli 2001",
-                                "type": "Datum",
-                            },
-                        },
                         "burgerservicenummer": "999992958",
-                        "geboorte": {
-                            "datum": {
-                                "datum": "1969-12-15",
-                                "langFormaat": "15 december 1969",
-                                "type": "Datum",
-                            },
-                        },
                         "naam": {
-                            "geslachtsnaam": "Buren",
-                            "voorletters": "A.",
                             "voornamen": "Anita",
                             "voorvoegsel": "van",
+                            "geslachtsnaam": "Buren",
+                            "voorletters": "A.",
+                        },
+                        "geboorte": {
+                            "datum": {
+                                "type": "Datum",
+                                "datum": "1969-12-15",
+                                "langFormaat": "15 december 1969",
+                            },
+                        },
+                        "aangaanHuwelijkPartnerschap": {
+                            "datum": {
+                                "type": "Datum",
+                                "datum": "2001-07-30",
+                                "langFormaat": "30 juli 2001",
+                            },
                         },
                         "ontbindingHuwelijkPartnerschap": {
                             "datum": {
+                                "type": "Datum",
                                 "datum": "2003-09-21",
                                 "langFormaat": "21 september 2003",
-                                "type": "Datum",
                             },
                         },
                     },
@@ -389,6 +389,8 @@ class TestBrpPartnerhistorieView:
             "type": "RaadpleegMetBurgerservicenummer",
             "burgerservicenummer": "123456789",
             "fields": ["aangaanHuwelijkPartnerschap", "burgerservicenummer"],
+            # Field is added to be able to call the correct transform response method in the client
+            "brp_v_type": "partnerhistorie",
         }
 
     def test_disallowed_fields_not_requested(self):

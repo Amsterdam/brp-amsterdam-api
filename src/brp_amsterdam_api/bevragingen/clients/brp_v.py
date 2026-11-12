@@ -77,18 +77,83 @@ BRP_CATEGORY_MAPPING = {
         "function": derive_description,
         "args": "REASON_DISSOLUTION_TABLE",
     },
+    "gemeenteVanInschrijving.code": "08.09.10",
+    "gemeenteVanInschrijving.omschrijving": {
+        "source": "gemeenteVanInschrijving.code",
+        "function": derive_description,
+        "args": "CITY_CODE_TABLE",
+    },
+    "datumInschrijvingInGemeente.datum": "08.09.20",
+    "verblijfplaats.functieAdres.code": "08.10.10",
+    "verblijfplaats.functieAdres.omschrijving": {
+        "source": "verblijfplaats.functieAdres.code",
+        "function": derive_description,
+        "args": "ADDRESS_FUNCTION_TABLE",
+    },
+    "verblijfplaats.datumVan": "08.10.30",
+    "verblijfplaats.verblijfadres.korteStraatnaam": "08.11.10",
+    "verblijfplaats.verblijfadres.officieleStraatnaam": "08.11.15",
+    "verblijfplaats.verblijfadres.huisnummer": "08.11.20",
+    "verblijfplaats.verblijfadres.huisletter": "08.11.30",
+    "verblijfplaats.verblijfadres.huisnummertoevoeging": "08.11.40",
+    "verblijfplaats.verblijfadres.postcode": "08.11.60",
+    "verblijfplaats.verblijfadres.woonplaats": "08.11.70",
+    "verblijfplaats.adresseerbaarObjectIdentificatie": "08.11.80",
+    "verblijfplaats.nummeraanduidingIdentificatie": "08.11.90",
+    "verblijfplaats.verblijfadres.locatiebeschrijving": "08.12.10",
+    "verblijfplaats.verblijfadres.land": "08.13.10",
+    "verblijfplaats.verblijfadres.regel1": "08.13.30",
+    "verblijfplaats.verblijfadres.regel2": "08.13.40",
+    "verblijfplaats.verblijfadres.regel3": "08.13.50",
+    "historie.gemeenteVanInschrijving.code": "58.09.10",
+    "historie.gemeenteVanInschrijving.omschrijving": {
+        "source": "historie.gemeenteVanInschrijving.code",
+        "function": derive_description,
+        "args": "CITY_CODE_TABLE",
+    },
+    "historie.datumInschrijvingInGemeente.datum": "58.09.20",
+    "historie.verblijfplaats.functieAdres.code": "58.10.10",
+    "historie.verblijfplaats.functieAdres.omschrijving": {
+        "source": "historie.verblijfplaats.functieAdres.code",
+        "function": derive_description,
+        "args": "ADDRESS_FUNCTION_TABLE",
+    },
+    "historie.verblijfplaats.datumVan": "58.10.30",
+    "historie.verblijfplaats.verblijfadres.korteStraatnaam": "58.11.10",
+    "historie.verblijfplaats.verblijfadres.officieleStraatnaam": "58.11.15",
+    "historie.verblijfplaats.verblijfadres.huisnummer": "58.11.20",
+    "historie.verblijfplaats.verblijfadres.huisletter": "58.11.30",
+    "historie.verblijfplaats.verblijfadres.huisnummertoevoeging": "58.11.40",
+    "historie.verblijfplaats.verblijfadres.postcode": "58.11.60",
+    "historie.verblijfplaats.verblijfadres.woonplaats": "58.11.70",
+    "historie.verblijfplaats.adresseerbaarObjectIdentificatie": "58.11.80",
+    "historie.verblijfplaats.nummeraanduidingIdentificatie": "58.11.90",
+    "historie.verblijfplaats.verblijfadres.locatiebeschrijving": "58.12.10",
+    "historie.verblijfplaats.verblijfadres.land": "58.13.10",
+    "historie.verblijfplaats.verblijfadres.regel1": "58.13.30",
+    "historie.verblijfplaats.verblijfadres.regel2": "58.13.40",
+    "historie.verblijfplaats.verblijfadres.regel3": "58.13.50",
 }
 
-ADDITIONAL_FIELDS_FOR_RELATION_START = {
+ADDITIONAL_FIELDS_FOR_PARTNER_RELATION_START = {
     "extra.aangaanHuwelijkPartnerschap.datum": "55.06.10",
     "extra.aangaanHuwelijkPartnerschap.plaats.code": "55.06.20",
     "extra.aangaanHuwelijkPartnerschap.land.code": "55.06.30",
 }
 
-ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION = {
+ADDITIONAL_FIELDS_FOR_PARTNER_UNDER_INVESTIGATION = {
     "extra.inOnderzoek": "05.83.10",
     "extra.datumIngangOnderzoek": "05.83.20",
     "extra.datumEindeOnderzoek": "05.83.30",
+}
+
+ADDITIONAL_FIELDS_FOR_ADDRESS_UNDER_INVESTIGATION = {
+    "extra.inOnderzoek.aanduidingGegevensOnderzoek": "08.83.10",
+    "extra.inOnderzoek.datumIngangOnderzoek": "08.83.20",
+    "extra.inOnderzoek.datumEindeOnderzoek": "08.83.30",
+    "extra.historie.inOnderzoek.aanduidingGegevensOnderzoek": "58.83.10",
+    "extra.historie.inOnderzoek.datumIngangOnderzoek": "58.83.20",
+    "extra.historie.inOnderzoek.datumEindeOnderzoek": "58.83.30",
 }
 
 
@@ -147,7 +212,12 @@ class BrpVAdhocServiceClient(BaseBrpClient):
             )
             raise BadGateway("Unexpected error from BRP Ad Hoc Service")
 
-        transformed_response = self._transform_response(response, requested_fields)
+        if hc_request["brp_v_type"] == "partnerhistorie":
+            transformed_response = self._transform_partner_response(response, requested_fields)
+        elif hc_request["brp_v_type"] == "adreshistorie":
+            transformed_response = self._transform_address_response(response, requested_fields)
+        else:
+            raise APIException(f"Unknown brp_v_type: {hc_request['brp_v_type']}")
 
         return JsonResponse(transformed_response)
 
@@ -179,7 +249,7 @@ class BrpVAdhocServiceClient(BaseBrpClient):
             ],
         )
 
-    def _transform_response(self, response, requested_fields: list[str]) -> dict:
+    def _transform_partner_response(self, response, requested_fields: list[str]) -> dict:
         """
         Transform the response from the BRP-V Ad Hoc service to a JSON response.
         """
@@ -206,8 +276,36 @@ class BrpVAdhocServiceClient(BaseBrpClient):
 
         return {"partnerhistorie": [_clean_empty_dicts(p) for p in partner_history]}
 
+    def _transform_address_response(self, response, requested_fields: list[str]) -> dict:
+        """
+        Transform the response from the BRP-V Ad Hoc service to a JSON response.
+        """
+        address_history = []
+        for persoonslijst in response.persoonslijsten.item:
+            for categoriestapel in persoonslijst.categoriestapels.item:
+                for categorievoorkomen in categoriestapel.categorievoorkomens.item:
+                    category = categorievoorkomen.categorienummer
+                    # We're only interested in category 5/55 (partner)
+                    if category not in [8, 58]:
+                        break
 
-def _transform_partner_data(partner: dict, requested_fields: list[str]) -> dict:
+                    address = {}
+                    for item in categorievoorkomen.elementen.item:
+                        group, element = re.findall("..", f"{item.nummer:04}")
+                        if fields := _get_fields_by_category(
+                            int(category), int(group), int(element)
+                        ):
+                            address[fields[0].replace("historie.", "")] = item.waarde
+                    if address:
+                        address_history.append(_group_dotted_result(address))
+
+        for a in address_history:
+            _transform_address_data(a, requested_fields)
+
+        return {"adreshistorie": [_clean_empty_dicts(a) for a in address_history]}
+
+
+def _transform_partner_data(partner: dict, requested_fields: list[str]) -> None:
     """
     Transforms the partner data from the BRP Ad Hoc Service to the desired format.
 
@@ -219,22 +317,40 @@ def _transform_partner_data(partner: dict, requested_fields: list[str]) -> dict:
     """
     _derive_relation_start(partner)
 
-    _derive_values(partner)
-
-    _derive_date_fields(partner)
+    _transform_data(partner)
 
     # Add the fields which are under investigation
     _derive_under_investigation(partner)
 
+    _cleanup_data(partner, requested_fields)
+
+
+def _transform_address_data(address: dict, requested_fields: list[str]) -> None:
+    _transform_data(address)
+    _derive_address_type(address)
+
+    # Add the fields which are under investigation
+    _derive_address_under_investigation(address)
+
+    _cleanup_data(address, requested_fields)
+
+
+def _transform_data(data: dict) -> None:
+    _derive_values(data)
+
+    _derive_date_fields(data)
+
+
+def _cleanup_data(data: dict, requested_fields: list[str]) -> None:
     # Remove the fields which are only used for derivation
-    if "extra" in partner:
-        del partner["extra"]
+    if "extra" in data:
+        del data["extra"]
 
     # Remove any disallowed fields
     for field in BRP_CATEGORY_MAPPING:
         if field in requested_fields or any(field.startswith(f) for f in requested_fields):
             continue
-        _remove_dotted_field(partner, field)
+        _remove_dotted_field(data, field)
 
 
 def _derive_relation_start(data: dict):
@@ -242,7 +358,7 @@ def _derive_relation_start(data: dict):
     # fields in category 55.
     extra_relation_fields = [
         field
-        for field in ADDITIONAL_FIELDS_FOR_RELATION_START
+        for field in ADDITIONAL_FIELDS_FOR_PARTNER_RELATION_START
         if field.startswith("extra.aangaanHuwelijkPartnerschap")
     ]
 
@@ -308,6 +424,75 @@ def _derive_under_investigation(data: dict):
             _set_dotted_field_value(data, under_investigation_field_name, True)
 
 
+def _derive_address_under_investigation(data: dict):
+    """
+    Edits the data in-place with the boolean flags for address under investigation and the start
+    and end dates of the investigation.
+
+    We only get one value which determines if the whole category is under investigation, a group
+    or an element. For example:
+
+    - 080000 -> The whole category address is under investigation
+    - 081000 -> The group verblijfplaats under category is under investigation
+    - 081010 -> The element verblijfplaats.functieAdres.code is under investigation
+
+    The result will be that the boolean flags on all elements match this logic and the start and
+    end dates will be added.
+    """
+    if source_value := _get_dotted_field_value(
+        data, "extra.inOnderzoek.aanduidingGegevensOnderzoek"
+    ):
+        category, group, element = (
+            source_value[i : i + 2] for i in range(0, len(source_value), 2)
+        )
+        fields = _get_fields_by_category(int(category), int(group), int(element))
+
+        # Remove code/omschrijving from field names
+        fields = {field.replace(".code", "").replace("omschrijving", "") for field in fields}
+
+        for field in fields:
+            if field.startswith("extra"):
+                continue
+
+            *base, leaf = field.split(".")
+            if base:
+                under_investigation_field_name = ".".join([*base, "inOnderzoek", leaf])
+            else:
+                under_investigation_field_name = f"inOnderzoek.{leaf}"
+
+            _set_dotted_field_value(data, under_investigation_field_name, True)
+
+        # If the start and end dates of the investigation are present, add them to the data
+        investigation_date = {}
+        start_date = _get_dotted_field_value(data, "extra.inOnderzoek.datumIngangOnderzoek")
+        end_date = _get_dotted_field_value(data, "extra.inOnderzoek.datumEindeOnderzoek")
+        if start_date:
+            investigation_date["datumIngangOnderzoek"] = derive_date(start_date)
+        if end_date:
+            investigation_date["datumEindeOnderzoek"] = derive_date(end_date)
+
+        if investigation_date:
+            _add_investigation_dates(data, investigation_date)
+
+
+def _add_investigation_dates(data: dict, investigation_date: dict):
+    """
+    Adds the investigation dates recursively to all inOnderzoek fields in the data
+    """
+    for _, value in data.items():
+        if isinstance(value, dict):
+            if "inOnderzoek" in value:
+                value["inOnderzoek"].update(investigation_date)
+            _add_investigation_dates(value, investigation_date)
+
+
+def _derive_address_type(data: dict):
+    if data.get("gemeenteVanInschrijving", {}).get("code") == "1999":
+        data["type"] = "VerblijfplaatsOnbekend"
+    else:
+        data["type"] = "Adres"
+
+
 def _get_category_masks(fields) -> list:
     """
     Returns all requested categories defined in the mapping formatted as integers
@@ -331,17 +516,13 @@ def _get_category_masks(fields) -> list:
                 categories.append(source_cat)
 
     # Add the additional fields for derivation of relation start
+    additional_fields = (
+        ADDITIONAL_FIELDS_FOR_ADDRESS_UNDER_INVESTIGATION
+        | ADDITIONAL_FIELDS_FOR_ADDRESS_UNDER_INVESTIGATION
+        | ADDITIONAL_FIELDS_FOR_PARTNER_RELATION_START
+    )
     categories += [
-        cat
-        for field, cat in ADDITIONAL_FIELDS_FOR_RELATION_START.items()
-        if field.replace("extra.", "") in fields
-    ]
-
-    # Add the additional fields for under investigation
-    categories += [
-        cat
-        for field, cat in ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION.items()
-        if field.replace("extra.", "") in fields
+        cat for field, cat in additional_fields.items() if field.replace("extra.", "") in fields
     ]
 
     return [int(cat.replace(".", "")) for cat in categories]
@@ -355,8 +536,9 @@ def _get_category_field_mapping() -> dict:
 
     all_fields = {
         **BRP_CATEGORY_MAPPING,
-        **ADDITIONAL_FIELDS_FOR_RELATION_START,
-        **ADDITIONAL_FIELDS_FOR_UNDER_INVESTIGATION,
+        **ADDITIONAL_FIELDS_FOR_PARTNER_RELATION_START,
+        **ADDITIONAL_FIELDS_FOR_PARTNER_UNDER_INVESTIGATION,
+        **ADDITIONAL_FIELDS_FOR_ADDRESS_UNDER_INVESTIGATION,
     }
 
     for field, number in all_fields.items():

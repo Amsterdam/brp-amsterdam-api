@@ -44,9 +44,9 @@ SCOPES_FOR_FIELDS = {
 
 
 class BrpPartnerhistorieView(BaseProxyView):
-    """View that proxies RvIG BRP API Verblijfplaatshistorie of a person (residence history).
+    """View that proxies RvIG BRP Adhoc Service Partnerhistorie of a person (partner history).
 
-    See: https://brp-api.github.io/Haal-Centraal-BRP-historie-bevragen/
+    See: https://www.rvig.nl/lo-brp
     """
 
     client_class = BrpVAdhocServiceClient
@@ -101,6 +101,9 @@ class BrpPartnerhistorieView(BaseProxyView):
         if "fields" not in hc_request:
             self._add_fields_filter(hc_request)
 
+        # Add brp_v type to be able to call the correct transform response method in the client
+        hc_request["brp_v_type"] = "partnerhistorie"
+
         # Always need to log aNummer/BSN, so make sure it's requested too.
         self.inserted_id_fields = []
         self._add_identifier_fields(hc_request)
@@ -109,6 +112,8 @@ class BrpPartnerhistorieView(BaseProxyView):
         self, hc_request: types.BaseQuery, hc_response: types.BaseResponse | list
     ) -> None:
         super().transform_response(hc_request, hc_response)  # add null values if needed
+
+        hc_request.pop("brp_v_type", None)  # remove the extra field we added for internal use
 
         # Remove the extra fields that were only inserted to have a BSN/aNummer in the logging,
         # even through the user has no access to these fields.

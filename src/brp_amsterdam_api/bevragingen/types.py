@@ -55,6 +55,14 @@ class PartnerhistorieQuery(BaseQuery):
     burgerservicenummer: str
 
 
+class AdreshistorieQuery(BaseQuery):
+    """Stub for the BRP Adreshistorie API request"""
+
+    type: Literal["RaadpleegMetBurgerservicenummer",]
+    fields: NotRequired[list[str]]
+    burgerservicenummer: str
+
+
 class BaseResponse(TypedDict):
     pass
 
@@ -90,3 +98,9 @@ class PartnerhistorieResponse(TypedDict):
     """Stub for the BRP Partnerhistorie API response"""
 
     partnerhistorie: list[dict]
+
+
+class AdreshistorieResponse(TypedDict):
+    """Stub for the BRP Adreshistorie API response"""
+
+    adreshistorie: list[dict]
