@@ -78,7 +78,8 @@ class TestBrpPartnerhistorieView:
             assert response.status_code == 502, response.data
             assert response.json() == {
                 "code": "badGateway",
-                "detail": "Unexpected error from BRP Ad Hoc Service",
+                "detail": "Unexpected error from BRP Ad Hoc Service. X25: Dubbel "
+                "rubrieknummer in masker niet toegestaan: 050210.",
                 "instance": "/bevragingen/v1/partnerhistorie",
                 "status": 502,
                 "title": "Connection failed (bad gateway)",
