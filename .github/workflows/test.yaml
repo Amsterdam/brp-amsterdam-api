@@ -25,7 +25,7 @@ jobs:
       run: docker compose up -d --build
 
     - name: Run tests
-      run: docker compose exec -T web pytest -v --ds=src.tests.settings --show-capture=no
+      run: docker compose exec -T web pytest -v --ds=tests.settings --show-capture=no
 
     - name: Stop containers
       if: always()
