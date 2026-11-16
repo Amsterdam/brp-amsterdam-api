@@ -28,6 +28,8 @@ from .base import BaseBrpClient
 logger = logging.getLogger(__name__)
 
 USER_AGENT = "BRP-Amsterdam-API/1.0"
+OAUTH_TOKEN_TIMEOUT_SECONDS = 0.5
+OAUTH_TOKEN_MAX_ATTEMPTS = 2
 
 
 class OAuthToken(TypedDict):
@@ -110,26 +112,42 @@ class RvIGBrpClient(BaseBrpClient):
         """
         # The retrieved token is also stored in self._session.token.
         host = self.oauth_endpoint_url
-        try:
-            token = self._session.fetch_token(
-                self.oauth_endpoint_url,
-                client_secret=self._client_secret,
-                include_client_id=True,  # not using "Authorization: Basic" header but POST params
-                resourceServer="ResourceServer01",
-                headers={
-                    "Accept": "application/json; charset=utf-8",
-                    "User-Agent": USER_AGENT,
-                },
-                timeout=5,
-            )
-        except (TimeoutError, Timeout) as e:
-            # Socket timeout
-            logger.error("Proxy call to %s failed, timeout from remote server: %s", host, e)
-            raise GatewayTimeout() from e
-        except OSError as e:
-            # Socket connect / SSL error.
-            logger.error("Proxy call to %s failed, error when connecting to server: %s", host, e)
-            raise ServiceUnavailable(str(e)) from e
+        token: OAuthToken | None = None
+        for attempt in range(1, OAUTH_TOKEN_MAX_ATTEMPTS + 1):
+            try:
+                token = self._session.fetch_token(
+                    self.oauth_endpoint_url,
+                    client_secret=self._client_secret,
+                    include_client_id=True,  # not using "Authorization: Basic" header but POST
+                    resourceServer="ResourceServer01",
+                    headers={
+                        "Accept": "application/json; charset=utf-8",
+                        "User-Agent": USER_AGENT,
+                    },
+                    timeout=OAUTH_TOKEN_TIMEOUT_SECONDS,
+                )
+                break
+            except (TimeoutError, Timeout) as e:
+                # Retry fetch token once before returning a gateway timeout.
+                if attempt < OAUTH_TOKEN_MAX_ATTEMPTS:
+                    logger.warning(
+                        "OAuth token fetch timed out after %.3fs on attempt %d/%d, retrying",
+                        OAUTH_TOKEN_TIMEOUT_SECONDS,
+                        attempt,
+                        OAUTH_TOKEN_MAX_ATTEMPTS,
+                    )
+                    continue
+                logger.error("Proxy call to %s failed, timeout from remote server: %s", host, e)
+                raise GatewayTimeout() from e
+            except OSError as e:
+                # Socket connect / SSL error.
+                logger.error(
+                    "Proxy call to %s failed, error when connecting to server: %s", host, e
+                )
+                raise ServiceUnavailable(str(e)) from e
+        print(f"Fetched token: {token}")
+        if token is None:
+            raise ServiceUnavailable()
         self._cache_token(token)
         return token
 
