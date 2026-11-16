@@ -130,12 +130,6 @@ class RvIGBrpClient(BaseBrpClient):
             except (TimeoutError, Timeout) as e:
                 # Retry fetch token once before returning a gateway timeout.
                 if attempt < OAUTH_TOKEN_MAX_ATTEMPTS:
-                    logger.warning(
-                        "OAuth token fetch timed out after %.3fs on attempt %d/%d, retrying",
-                        OAUTH_TOKEN_TIMEOUT_SECONDS,
-                        attempt,
-                        OAUTH_TOKEN_MAX_ATTEMPTS,
-                    )
                     continue
                 logger.error("Proxy call to %s failed, timeout from remote server: %s", host, e)
                 raise GatewayTimeout() from e
@@ -145,7 +139,6 @@ class RvIGBrpClient(BaseBrpClient):
                     "Proxy call to %s failed, error when connecting to server: %s", host, e
                 )
                 raise ServiceUnavailable(str(e)) from e
-        print(f"Fetched token: {token}")
         if token is None:
             raise ServiceUnavailable()
         self._cache_token(token)
