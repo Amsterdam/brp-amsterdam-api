@@ -124,7 +124,7 @@ class RvIGBrpClient(BaseBrpClient):
                         "Accept": "application/json; charset=utf-8",
                         "User-Agent": USER_AGENT,
                     },
-                    timeout=OAUTH_TOKEN_TIMEOUT_SECONDS,
+                    timeout=OAUTH_TOKEN_TIMEOUT_SECONDS * attempt,
                 )
                 break
             except (TimeoutError, Timeout) as e:

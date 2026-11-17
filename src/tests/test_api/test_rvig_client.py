@@ -4,6 +4,7 @@ import pytest
 from requests import Timeout
 
 from brp_amsterdam_api.bevragingen.clients.rvig import (
+    OAUTH_TOKEN_TIMEOUT_SECONDS,
     RvIGBrpClient,
 )
 from brp_amsterdam_api.bevragingen.exceptions import GatewayTimeout, ServiceUnavailable
@@ -11,6 +12,10 @@ from brp_amsterdam_api.bevragingen.exceptions import GatewayTimeout, ServiceUnav
 
 class TestRvIGBrpClient:
     def test_fetch_token_retries_once_after_500ms_timeout(self, settings):
+        """
+        Test that the fetch_token method retries once after a brief timeout (500ms). The second
+        attempt tries with a doubled timeout (1s) and succeeds, returning the token.
+        """
         settings.BACKEND_API = "rvig"
         client = RvIGBrpClient(
             endpoint_url="https://example.org/lap/api/brp/personen",
@@ -32,6 +37,14 @@ class TestRvIGBrpClient:
 
         assert result == token
         assert client._session.fetch_token.call_count == 2
+        assert (
+            client._session.fetch_token.call_args_list[0].kwargs["timeout"]
+            == OAUTH_TOKEN_TIMEOUT_SECONDS
+        )
+        assert (
+            client._session.fetch_token.call_args_list[1].kwargs["timeout"]
+            == OAUTH_TOKEN_TIMEOUT_SECONDS * 2
+        )
 
     def test_fetch_token_raises_gateway_timeout_after_retries(self, settings):
         settings.BACKEND_API = "rvig"
