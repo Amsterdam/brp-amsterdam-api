@@ -15,7 +15,7 @@ This service does this based on policy files.
 
 Requirements:
 
-* Python >= 3.13
+* Python >= 3.14
 * Recommended: Docker/Docker Compose (or pyenv for local installs)
 
 ## Using Docker Compose
@@ -29,18 +29,12 @@ Navigate to `localhost:8095`.
 
 ## Using Local Python
 
-Create a virtualenv:
+Create a virtualenv and install all packages in it:
 
 ```shell
-uv venv
-source .venv/bin/activate
+uv sync
 ```
 
-Install all packages in it:
-```shell
-cd src/
-make install  # installs src/requirements_dev.txt
-```
 
 Start the Django application:
 ```shell

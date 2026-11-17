@@ -9,13 +9,11 @@ dependencies = [
     "django-cors-headers == 4.9.0",
     "django-csp == 4.0",
     "django-healthchecks == 1.6.0",
-    # "amsterdam-schema-tools[django] == 6.0.1",
     "datapunt-authorization-django == 3.1.0",
     "djangorestframework == 3.18.3",
     "python-json-logger==4.2.0",
     "requests == 2.34.2",
     "requests-oauthlib == 2.0.0",
-    # "sentry-sdk == 2.13.0",
     "more-ds == 0.0.6",
     "orjson == 3.13.0",
     "whitenoise == 6.12.0",
@@ -41,12 +39,9 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    # Packaging
-    "pur == 7.4.0",
-
     # Linting
     "pre-commit==4.7.0",
-    "ruff==0.17.4",
+    "ruff==0.17.5",
 
     # Testing
     "pytest-sugar==1.1.1",
@@ -79,8 +74,8 @@ filterwarnings = [
 # ==== Coverage ====
 [tool.coverage.run]
 branch = true
-source = ["gisserver"]
-omit = ["*/migrations/*.py", "*/test*.py", "*/tests/*"]
+source = ["src/brp_amsterdam_api"]
+omit = ["settings.py", "wsgi.py"]
 plugins = ["django_coverage_plugin"]
 
 # ==== ruff ====

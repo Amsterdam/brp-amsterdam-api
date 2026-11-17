@@ -15,7 +15,6 @@ class TestBrpPartnerhistorieView:
         """Prove a search is possible and that the response is properly parsed and
         transformed to the expected output."""
         with open("src/tests/data/response-simple.xml") as mock_response:
-
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")
@@ -56,7 +55,6 @@ class TestBrpPartnerhistorieView:
     def test_partnerhistorie_error_response(self, api_client, requests_mock, common_headers):
         """Prove an error response is properly handled and logged."""
         with open("src/tests/data/response-error.xml") as mock_response:
-
             requests_mock.post("/gba-v/online/lo3services/adhoc", text=mock_response.read())
 
             url = reverse("brp-partnerhistorie")

@@ -29,7 +29,6 @@ class TestReadConfiguration:
 
 
 class TestCompactValues:
-
     def test_compact_fields_values(self):
         """Prove that wildcard values can be properly stripped from a list of allowed values."""
         assert compact_fields_values(

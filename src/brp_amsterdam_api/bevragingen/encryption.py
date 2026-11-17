@@ -5,7 +5,6 @@ from django.conf import settings
 
 
 class DecryptionFailed(Exception):
-
     def __init__(self, detail: str):
         super().__init__(detail)
         self.detail = detail

@@ -32,9 +32,13 @@ repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.11
     hooks:
-      - id: ruff
+      - id: ruff-check
         args:
         - --fix
         - --show-fixes
         - --config=pyproject.toml
         - --exit-non-zero-on-fix
+      - id: ruff-format
+        args:
+        - --config=pyproject.toml
+        - --exit-non-zero-on-format

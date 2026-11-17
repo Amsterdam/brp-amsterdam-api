@@ -1,9 +1,8 @@
-FROM python:3.14-slim-trixie AS builder
+FROM ghcr.io/astral-sh/uv:0.13-python3.14-trixie-slim AS builder
 MAINTAINER datapunt@amsterdam.nl
 
 WORKDIR /app
 
-COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /uvx /bin/
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \

@@ -10,7 +10,6 @@ from brp_amsterdam_api.bevragingen.clients.brp_v import (
 
 
 class TestBrpVAdhocServiceClient:
-
     def test_derive_initials(self):
         data = {"naam": {"voornamen": "Jan-Willem Hendrikus"}}
         _derive_values(data)
