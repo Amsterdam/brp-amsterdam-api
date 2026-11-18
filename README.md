@@ -15,7 +15,7 @@ This service does this based on policy files.
 
 Requirements:
 
-* Python >= 3.13
+* Python >= 3.14
 * Recommended: Docker/Docker Compose (or pyenv for local installs)
 
 ## Using Docker Compose
@@ -29,26 +29,19 @@ Navigate to `localhost:8095`.
 
 ## Using Local Python
 
-Create a virtualenv:
+Create a virtualenv and install all packages in it:
 
 ```shell
-python3 -m venv venv
-source venv/bin/activate
+uv sync
 ```
 
-Install all packages in it:
-```shell
-pip install -U wheel pip
-cd src/
-make install  # installs src/requirements_dev.txt
-```
 
 Start the Django application:
 ```shell
 export PUB_JWKS="$(cat jwks_test.json)"
 export DJANGO_DEBUG=true
 
-./manage.py runserver localhost:8000
+uv run ./src/manage.py runserver localhost:8000
 ```
 
 ## Example Requests
@@ -177,13 +170,13 @@ Run `make` in the `src` folder to have a help-overview of all common developer t
 
 ## Package Management
 
-The packages are managed with *pip-compile*.
+Packages are managed with uv and locked in uv.lock.
 
-To add a package, update the `requirements.in` file and run `make requirements`.
-This will update the "lockfile" aka `requirements.txt` that's used for pip installs.
+To add a package, run `uv add <package-name>`. To add a development dependency: `uv add --dev <package-name>`.
+This updates both pyproject.toml and the uv.lock file.
 
-To upgrade all packages, run `make upgrade`, followed by `make install` and `make test`.
-Or at once if you feel lucky: `make upgrade install test`.
+To upgrade all packages, run `uv lock --upgrade` or `make upgrade`.
+Verify that everything still works with `uv sync && uv run pytest` or `make test`.
 
 ## Environment Settings
 
@@ -191,14 +184,8 @@ Consider using *direnv* for automatic activation of environment variables.
 It automatically sources an ``.envrc`` file when you enter the directory.
 This file should contain all lines in the `export VAR=value` format.
 
-In a similar way, *pyenv* helps to install the exact Python version,
-and will automatically activate the virtualenv when a `.python-version` file is found:
-
-```shell
-pyenv install 3.13
-pyenv virtualenv 3.13 brp-amsterdam-api
-echo brp-amsterdam-api > .python-version
-```
+In a similar way, *uv* helps to install the exact Python version,
+and will automatically activate a virtualenv and use it when you run commands using `uv run`.
 
 ## Testing Connectivity
 

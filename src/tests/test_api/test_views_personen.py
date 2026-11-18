@@ -757,9 +757,9 @@ class TestBrpPersonenView:
         assert personen == expect
 
         if hide:
-            assert any(
-                m.startswith("Removed 1 persons from response") for m in caplog.messages
-            ), caplog.messages
+            assert any(m.startswith("Removed 1 persons from response") for m in caplog.messages), (
+                caplog.messages
+            )
 
     @pytest.mark.parametrize("can_see_bsn", [True, False])
     def test_log_retrieved_bsns(

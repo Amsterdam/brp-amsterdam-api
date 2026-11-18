@@ -14,7 +14,6 @@ class AuditLogResponseError(Exception):
 
 
 class BRPAuditLogHandler(logging.Handler):
-
     def __init__(self):
         super().__init__()
         self.endpoint = settings.AZURE_DATA_COLLECTION_ENDPOINT

@@ -133,7 +133,7 @@ def _find_consecutive_run(values):
     """
     if not values:
         return 0
-    ascii_changes = [abs(c1 - c2) for c1, c2 in zip(values[:-1], values[1:])]
+    ascii_changes = [abs(c1 - c2) for c1, c2 in zip(values[:-1], values[1:], strict=False)]
 
     current = 1
     longest = 1

@@ -33,7 +33,6 @@ SCOPE_ENCRYPT_BSN = "benk-brp-encrypt-bsn"
 
 
 class ClientMixin(APIView):
-
     #: Define which additional scopes are needed
     client_class = RvIGBrpClient
 
@@ -428,7 +427,7 @@ class BaseProxyView(ClientMixin, APIView):
                         continue
                     item[key] = process_function(value, salt=correlation_id)
 
-                if isinstance(value, (dict, list)):
+                if isinstance(value, (dict | list)):
                     self._process_bsn(value, process_function)
 
     def transform_request(self, hc_request: types.BaseQuery) -> None:
@@ -466,7 +465,7 @@ class BaseProxyView(ClientMixin, APIView):
             if in_links and isinstance(href := data.get("href"), str):
                 for find, replace in rewrites:
                     if href.startswith(find):
-                        data["href"] = f"{replace}{href[len(find):]}"
+                        data["href"] = f"{replace}{href[len(find) :]}"
                         break
 
             if links := data.get("_links"):

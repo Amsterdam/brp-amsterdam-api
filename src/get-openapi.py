@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from openapi_parser import parse  # pip install openapi3-parser
+from openapi_parser import parse
 from openapi_parser.enumeration import DataType
 
 DEFAULT_FILE = "https://raw.githubusercontent.com/BRP-API/Haal-Centraal-BRP-bevragen/master/specificatie/resolved/openapi.yaml"
