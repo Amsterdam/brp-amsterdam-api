@@ -17,7 +17,7 @@ ENV CC=/usr/bin/gcc \
 RUN uv sync --frozen --no-install-project --all-groups
 
 # Start runtime image,
-FROM python:3.14-slim-trixie
+FROM python:3.15-slim-trixie
 RUN useradd -U -r brpamsterdamapi
 RUN apt-get update && apt-get install --no-install-recommends -y \
     curl \
