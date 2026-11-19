@@ -147,7 +147,7 @@ class RvIGBrpClient(BaseBrpClient):
     def _cache_token(self, token: OAuthToken):
         """Save the retrieved token."""
         # make sure the cache is expired when refreshes are needed.
-        timeout = token["expires_in"] - 900
+        timeout = token["expires_in"] - 120  # Token expires in 10 minutes
         logger.debug("Caching OAuth access token for %d seconds", timeout)
         cache.set("rvig-token", token, timeout=timeout)
 
